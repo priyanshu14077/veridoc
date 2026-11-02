@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 11485,
+ "tokens_in": 1061,
+ "tokens_out": 604,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "ZS-2026-1219",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    171,
+    71,
+    184,
+    180
+   ]
+  },
+  "total_packages": {
+   "value": "150",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    287,
+    114,
+    301,
+    142
+   ]
+  },
+  "package_type": {
+   "value": "CARTONS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    287,
+    151,
+    301,
+    222
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "2,700.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    308,
+    188,
+    321,
+    281
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "3,060.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    325,
+    202,
+    338,
+    295
+   ]
+  },
+  "container_numbers": {
+   "value": "PRLU 118342-4",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    366,
+    60,
+    380,
+    189
+   ]
+  },
+  "marks": {
+   "value": "CO-E / NSA / C/NO. 1-150",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    397,
+    196,
+    412,
+    378
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "LED high bay light 150W",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      230,
+      77,
+      244,
+      235
+     ]
+    },
+    "quantity": {
+     "value": "600",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      451,
+      246,
+      480
+     ]
+    },
+    "packages": {
+     "value": "150",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      538,
+      246,
+      564
+     ]
+    },
+    "net_weight_kg": {
+     "value": "2,700.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      624,
+      248,
+      683
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "3,060.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      238,
+      747,
+      250,
+      809
+     ]
+    }
+   }
+  ]
+ }
+}

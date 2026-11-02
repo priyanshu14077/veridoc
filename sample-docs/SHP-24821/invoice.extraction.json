@@ -1,0 +1,230 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 12962,
+ "tokens_in": 1141,
+ "tokens_out": 879,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company C Valves AB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    200,
+    56,
+    215,
+    230
+   ]
+  },
+  "supplier_country": {
+   "value": "SWEDEN",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    230,
+    56,
+    241,
+    126
+   ]
+  },
+  "buyer_name": {
+   "value": "Company F Flow Controls Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    201,
+    517,
+    214,
+    749
+   ]
+  },
+  "invoice_number": {
+   "value": "CV-41003",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    55,
+    166,
+    133
+   ]
+  },
+  "invoice_date": {
+   "value": "2026-10-24",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    281,
+    166,
+    367
+   ]
+  },
+  "currency": {
+   "value": "EUR",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    720,
+    167,
+    757
+   ]
+  },
+  "incoterm": {
+   "value": "CIF",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    518,
+    167,
+    548
+   ]
+  },
+  "incoterm_place": {
+   "value": "Nhava Sheva",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    553,
+    167,
+    638
+   ]
+  },
+  "country_of_origin": {
+   "value": "Sweden",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    279,
+    178,
+    288,
+    226
+   ]
+  },
+  "invoice_total": {
+   "value": "5 778,00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    358,
+    861,
+    370,
+    936
+   ]
+  },
+  "total_packages": {
+   "value": "3 PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    392,
+    162,
+    403,
+    241
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "810,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    409,
+    137,
+    420,
+    213
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "866,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    426,
+    149,
+    437,
+    226
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Check valve DN80 swing type",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      329,
+      108,
+      343,
+      308
+     ]
+    },
+    "hsn": {
+     "value": "84813000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      456,
+      341,
+      526
+     ]
+    },
+    "quantity": {
+     "value": "90",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      636,
+      341,
+      655
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      672,
+      341,
+      700
+     ]
+    },
+    "unit_price": {
+     "value": "64,20",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      783,
+      342,
+      822
+     ]
+    },
+    "amount": {
+     "value": "5 778,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      878,
+      342,
+      937
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,149 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 14900,
+ "tokens_in": 1068,
+ "tokens_out": 910,
+ "response": {
+  "detected_doc_type": "bill_of_lading",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "bl_number": {
+   "value": "HAMNSA6631266",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    83,
+    797,
+    96,
+    942
+   ]
+  },
+  "shipper_name": {
+   "value": "Company H Antriebstechnik GmbH",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    135,
+    63,
+    148,
+    332
+   ]
+  },
+  "consignee_name": {
+   "value": "Company G Packaging Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    223,
+    64,
+    237,
+    301
+   ]
+  },
+  "vessel": {
+   "value": "RHINE TIGRIS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    126,
+    508,
+    137,
+    621
+   ]
+  },
+  "voyage": {
+   "value": "0FM3TW1MA",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    127,
+    720,
+    137,
+    822
+   ]
+  },
+  "port_of_loading": {
+   "value": "Hamburg, Germany",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    168,
+    509,
+    182,
+    665
+   ]
+  },
+  "port_of_discharge": {
+   "value": "Nhava Sheva, India",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    209,
+    509,
+    222,
+    664
+   ]
+  },
+  "container_numbers": {
+   "value": "RHNU5412662",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    429,
+    63,
+    440,
+    163
+   ]
+  },
+  "seal_numbers": {
+   "value": "DE7713491",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    429,
+    175,
+    440,
+    248
+   ]
+  },
+  "total_packages": {
+   "value": "2 PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    472,
+    98,
+    482,
+    171
+   ]
+  },
+  "package_type": {
+   "value": "PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    472,
+    114,
+    482,
+    171
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "298,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    429,
+    856,
+    440,
+    938
+   ]
+  }
+ }
+}

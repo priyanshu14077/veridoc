@@ -1,0 +1,230 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 21213,
+ "tokens_in": 1141,
+ "tokens_out": 1406,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company B Lighting Technology Co., Ltd.",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    239,
+    64,
+    255,
+    386
+   ]
+  },
+  "supplier_country": {
+   "value": "CHINA",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    281,
+    65,
+    292,
+    107
+   ]
+  },
+  "buyer_name": {
+   "value": "Company G Packaging Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    225,
+    519,
+    237,
+    755
+   ]
+  },
+  "invoice_number": {
+   "value": "ZS-2026-1231",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    179,
+    56,
+    189,
+    164
+   ]
+  },
+  "invoice_date": {
+   "value": "Oct. 25, 2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    179,
+    278,
+    191,
+    382
+   ]
+  },
+  "currency": {
+   "value": "USD",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    179,
+    720,
+    189,
+    756
+   ]
+  },
+  "incoterm": {
+   "value": "FOB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    179,
+    487,
+    189,
+    521
+   ]
+  },
+  "incoterm_place": {
+   "value": "Shenzhen",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    178,
+    526,
+    190,
+    608
+   ]
+  },
+  "country_of_origin": {
+   "value": "China",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    303,
+    178,
+    314,
+    212
+   ]
+  },
+  "invoice_total": {
+   "value": "4,500.00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    383,
+    869,
+    394,
+    936
+   ]
+  },
+  "total_packages": {
+   "value": "100 CARTONS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    417,
+    172,
+    428,
+    273
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "2,150.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    434,
+    143,
+    446,
+    240
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "2,290.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    452,
+    156,
+    464,
+    251
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Printed folding carton for LED lamps",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      357,
+      104,
+      369,
+      347
+     ]
+    },
+    "hsn": {
+     "value": "48191090",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      357,
+      442,
+      368,
+      523
+     ]
+    },
+    "quantity": {
+     "value": "50,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      357,
+      608,
+      369,
+      655
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      357,
+      668,
+      368,
+      700
+     ]
+    },
+    "unit_price": {
+     "value": "0.09",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      357,
+      792,
+      368,
+      824
+     ]
+    },
+    "amount": {
+     "value": "4,500.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      357,
+      880,
+      368,
+      936
+     ]
+    }
+   }
+  ]
+ }
+}

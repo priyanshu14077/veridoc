@@ -1,0 +1,149 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 11979,
+ "tokens_in": 1068,
+ "tokens_out": 906,
+ "response": {
+  "detected_doc_type": "bill_of_lading",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "bl_number": {
+   "value": "GOT0294502",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    84,
+    826,
+    97,
+    942
+   ]
+  },
+  "shipper_name": {
+   "value": "Company C Valves AB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    134,
+    65,
+    148,
+    235
+   ]
+  },
+  "consignee_name": {
+   "value": "Company F Flow Controls Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    225,
+    65,
+    238,
+    296
+   ]
+  },
+  "vessel": {
+   "value": "NORDIC ANNA",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    128,
+    509,
+    140,
+    626
+   ]
+  },
+  "voyage": {
+   "value": "FA644W",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    128,
+    715,
+    139,
+    782
+   ]
+  },
+  "port_of_loading": {
+   "value": "Gothenburg, Sweden",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    168,
+    509,
+    181,
+    678
+   ]
+  },
+  "port_of_discharge": {
+   "value": "Nhava Sheva, India",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    206,
+    509,
+    219,
+    664
+   ]
+  },
+  "container_numbers": {
+   "value": "NRDU2050334",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    66,
+    442,
+    168
+   ]
+  },
+  "seal_numbers": {
+   "value": "SE0091877",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    185,
+    442,
+    252
+   ]
+  },
+  "total_packages": {
+   "value": "4",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    336,
+    440,
+    345
+   ]
+  },
+  "package_type": {
+   "value": "PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    349,
+    440,
+    412
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "958,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    856,
+    441,
+    936
+   ]
+  }
+ }
+}

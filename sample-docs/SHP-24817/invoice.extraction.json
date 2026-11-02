@@ -1,0 +1,230 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 16356,
+ "tokens_in": 1141,
+ "tokens_out": 1408,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company B Lighting Technology Co., Ltd.",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    63,
+    76,
+    77,
+    526
+   ]
+  },
+  "supplier_country": {
+   "value": "CHINA",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    272,
+    73,
+    283,
+    116
+   ]
+  },
+  "buyer_name": {
+   "value": "Company E Lighting Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    227,
+    529,
+    240,
+    748
+   ]
+  },
+  "invoice_number": {
+   "value": "ZS-2026-1219",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    171,
+    71,
+    182,
+    172
+   ]
+  },
+  "invoice_date": {
+   "value": "Oct. 20, 2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    176,
+    292,
+    188,
+    396
+   ]
+  },
+  "currency": {
+   "value": "USD",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    182,
+    739,
+    194,
+    778
+   ]
+  },
+  "incoterm": {
+   "value": "CFR",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    180,
+    517,
+    190,
+    551
+   ]
+  },
+  "incoterm_place": {
+   "value": "Nhava Sheva",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    180,
+    558,
+    190,
+    671
+   ]
+  },
+  "country_of_origin": {
+   "value": "China",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    296,
+    180,
+    307,
+    219
+   ]
+  },
+  "invoice_total": {
+   "value": "14,940.00",
+   "confidence": 0.95,
+   "page": 1,
+   "box_2d": [
+    387,
+    856,
+    401,
+    938
+   ]
+  },
+  "total_packages": {
+   "value": "150 CARTONS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    408,
+    173,
+    419,
+    276
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "2,700.00 KGS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    426,
+    144,
+    436,
+    252
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "3,060.00 KGS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    443,
+    156,
+    455,
+    253
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "LED high bay light 150W",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      351,
+      117,
+      362,
+      277
+     ]
+    },
+    "hsn": {
+     "value": "94054290",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      356,
+      464,
+      367,
+      532
+     ]
+    },
+    "quantity": {
+     "value": "600",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      631,
+      368,
+      659
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      359,
+      674,
+      370,
+      705
+     ]
+    },
+    "unit_price": {
+     "value": "24.90",
+     "confidence": 0.9,
+     "page": 1,
+     "box_2d": [
+      362,
+      792,
+      373,
+      831
+     ]
+    },
+    "amount": {
+     "value": "14,940.00",
+     "confidence": 0.95,
+     "page": 1,
+     "box_2d": [
+      364,
+      878,
+      375,
+      941
+     ]
+    }
+   }
+  ]
+ }
+}

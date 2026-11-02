@@ -1,0 +1,210 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 17662,
+ "tokens_in": 1061,
+ "tokens_out": 1271,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "CV-40977",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    153,
+    56,
+    168,
+    128
+   ]
+  },
+  "total_packages": {
+   "value": "4",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    293,
+    111,
+    305,
+    121
+   ]
+  },
+  "package_type": {
+   "value": "PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    293,
+    125,
+    305,
+    190
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "894,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    314,
+    189,
+    326,
+    260
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "958,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    331,
+    196,
+    343,
+    276
+   ]
+  },
+  "container_numbers": {
+   "value": "NRDU 205033-4",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    373,
+    56,
+    385,
+    170
+   ]
+  },
+  "marks": {
+   "value": "CO-F / NSA / P1-4",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    404,
+    194,
+    416,
+    321
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Butterfly valve DN100 wafer type",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      62,
+      227,
+      277
+     ]
+    },
+    "quantity": {
+     "value": "60",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      450,
+      225,
+      467
+     ]
+    },
+    "packages": {
+     "value": "3",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      539,
+      225,
+      548
+     ]
+    },
+    "net_weight_kg": {
+     "value": "744,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      622,
+      225,
+      668
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "790,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      757,
+      225,
+      803
+     ]
+    }
+   },
+   {
+    "description": {
+     "value": "Gear operator for DN100 valve",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      237,
+      62,
+      250,
+      264
+     ]
+    },
+    "quantity": {
+     "value": "60",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      237,
+      450,
+      247,
+      467
+     ]
+    },
+    "packages": {
+     "value": "1",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      237,
+      539,
+      247,
+      546
+     ]
+    },
+    "net_weight_kg": {
+     "value": "150,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      237,
+      623,
+      247,
+      667
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "168,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      237,
+      758,
+      247,
+      803
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.5-flash-lite",
+ "prompt_version": "v1",
+ "latency_ms": 5131,
+ "tokens_in": 1061,
+ "tokens_out": 974,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "ZS-2026-1231",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    172,
+    54,
+    182,
+    165
+   ]
+  },
+  "total_packages": {
+   "value": "100",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    307,
+    107,
+    319,
+    151
+   ]
+  },
+  "package_type": {
+   "value": "CARTONS",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    308,
+    158,
+    319,
+    237
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "2,150.00",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    328,
+    167,
+    340,
+    233
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "2,290.00",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    349,
+    166,
+    360,
+    234
+   ]
+  },
+  "container_numbers": {
+   "value": "PRLU 118409-8",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    392,
+    56,
+    404,
+    184
+   ]
+  },
+  "marks": {
+   "value": "as per marks",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    249,
+    816,
+    261,
+    897
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Printed folding carton for LED lamps",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      249,
+      63,
+      261,
+      294
+     ]
+    },
+    "quantity": {
+     "value": "50,000",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      249,
+      422,
+      261,
+      472
+     ]
+    },
+    "packages": {
+     "value": "100",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      249,
+      525,
+      260,
+      549
+     ]
+    },
+    "net_weight_kg": {
+     "value": "2,150.00",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      249,
+      613,
+      260,
+      669
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "2,290.00",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      249,
+      742,
+      260,
+      798
+     ]
+    }
+   }
+  ]
+ }
+}
