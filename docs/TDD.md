@@ -183,13 +183,15 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
 | POST | `/api/shipments/{id}/documents` | scoped | multipart, returns 202 |
 | GET | `/api/documents/{id}/file` | scoped | Streamed by the API after an auth check. No public URLs |
 | POST | `/api/documents/{id}/retry` · `/manual` | scoped | |
-| PATCH | `/api/fields/{id}` | scoped | `{value, version}` or `{action:"confirm", version}` |
+| GET | `/api/documents/{id}` | scoped | Fields with flags, plus `read_only_reason` (exported, replaced, still being read) |
+| PATCH | `/api/fields/{id}` | scoped | `{value, version}` or `{action:"confirm", version}`. 409 with the winning value on a version mismatch. 422 if the value doesn't parse as the field's type **[A19]** |
+| POST · DELETE | `/api/documents/{id}/lines` · `/lines/{line_index}` | scoped | Add an empty line item / remove one. The last line can't be removed **[A20]** |
 | POST | `/api/checks/{id}/accept` | scoped | `{reason}` of at least 10 characters |
 | POST | `/api/shipments/{id}/export` | scoped | 409 with blockers |
 | GET | `/api/shipments/{id}/exports` | scoped | |
 | POST | `/api/shipments/{id}/reopen` | manager | |
 | GET | `/api/importers/{id}/contact` | scoped | Unmasked. Logs a reveal |
-| GET | `/api/fields/{id}/history` | scoped | P1 |
+| GET | `/api/fields/{id}/history` | scoped | From `audit_log`, newest first, with names |
 | GET | `/api/reports/accuracy?group=field\|supplier` · `/overrides` | manager | P1 |
 
 "Scoped" means one dependency, `require_shipment_access(user, shipment)`, used on every route that loads a shipment or one of its children. A test checks every route against both roles.
@@ -308,3 +310,7 @@ crosscheck/
 | A15 | Dates are read day-first unless the supplier is in the US |
 | A16 | ≥ 70% of required fields null means the page is effectively unreadable |
 | A17 | The audit log is protected at the database-role level in production. Locally, one role is used |
+| A18 | Managers can correct fields too. Their edits are audited like anyone's. *Alternative: managers are read-only until they reopen* |
+| A19 | A person's value must parse as the field's type (a number, a date) so cross-checks and export can use it. Other format warnings (an HSN that isn't 8 digits, a container check digit) are shown but don't block the save, since the document may really say that |
+| A20 | Every invoice and packing list keeps at least one line item. A document with no lines can't be exported |
+| A21 | After a person confirms or edits a field, its AI confidence no longer decides whether it's flagged. Only an empty required value is |
