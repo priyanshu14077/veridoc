@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 11174,
+ "tokens_in": 1061,
+ "tokens_out": 598,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "JP/EX/26/0488",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    157,
+    57,
+    168,
+    172
+   ]
+  },
+  "total_packages": {
+   "value": "100",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    280,
+    115,
+    290,
+    140
+   ]
+  },
+  "package_type": {
+   "value": "CARTONS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    280,
+    146,
+    290,
+    215
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "1,600.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    301,
+    168,
+    311,
+    274
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "1,720.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    319,
+    182,
+    330,
+    288
+   ]
+  },
+  "container_numbers": {
+   "value": "MKSU 771377-2",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    361,
+    57,
+    372,
+    183
+   ]
+  },
+  "marks": {
+   "value": "CO-E / NSA",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    389,
+    193,
+    399,
+    287
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Moulded pulp packaging insert for\nluminaires",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      61,
+      237,
+      281
+     ]
+    },
+    "quantity": {
+     "value": "20,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      421,
+      225,
+      467
+     ]
+    },
+    "packages": {
+     "value": "100",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      524,
+      224,
+      549
+     ]
+    },
+    "net_weight_kg": {
+     "value": "1,600.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      613,
+      225,
+      668
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "1,720.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      742,
+      225,
+      798
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.5-flash-lite",
+ "prompt_version": "v1",
+ "latency_ms": 3858,
+ "tokens_in": 1061,
+ "tokens_out": 974,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "RE-2026-08840",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    172,
+    55,
+    183,
+    176
+   ]
+  },
+  "total_packages": {
+   "value": "2",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    261,
+    112,
+    272,
+    189
+   ]
+  },
+  "package_type": {
+   "value": "PALLETS",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    261,
+    117,
+    272,
+    187
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "312,00",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    303,
+    113,
+    315,
+    177
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "298,00",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    325,
+    114,
+    338,
+    177
+   ]
+  },
+  "container_numbers": {
+   "value": "RHNU 541266-2",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    361,
+    55,
+    372,
+    161
+   ]
+  },
+  "marks": {
+   "value": "CO-G / BHIWANDI / 1-2",
+   "confidence": 1.0,
+   "page": 1,
+   "box_2d": [
+    404,
+    193,
+    416,
+    357
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Servo motor 1.5 kW with brake",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      218,
+      64,
+      229,
+      252
+     ]
+    },
+    "quantity": {
+     "value": "24",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      217,
+      452,
+      228,
+      467
+     ]
+    },
+    "packages": {
+     "value": "2",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      218,
+      539,
+      229,
+      547
+     ]
+    },
+    "net_weight_kg": {
+     "value": "312,00",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      217,
+      625,
+      228,
+      668
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "298,00",
+     "confidence": 1.0,
+     "page": 1,
+     "box_2d": [
+      217,
+      753,
+      228,
+      795
+     ]
+    }
+   }
+  ]
+ }
+}

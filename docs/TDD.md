@@ -161,13 +161,15 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
   - **review load**: flagged fields per shipment. This drives the client's 15-minute target.
 - **Choosing the threshold:** the lowest threshold that keeps the unflagged error rate ≤ 1%. The trade-off table goes here.
 - **First results (2026-11-02, 18 documents / 291 fields, `gemini-3.5-flash`):** 291/291 fields correct after normalisation. The first run scored 287/291, and all 4 misses were *our* normaliser bugs (country casing, "360 BUNDLES" as a number), not model errors; both were fixed with tests.
+- **Full set (2026-11-02, 34 readable documents / 536 fields; 31 by `gemini-3.5-flash`, 2 by `gemini-3.5-flash-lite` and 1 by `gemini-3.8-flash` after fallbacks):** 535/536 correct (99.8%). The unreadable B/L (SHP-24820) went to manual entry as designed. Unflagged error rate 0.19%, inside the 1% aim, at every threshold from 0.50 to 0.98, so 0.85 stays.
+- **Finding: the one miss was confidently wrong.** On SHP-24822's packing list the model returned "as per marks" (the text in the Dimensions column) as the *shipping marks*, at confidence 1.0; the real marks ("CO-G / BHIWANDI") are printed lower on the page. No threshold flags this. Shipping marks aren't cross-checked against another document, so today only the reviewer can catch it. Next steps: a prompt hint that marks are never a table cell, and a cross-check against the B/L's marks field if one is added.
 - **Finding: self-reported confidence doesn't catch the hard case.** On SHP-24817 a rubber stamp covers the invoice total. The model read it correctly but reported 0.95 confidence, the same as clean text. A threshold can't separate "covered by a stamp" from "clean" if the model doesn't. This is the strongest argument for the deterministic cross-checks: they catch a wrong value regardless of how confident the model is.
 - Limitation stated up front: synthetic documents are cleaner than real scans, so these numbers are an upper bound. The real 200-shipment check is the first step after go-live.
 
 ### 5.7 Provider, privacy and cost
 - **Demo:** free-tier Gemini API key, **synthetic data only** [A11]. The free tier's terms allow Google to use submitted content to improve its products, so the free tier must never see real client documents.
 - **Production design:** the same SDK pointed at **Vertex AI** (`GOOGLE_GENAI_USE_VERTEXAI=true`) in an Indian region. Vertex AI's terms say customer data is not used for training. *Check available models in `asia-south1` before final submission.*
-- **Measured tokens:** about 1,060–1,140 input and 600–1,850 output tokens per one-page document; latency 7.5–16 s (median about 11 s). Cost at the client's volume = 3,300 documents/month × these tokens × the paid price for the chosen model *(fill in from the current price list)*.
+- **Measured tokens:** about 1,060–1,140 input tokens per one-page document, output 350–1,990; latency 4–24 s (median about 13 s) across 35 calls. Cost at the client's volume = 3,300 documents/month × these tokens × the paid price for the chosen model *(fill in from the current price list)*.
 - **Free tier is capped at 20 requests per model per day** (Google's `GenerateRequestsPerDayPerProjectPerModel-FreeTier`; the `gemini-3.5-flash` alias counts against `gemini-3.6-flash`). That's about 6 shipments a day per model. The worker falls back across models (each has its own quota) and then waits for the reset (§5.5). The worker also paces calls with `GEMINI_RPM`. Seed shipments replay recorded real extractions, so the demo doesn't spend quota. Production needs a paid tier, which also removes the training-on-data concern.
 
 ## 6. API surface
@@ -181,13 +183,15 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
 | POST | `/api/shipments/{id}/documents` | scoped | multipart, returns 202 |
 | GET | `/api/documents/{id}/file` | scoped | Streamed by the API after an auth check. No public URLs |
 | POST | `/api/documents/{id}/retry` · `/manual` | scoped | |
-| PATCH | `/api/fields/{id}` | scoped | `{value, version}` or `{action:"confirm", version}` |
+| GET | `/api/documents/{id}` | scoped | Fields with flags, plus `read_only_reason` (exported, replaced, still being read) |
+| PATCH | `/api/fields/{id}` | scoped | `{value, version}` or `{action:"confirm", version}`. 409 with the winning value on a version mismatch. 422 if the value doesn't parse as the field's type **[A19]** |
+| POST · DELETE | `/api/documents/{id}/lines` · `/lines/{line_index}` | scoped | Add an empty line item / remove one. The last line can't be removed **[A20]** |
 | POST | `/api/checks/{id}/accept` | scoped | `{reason}` of at least 10 characters |
 | POST | `/api/shipments/{id}/export` | scoped | 409 with blockers |
 | GET | `/api/shipments/{id}/exports` | scoped | |
 | POST | `/api/shipments/{id}/reopen` | manager | |
 | GET | `/api/importers/{id}/contact` | scoped | Unmasked. Logs a reveal |
-| GET | `/api/fields/{id}/history` | scoped | P1 |
+| GET | `/api/fields/{id}/history` | scoped | From `audit_log`, newest first, with names |
 | GET | `/api/reports/accuracy?group=field\|supplier` · `/overrides` | manager | P1 |
 
 "Scoped" means one dependency, `require_shipment_access(user, shipment)`, used on every route that loads a shipment or one of its children. A test checks every route against both roles.
@@ -306,3 +310,7 @@ crosscheck/
 | A15 | Dates are read day-first unless the supplier is in the US |
 | A16 | ≥ 70% of required fields null means the page is effectively unreadable |
 | A17 | The audit log is protected at the database-role level in production. Locally, one role is used |
+| A18 | Managers can correct fields too. Their edits are audited like anyone's. *Alternative: managers are read-only until they reopen* |
+| A19 | A person's value must parse as the field's type (a number, a date) so cross-checks and export can use it. Other format warnings (an HSN that isn't 8 digits, a container check digit) are shown but don't block the save, since the document may really say that |
+| A20 | Every invoice and packing list keeps at least one line item. A document with no lines can't be exported |
+| A21 | After a person confirms or edits a field, its AI confidence no longer decides whether it's flagged. Only an empty required value is |

@@ -102,6 +102,24 @@ export interface FieldValue {
 
 export interface DocumentDetail extends DocumentSummary {
   fields: FieldValue[];
+  shipment_id: number;
+  read_only_reason: string | null;
+}
+
+/** Response of every field write: what changed plus the numbers shown around it. */
+export interface ReviewResult {
+  fields: FieldValue[];
+  document_flag_count: number;
+  shipment_status: ShipmentStatus;
+  shipment_open_flags: number;
+}
+
+export interface HistoryEntry {
+  at: string;
+  actor: string | null;
+  action: string;
+  before: { value: string | null; status: string } | null;
+  after: { value: string | null; status: string } | null;
 }
 
 export interface Importer {

@@ -1,0 +1,230 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 21222,
+ "tokens_in": 1141,
+ "tokens_out": 1409,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company J Packaging Joint Stock Company",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    201,
+    62,
+    215,
+    406
+   ]
+  },
+  "supplier_country": {
+   "value": "VIETNAM",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    241,
+    63,
+    250,
+    126
+   ]
+  },
+  "buyer_name": {
+   "value": "Company E Lighting Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    201,
+    517,
+    214,
+    735
+   ]
+  },
+  "invoice_number": {
+   "value": "JP/EX/26/0488",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    154,
+    57,
+    168,
+    172
+   ]
+  },
+  "invoice_date": {
+   "value": "23/10/2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    154,
+    281,
+    168,
+    363
+   ]
+  },
+  "currency": {
+   "value": "USD",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    154,
+    719,
+    168,
+    755
+   ]
+  },
+  "incoterm": {
+   "value": "FOB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    154,
+    508,
+    168,
+    540
+   ]
+  },
+  "incoterm_place": {
+   "value": "Cat Lai",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    154,
+    545,
+    168,
+    603
+   ]
+  },
+  "country_of_origin": {
+   "value": "Vietnam",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    280,
+    150,
+    289,
+    206
+   ]
+  },
+  "invoice_total": {
+   "value": "3,600.00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    367,
+    856,
+    379,
+    935
+   ]
+  },
+  "total_packages": {
+   "value": "100 CARTONS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    402,
+    172,
+    414,
+    273
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "1,600.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    422,
+    142,
+    434,
+    240
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "1,720.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    437,
+    153,
+    449,
+    252
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Moulded pulp packaging insert for luminaires",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      108,
+      357,
+      331
+     ]
+    },
+    "hsn": {
+     "value": "48236900",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      458,
+      340,
+      524
+     ]
+    },
+    "quantity": {
+     "value": "20,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      609,
+      341,
+      655
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      671,
+      340,
+      702
+     ]
+    },
+    "unit_price": {
+     "value": "0.18",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      789,
+      340,
+      818
+     ]
+    },
+    "amount": {
+     "value": "3,600.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      881,
+      340,
+      936
+     ]
+    }
+   }
+  ]
+ }
+}

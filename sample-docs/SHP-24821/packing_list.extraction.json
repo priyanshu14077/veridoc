@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.8-flash",
+ "prompt_version": "v1",
+ "latency_ms": 18317,
+ "tokens_in": 1061,
+ "tokens_out": 919,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "CV-41003",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    56,
+    166,
+    132
+   ]
+  },
+  "total_packages": {
+   "value": "3",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    272,
+    104,
+    281,
+    113
+   ]
+  },
+  "package_type": {
+   "value": "PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    272,
+    117,
+    281,
+    189
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "810,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    291,
+    177,
+    301,
+    260
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "866,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    308,
+    191,
+    319,
+    277
+   ]
+  },
+  "container_numbers": {
+   "value": "NRDU 205101-1",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    351,
+    56,
+    361,
+    175
+   ]
+  },
+  "marks": {
+   "value": "CO-F / NSA / P1-3",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    382,
+    193,
+    392,
+    321
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Check valve DN80 swing type",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      63,
+      225,
+      258
+     ]
+    },
+    "quantity": {
+     "value": "90",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      451,
+      224,
+      469
+     ]
+    },
+    "packages": {
+     "value": "3",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      539,
+      224,
+      549
+     ]
+    },
+    "net_weight_kg": {
+     "value": "810,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      624,
+      225,
+      670
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "866,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      753,
+      225,
+      799
+     ]
+    }
+   }
+  ]
+ }
+}

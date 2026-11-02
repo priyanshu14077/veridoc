@@ -12,6 +12,8 @@ function detailMessage(body: unknown, fallback: string): string {
   if (body && typeof body === "object" && "detail" in body) {
     const d = (body as { detail: unknown }).detail;
     if (typeof d === "string") return d;
+    if (d && typeof d === "object" && "message" in d)
+      return String((d as { message: unknown }).message);
     if (Array.isArray(d)) return "Some of the values aren't valid. Check the form and try again.";
   }
   return fallback;

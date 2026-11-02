@@ -1,0 +1,89 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 9490,
+ "tokens_in": 1068,
+ "tokens_out": 350,
+ "response": {
+  "detected_doc_type": "bill_of_lading",
+  "pages": [
+   {
+    "page": 1,
+    "readable": false,
+    "reason": "Image is extremely blurry and low resolution, rendering text unreadable."
+   }
+  ],
+  "bl_number": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "shipper_name": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "consignee_name": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "vessel": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "voyage": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "port_of_loading": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "port_of_discharge": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "container_numbers": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "seal_numbers": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "total_packages": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "package_type": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  },
+  "total_gross_weight_kg": {
+   "value": null,
+   "confidence": 0.0,
+   "page": null,
+   "box_2d": null
+  }
+ }
+}

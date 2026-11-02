@@ -186,7 +186,19 @@ function FlagSummary({ shipment }: { shipment: ShipmentDetail }) {
       </p>
       <ul className="mt-2 space-y-1 text-ink-2">
         {reviewable.slice(0, 5).map((f, i) => (
-          <li key={i}>· {f.message}</li>
+          <li key={i}>
+            ·{" "}
+            {f.document_id && f.field_id ? (
+              <Link
+                href={`/shipments/${shipment.id}/documents/${f.document_id}?field=${f.field_id}`}
+                className="underline decoration-line-strong underline-offset-2 hover:decoration-ink"
+              >
+                {f.message}
+              </Link>
+            ) : (
+              f.message
+            )}
+          </li>
         ))}
         {reviewable.length > 5 && <li className="text-muted">and {reviewable.length - 5} more</li>}
       </ul>

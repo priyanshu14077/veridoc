@@ -26,8 +26,9 @@ A documentation executive drops in a shipment's **invoice, packing list and bill
 | Document upload, Postgres job queue, Gemini extraction with fallback models | ✅ Done |
 | Confidence scoring, format validators, unreadable → manual entry | ✅ Done |
 | Synthetic sample documents + recorded extractions + eval script | ✅ Done |
-| Review screen, cross-check engine, export gate, CSV export | 🔜 Planned |
-| Edit history, accuracy report | 🔜 Planned |
+| Review screen: pdf.js viewer with field highlight, confirm / edit with optimistic locking, J/K keys, line items, edit history | ✅ Done |
+| Cross-check engine, export gate, CSV export | 🔜 Planned |
+| Accuracy report, manager override review | 🔜 Planned |
 
 ---
 
@@ -341,6 +342,7 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │  │  ├─ auth/             passwords, sessions, deps, routes
 │  │  ├─ shipments/        access policy, routes, flags and status
 │  │  ├─ documents/        upload, file streaming, retry, manual entry
+│  │  ├─ fields/           confirm / edit (version-checked), line items, history
 │  │  ├─ extraction/       catalog, Gemini client, prompts, normalisers, validators, confidence
 │  │  ├─ jobs.py           Postgres job queue (SKIP LOCKED, backoff)
 │  │  ├─ worker.py         extraction worker
@@ -354,8 +356,8 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │  └─ tests/               pytest, against a separate test database
 ├─ web/                    Next.js 16 app
 │  └─ src/
-│     ├─ app/              login, (app)/shipments, (app)/shipments/[id]
-│     ├─ components/       app shell, status chip, UI primitives
+│     ├─ app/              login, shipments list / detail, documents/[docId] review screen
+│     ├─ components/       app shell, documents panel, pdf.js viewer, UI primitives
 │     ├─ lib/              API client, types, formatting
 │     └─ proxy.ts          route guard (Next 16's replacement for middleware)
 ├─ sample-docs/            synthetic invoices, packing lists, B/Ls + ground truth + recorded extractions

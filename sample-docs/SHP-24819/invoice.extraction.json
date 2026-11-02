@@ -1,0 +1,230 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 16809,
+ "tokens_in": 1141,
+ "tokens_out": 1402,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company H Antriebstechnik GmbH",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    203,
+    67,
+    215,
+    332
+   ]
+  },
+  "supplier_country": {
+   "value": "Germany",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    231,
+    68,
+    241,
+    137
+   ]
+  },
+  "buyer_name": {
+   "value": "Company G Packaging Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    203,
+    519,
+    215,
+    752
+   ]
+  },
+  "invoice_number": {
+   "value": "RE-2026-08840",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    56,
+    167,
+    177
+   ]
+  },
+  "invoice_date": {
+   "value": "21.10.2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    279,
+    166,
+    359
+   ]
+  },
+  "currency": {
+   "value": "EUR",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    720,
+    166,
+    751
+   ]
+  },
+  "incoterm": {
+   "value": "FCA",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    518,
+    167,
+    549
+   ]
+  },
+  "incoterm_place": {
+   "value": "Stuttgart",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    555,
+    168,
+    608
+   ]
+  },
+  "country_of_origin": {
+   "value": "Germany",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    279,
+    172,
+    289,
+    222
+   ]
+  },
+  "invoice_total": {
+   "value": "14.688,00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    359,
+    856,
+    370,
+    936
+   ]
+  },
+  "total_packages": {
+   "value": "2 PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    393,
+    161,
+    403,
+    242
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "312,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    410,
+    140,
+    421,
+    226
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "298,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    427,
+    151,
+    437,
+    239
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Servo motor 1.5 kW with brake",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      110,
+      341,
+      314
+     ]
+    },
+    "hsn": {
+     "value": "85015290",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      452,
+      341,
+      526
+     ]
+    },
+    "quantity": {
+     "value": "24",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      634,
+      341,
+      652
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      670,
+      341,
+      700
+     ]
+    },
+    "unit_price": {
+     "value": "612,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      775,
+      342,
+      822
+     ]
+    },
+    "amount": {
+     "value": "14.688,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      874,
+      342,
+      936
+     ]
+    }
+   }
+  ]
+ }
+}

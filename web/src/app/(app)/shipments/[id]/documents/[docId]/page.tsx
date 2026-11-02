@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { DocumentView } from "./document-view";
+import { ReviewView } from "./review-view";
 
 export default function DocumentPage() {
   return (
     <Suspense>
-      <DocumentView />
+      <ReviewView />
     </Suspense>
   );
 }

@@ -6,6 +6,7 @@ from app.auth.router import router as auth_router
 from app.config import get_settings
 from app.db import engine
 from app.documents.router import router as documents_router
+from app.fields.router import router as fields_router
 from app.parties import router as parties_router
 from app.shipments.router import router as shipments_router
 from app.users import router as users_router
@@ -31,5 +32,12 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-for r in (auth_router, shipments_router, documents_router, parties_router, users_router):
+for r in (
+    auth_router,
+    shipments_router,
+    documents_router,
+    fields_router,
+    parties_router,
+    users_router,
+):
     app.include_router(r, prefix="/api")
