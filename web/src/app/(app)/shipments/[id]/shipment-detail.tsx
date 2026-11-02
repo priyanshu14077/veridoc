@@ -5,6 +5,7 @@ import { ArrowLeft, CheckCircle2, Eye, FileText, Lock, TriangleAlert } from "luc
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
+import { ChecksPanel } from "@/components/checks-panel";
 import { DocumentsPanel } from "@/components/documents-panel";
 import { StatusChip } from "@/components/status-chip";
 import { Button, EmptyState, ErrorState } from "@/components/ui";
@@ -33,7 +34,10 @@ export function ShipmentDetailView() {
 
   return (
     <div>
-      <Link href="/shipments" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink">
+      <Link
+        href="/shipments"
+        className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink"
+      >
         <ArrowLeft aria-hidden className="size-4" /> Shipments
       </Link>
 
@@ -64,20 +68,26 @@ export function ShipmentDetailView() {
             <StatusChip status={q.data.status} />
           </div>
           <p className="mt-1 text-muted">
-            {q.data.supplier ? `${q.data.supplier.name}, ${q.data.supplier.country}` : "Supplier not set"}{" "}
+            {q.data.supplier
+              ? `${q.data.supplier.name}, ${q.data.supplier.country}`
+              : "Supplier not set"}{" "}
             → {q.data.importer.name}
           </p>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
             <div className="space-y-6">
               <FlagSummary shipment={q.data} />
+              <ChecksPanel shipment={q.data} />
               <DocumentsPanel shipment={q.data} />
             </div>
 
             <aside className="space-y-6">
               <dl className="rounded-md border border-line bg-surface p-4 text-sm">
                 <Row label="Assignee" value={q.data.assignee?.name ?? "Unassigned"} />
-                <Row label="Importer IEC" value={<span className="num">{q.data.importer_iec}</span>} />
+                <Row
+                  label="Importer IEC"
+                  value={<span className="num">{q.data.importer_iec}</span>}
+                />
               </dl>
               <ContactCard
                 shipmentId={q.data.id}
@@ -128,7 +138,11 @@ function ContactCard({
       </dl>
       {c.masked &&
         (canReveal ? (
-          <Button className="mt-3 w-full" onClick={() => reveal.mutate()} loading={reveal.isPending}>
+          <Button
+            className="mt-3 w-full"
+            onClick={() => reveal.mutate()}
+            loading={reveal.isPending}
+          >
             <Eye aria-hidden className="size-4" /> Show contact
           </Button>
         ) : (
@@ -168,10 +182,13 @@ function FlagSummary({ shipment }: { shipment: ShipmentDetail }) {
     );
   }
   if (reviewable.length === 0) {
+    const accepted = shipment.checks.filter((c) => c.accepted).length;
     return (
       <p className="flex items-center gap-2 rounded-md bg-clear-soft px-4 py-3 text-sm text-clear">
-        <CheckCircle2 aria-hidden className="size-4" /> Nothing needs you. Every field was read with
-        confidence.
+        <CheckCircle2 aria-hidden className="size-4 shrink-0" />
+        {accepted
+          ? `Nothing needs you. ${accepted} mismatch${accepted > 1 ? "es were" : " was"} accepted with a reason.`
+          : "Nothing needs you. Every field was read with confidence and every cross-check passes."}
       </p>
     );
   }
@@ -188,7 +205,14 @@ function FlagSummary({ shipment }: { shipment: ShipmentDetail }) {
         {reviewable.slice(0, 5).map((f, i) => (
           <li key={i}>
             ·{" "}
-            {f.document_id && f.field_id ? (
+            {f.check_id ? (
+              <a
+                href={`#check-${f.check_id}`}
+                className="underline decoration-line-strong underline-offset-2 hover:decoration-ink"
+              >
+                {f.message}
+              </a>
+            ) : f.document_id && f.field_id ? (
               <Link
                 href={`/shipments/${shipment.id}/documents/${f.document_id}?field=${f.field_id}`}
                 className="underline decoration-line-strong underline-offset-2 hover:decoration-ink"

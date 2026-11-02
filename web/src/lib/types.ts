@@ -72,12 +72,44 @@ export interface Flag {
   message: string;
 }
 
+export type CheckStatus = "pass" | "fail" | "not_checkable";
+
+export interface CheckShown {
+  label: string;
+  doc: DocType | null;
+  value: string;
+  field_id: number | null;
+}
+
+export interface Check {
+  id: number;
+  rule_id: string;
+  title: string;
+  status: CheckStatus;
+  message: string;
+  shown: CheckShown[];
+  field_ids: number[];
+  tolerance: string | null;
+  accepted: boolean;
+  accept_reason: string | null;
+  accepted_by: string | null;
+  accepted_at: string | null;
+}
+
+export interface Conflict {
+  check_id: number;
+  rule_id: string;
+  status: CheckStatus;
+  message: string;
+}
+
 export interface ShipmentDetail extends ShipmentRow {
   importer_iec: string;
   contact: Contact;
   can_reveal_contact: boolean;
   documents: DocumentSummary[];
   flags: Flag[];
+  checks: Check[];
 }
 
 export interface FieldValue {
@@ -98,6 +130,7 @@ export interface FieldValue {
   bbox: number[] | null;
   version: number;
   flag: FlagKind | null;
+  conflicts: Conflict[];
 }
 
 export interface DocumentDetail extends DocumentSummary {
