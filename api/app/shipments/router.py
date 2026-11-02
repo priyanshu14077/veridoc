@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app import audit
 from app.auth.deps import DB, CurrentUser
+from app.checks.router import CheckOut, shipment_checks
 from app.documents.router import DocumentOut, doc_out
 from app.models import Importer, Shipment, Supplier, User
 from app.privacy import mask_email, mask_name, mask_phone
@@ -69,6 +70,7 @@ class ShipmentDetail(ShipmentRow):
     can_reveal_contact: bool
     documents: list[DocumentOut]
     flags: list[FlagOut]
+    checks: list[CheckOut]
 
 
 class ShipmentIn(BaseModel):
@@ -173,6 +175,7 @@ def _detail(db: Session, user: User, s: Shipment) -> ShipmentDetail:
         can_reveal_contact=can_see_contact(user, s),
         documents=[doc_out(d) for d in active_documents(db, s.id)],
         flags=[FlagOut(**vars(f)) for f in open_flags(db, s.id)],
+        checks=shipment_checks(db, s.id),
     )
 
 
