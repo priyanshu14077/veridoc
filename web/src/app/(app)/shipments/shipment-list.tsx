@@ -2,7 +2,7 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
-import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -81,6 +81,12 @@ export function ShipmentListView() {
               : "Shipments assigned to you, plus the unassigned pool."}
           </p>
         </div>
+        <Link
+          href="/shipments/new"
+          className="inline-flex h-9 items-center gap-2 rounded-md bg-accent px-3.5 text-sm font-medium text-accent-ink hover:bg-[#1a43b3]"
+        >
+          <Plus aria-hidden className="size-4" /> New shipment
+        </Link>
       </div>
 
       {/* Filters */}
@@ -160,6 +166,11 @@ export function ShipmentListView() {
             <EmptyState
               title="No shipments yet"
               body="Shipments you create, or that are assigned to you, show up here."
+              action={
+                <Link href="/shipments/new" className="text-accent hover:underline">
+                  Create a shipment
+                </Link>
+              }
             />
           )
         ) : (

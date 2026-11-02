@@ -48,3 +48,32 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   }
   return body as T;
 }
+
+/** Multipart upload with progress (fetch can't report upload progress). */
+export function uploadFile<T>(
+  path: string,
+  form: FormData,
+  onProgress: (fraction: number) => void,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `/api${path}`);
+    xhr.withCredentials = true;
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded / e.total);
+    };
+    xhr.onerror = () =>
+      reject(new ApiError(0, "Upload failed. Check your connection and try again."));
+    xhr.onload = () => {
+      let body: unknown;
+      try {
+        body = JSON.parse(xhr.responseText);
+      } catch {
+        body = undefined;
+      }
+      if (xhr.status >= 200 && xhr.status < 300) resolve(body as T);
+      else reject(new ApiError(xhr.status, detailMessage(body, "Upload failed."), body));
+    };
+    xhr.send(form);
+  });
+}

@@ -9,3 +9,15 @@ export function relativeTime(iso: string, now = Date.now()): string {
   if (abs < 86400 * 7) return rtf.format(Math.round(diff / 86400), "day");
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 }
+
+export const DOC_LABEL: Record<string, string> = {
+  invoice: "Commercial invoice",
+  packing_list: "Packing list",
+  bill_of_lading: "Bill of lading",
+};
+
+export function fileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
