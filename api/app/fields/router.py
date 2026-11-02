@@ -16,7 +16,13 @@ from sqlalchemy.orm import Session
 
 from app import audit
 from app.auth.deps import DB, CurrentUser
-from app.documents.router import FieldOut, doc_out, field_out, get_visible_document
+from app.documents.router import (
+    FieldOut,
+    doc_out,
+    field_out,
+    get_visible_document,
+    read_only_reason,
+)
 from app.extraction.catalog import LINES, field_def
 from app.extraction.confidence import score
 from app.extraction.validators import normalize_and_validate
@@ -59,16 +65,8 @@ class HistoryEntry(BaseModel):
 
 def _editable(db: Session, user: User, document_id: int) -> tuple[Document, Shipment]:
     doc, shipment = get_visible_document(db, user, document_id)
-    if shipment.status == "exported":
-        raise HTTPException(
-            http.HTTP_409_CONFLICT, "This shipment is exported. A manager must reopen it first."
-        )
-    if doc.superseded_at is not None:
-        raise HTTPException(http.HTTP_409_CONFLICT, "A newer upload replaced this document.")
-    if doc.extraction_status not in ("done", "manual"):
-        raise HTTPException(
-            http.HTTP_409_CONFLICT, "Wait for the AI to finish reading this document."
-        )
+    if reason := read_only_reason(doc, shipment):
+        raise HTTPException(http.HTTP_409_CONFLICT, reason)
     return doc, shipment
 
 

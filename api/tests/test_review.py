@@ -190,3 +190,12 @@ def test_history_lists_edits_newest_first_with_names(client, db, fake_gemini) ->
     assert [h["action"] for h in hist] == ["edited", "edited"]
     assert hist[0]["after"]["value"] == "7,650.00" and hist[1]["before"]["value"] == "7,650.00"
     assert hist[0]["actor"] == "Meera Iyer"
+
+
+def test_document_says_why_it_is_read_only(client, db, fake_gemini) -> None:
+    sid, doc_id, _ = extracted_invoice(client, db, fake_gemini)
+    assert client.get(f"/api/documents/{doc_id}").json()["read_only_reason"] is None
+    db.execute(update(Shipment).where(Shipment.id == sid).values(status="exported"))
+    db.commit()
+    reason = client.get(f"/api/documents/{doc_id}").json()["read_only_reason"]
+    assert reason is not None and "reopen" in reason

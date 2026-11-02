@@ -68,6 +68,19 @@ class FieldOut(BaseModel):
 
 class DocumentDetail(DocumentOut):
     fields: list[FieldOut]
+    shipment_id: int
+    read_only_reason: str | None
+
+
+def read_only_reason(doc: Document, shipment: Shipment) -> str | None:
+    """Why fields can't be changed right now, or None. The field routes enforce the same rules."""
+    if shipment.status == "exported":
+        return "This shipment is exported. A manager must reopen it first."
+    if doc.superseded_at is not None:
+        return "A newer upload replaced this document."
+    if doc.extraction_status not in ("done", "manual"):
+        return "Wait for the AI to finish reading this document."
+    return None
 
 
 def sniff(data: bytes) -> tuple[str, str]:
@@ -231,9 +244,12 @@ async def upload_document(
 
 @router.get("/documents/{document_id}", response_model=DocumentDetail)
 def get_document(document_id: int, user: CurrentUser, db: DB) -> DocumentDetail:
-    doc, _ = get_visible_document(db, user, document_id)
+    doc, shipment = get_visible_document(db, user, document_id)
     return DocumentDetail(
-        **doc_out(doc).model_dump(), fields=[field_out(doc, f) for f in doc.fields]
+        **doc_out(doc).model_dump(),
+        fields=[field_out(doc, f) for f in doc.fields],
+        shipment_id=shipment.id,
+        read_only_reason=read_only_reason(doc, shipment),
     )
 
 
