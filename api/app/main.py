@@ -5,6 +5,8 @@ from sqlalchemy import text
 from app.auth.router import router as auth_router
 from app.config import get_settings
 from app.db import engine
+from app.shipments.router import router as shipments_router
+from app.users import router as users_router
 
 app = FastAPI(title="Crosscheck API", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
@@ -27,5 +29,5 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-for r in (auth_router,):
+for r in (auth_router, shipments_router, users_router):
     app.include_router(r, prefix="/api")
