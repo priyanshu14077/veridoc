@@ -145,7 +145,7 @@ function Slot({
               href={`/shipments/${shipmentId}/documents/${doc.id}`}
               className="inline-flex h-9 items-center rounded-md border border-line-strong px-3 text-sm font-medium hover:bg-paper"
             >
-              View fields
+              {doc.flag_count > 0 ? "Review" : "View fields"}
             </Link>
           )}
           {doc?.extraction_status === "failed" && (
@@ -209,7 +209,10 @@ function Subline({ doc, progress }: { doc: DocumentSummary | undefined; progress
     return (
       <div className="mt-1.5 flex items-center gap-3">
         <div className="h-1.5 w-40 overflow-hidden rounded-full bg-info-soft">
-          <div className="h-full bg-accent transition-[width]" style={{ width: `${progress * 100}%` }} />
+          <div
+            className="h-full bg-accent transition-[width]"
+            style={{ width: `${progress * 100}%` }}
+          />
         </div>
         <span className="num text-xs text-muted">{Math.round(progress * 100)}%</span>
       </div>
