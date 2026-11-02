@@ -1,0 +1,89 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company B Lighting Technology Co., Ltd.",
+      "supplier_country": "China",
+      "buyer_name": "Company E Lighting Pvt Ltd",
+      "invoice_number": "ZS-2026-1203",
+      "invoice_date": "2026-10-16",
+      "currency": "USD",
+      "incoterm": "FOB",
+      "incoterm_place": "Shenzhen",
+      "country_of_origin": "China",
+      "invoice_total": "18600.00",
+      "total_packages": "320",
+      "total_net_weight_kg": "2100.00",
+      "total_gross_weight_kg": "2410.00"
+    },
+    "lines": [
+      {
+        "description": "LED downlight 12W round",
+        "hsn": "94054290",
+        "quantity": "6000",
+        "unit": "PCS",
+        "unit_price": "2.15",
+        "amount": "12900.00"
+      },
+      {
+        "description": "LED driver 12W constant current",
+        "hsn": "85044090",
+        "quantity": "6000",
+        "unit": "PCS",
+        "unit_price": "0.95",
+        "amount": "5700.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "ZS-2026-1203",
+      "total_packages": "320",
+      "package_type": "CARTONS",
+      "total_net_weight_kg": "2100.00",
+      "total_gross_weight_kg": "2410.00",
+      "container_numbers": "LTSU9022376",
+      "marks": "CO-E / NSA / C/NO. 1-320"
+    },
+    "lines": [
+      {
+        "description": "LED downlight 12W round",
+        "quantity": "6000",
+        "packages": "200",
+        "net_weight_kg": "1500.00",
+        "gross_weight_kg": "1720.00"
+      },
+      {
+        "description": "LED driver 12W constant current",
+        "quantity": "6000",
+        "packages": "120",
+        "net_weight_kg": "600.00",
+        "gross_weight_kg": "690.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "SZXNSA2612031",
+      "shipper_name": "Company B Lighting Technology Co., Ltd.",
+      "consignee_name": "Company E Lighting Pvt Ltd",
+      "vessel": "SEA LOTUS 512",
+      "voyage": "W063",
+      "port_of_loading": "Shenzhen (Yantian), China",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "LTSU9022376",
+      "seal_numbers": "CN4480911",
+      "total_packages": "318",
+      "package_type": "CARTONS",
+      "total_gross_weight_kg": "2410.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [
+      "X4: PL 320 cartons vs B/L 318"
+    ],
+    "unreadable": [],
+    "scan": "clean",
+    "bilingual": true
+  }
+}

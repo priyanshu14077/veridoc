@@ -1,0 +1,76 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company J Packaging Joint Stock Company",
+      "supplier_country": "Vietnam",
+      "buyer_name": "Company E Lighting Pvt Ltd",
+      "invoice_number": "JP/EX/26/0488",
+      "invoice_date": "2026-10-23",
+      "currency": "USD",
+      "incoterm": "FOB",
+      "incoterm_place": "Cat Lai",
+      "country_of_origin": "Vietnam",
+      "invoice_total": "3600.00",
+      "total_packages": "100",
+      "total_net_weight_kg": "1600.00",
+      "total_gross_weight_kg": "1720.00"
+    },
+    "lines": [
+      {
+        "description": "Moulded pulp packaging insert for luminaires",
+        "hsn": "48236900",
+        "quantity": "20000",
+        "unit": "PCS",
+        "unit_price": "0.18",
+        "amount": "3600.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "JP/EX/26/0488",
+      "total_packages": "100",
+      "package_type": "CARTONS",
+      "total_net_weight_kg": "1600.00",
+      "total_gross_weight_kg": "1720.00",
+      "container_numbers": "MKSU7713772",
+      "marks": "CO-E / NSA"
+    },
+    "lines": [
+      {
+        "description": "Moulded pulp packaging insert for luminaires",
+        "quantity": "20000",
+        "packages": "100",
+        "net_weight_kg": "1600.00",
+        "gross_weight_kg": "1720.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "SGNNSA260488",
+      "shipper_name": "Company J Packaging Joint Stock Company",
+      "consignee_name": "Company E Lighting Pvt Ltd",
+      "vessel": "MEKONG STAR",
+      "voyage": "2615W",
+      "port_of_loading": "Cat Lai, Ho Chi Minh City, Vietnam",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "MKSU7713772",
+      "seal_numbers": "VN771377A",
+      "total_packages": "100",
+      "package_type": "CARTONS",
+      "total_gross_weight_kg": "1720.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [
+      "B/L unreadable → manual entry"
+    ],
+    "unreadable": [
+      "bill_of_lading"
+    ],
+    "scan": "clean",
+    "bilingual": false
+  }
+}

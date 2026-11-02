@@ -1,0 +1,89 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company J Packaging Joint Stock Company",
+      "supplier_country": "Vietnam",
+      "buyer_name": "Company G Packaging Pvt Ltd",
+      "invoice_number": "JP/EX/26/0457",
+      "invoice_date": "2026-10-02",
+      "currency": "USD",
+      "incoterm": "FOB",
+      "incoterm_place": "Cat Lai",
+      "country_of_origin": "Vietnam",
+      "invoice_total": "9840.00",
+      "total_packages": "360",
+      "total_net_weight_kg": "7740.00",
+      "total_gross_weight_kg": "8165.00"
+    },
+    "lines": [
+      {
+        "description": "Corrugated carton box 5-ply 600x400x400",
+        "hsn": "48191010",
+        "quantity": "12000",
+        "unit": "PCS",
+        "unit_price": "0.62",
+        "amount": "7440.00"
+      },
+      {
+        "description": "Die-cut carton divider insert",
+        "hsn": "48239090",
+        "quantity": "6000",
+        "unit": "PCS",
+        "unit_price": "0.35",
+        "amount": "2100.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "JP/EX/26/0457",
+      "total_packages": "360",
+      "package_type": "BUNDLES",
+      "total_net_weight_kg": "7740.00",
+      "total_gross_weight_kg": "8165.00",
+      "container_numbers": "MKSU7712307; MKSU7712457",
+      "marks": "CO-G / BHIWANDI"
+    },
+    "lines": [
+      {
+        "description": "Corrugated carton box 5-ply 600x400x400",
+        "quantity": "12000",
+        "packages": "300",
+        "net_weight_kg": "6900.00",
+        "gross_weight_kg": "7260.00"
+      },
+      {
+        "description": "Die-cut carton divider insert",
+        "quantity": "6000",
+        "packages": "60",
+        "net_weight_kg": "840.00",
+        "gross_weight_kg": "905.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "SGNNSA260457",
+      "shipper_name": "Company J Packaging Joint Stock Company",
+      "consignee_name": "Company G Packaging Pvt Ltd",
+      "vessel": "MEKONG STAR",
+      "voyage": "2611W",
+      "port_of_loading": "Cat Lai, Ho Chi Minh City, Vietnam",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "MKSU7712307; MKSU7712457",
+      "seal_numbers": "VN771230A; VN771245A",
+      "total_packages": "360",
+      "package_type": "BUNDLES",
+      "total_gross_weight_kg": "8165.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [
+      "X1: printed total 9,840.00 vs line sum 9,540.00"
+    ],
+    "unreadable": [],
+    "scan": "light",
+    "bilingual": false
+  }
+}

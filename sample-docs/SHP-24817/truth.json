@@ -1,0 +1,74 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company B Lighting Technology Co., Ltd.",
+      "supplier_country": "China",
+      "buyer_name": "Company E Lighting Pvt Ltd",
+      "invoice_number": "ZS-2026-1219",
+      "invoice_date": "2026-10-20",
+      "currency": "USD",
+      "incoterm": "CFR",
+      "incoterm_place": "Nhava Sheva",
+      "country_of_origin": "China",
+      "invoice_total": "14940.00",
+      "total_packages": "150",
+      "total_net_weight_kg": "2700.00",
+      "total_gross_weight_kg": "3060.00"
+    },
+    "lines": [
+      {
+        "description": "LED high bay light 150W",
+        "hsn": "94054290",
+        "quantity": "600",
+        "unit": "PCS",
+        "unit_price": "24.90",
+        "amount": "14940.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "ZS-2026-1219",
+      "total_packages": "150",
+      "package_type": "CARTONS",
+      "total_net_weight_kg": "2700.00",
+      "total_gross_weight_kg": "3060.00",
+      "container_numbers": "PRLU1183424",
+      "marks": "CO-E / NSA / C/NO. 1-150"
+    },
+    "lines": [
+      {
+        "description": "LED high bay light 150W",
+        "quantity": "600",
+        "packages": "150",
+        "net_weight_kg": "2700.00",
+        "gross_weight_kg": "3060.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "SZXNSA2612194",
+      "shipper_name": "Company B Lighting Technology Co., Ltd.",
+      "consignee_name": "Company E Lighting Pvt Ltd",
+      "vessel": "PEARL COMPETENCE",
+      "voyage": "047W",
+      "port_of_loading": "Shenzhen (Shekou), China",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "PRLU1183424",
+      "seal_numbers": "CN4492007",
+      "total_packages": "150",
+      "package_type": "CARTONS",
+      "total_gross_weight_kg": "3060.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [
+      "stamp over invoice total (expect low confidence)"
+    ],
+    "unreadable": [],
+    "scan": "light",
+    "bilingual": true
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company C Valves AB",
+      "supplier_country": "Sweden",
+      "buyer_name": "Company F Flow Controls Ltd",
+      "invoice_number": "CV-40921",
+      "invoice_date": "2026-10-14",
+      "currency": "EUR",
+      "incoterm": "CIF",
+      "incoterm_place": "Nhava Sheva",
+      "country_of_origin": "Sweden",
+      "invoice_total": "7650.00",
+      "total_packages": "6",
+      "total_net_weight_kg": "1380.00",
+      "total_gross_weight_kg": "1460.00"
+    },
+    "lines": [
+      {
+        "description": "Steel ball valve DN50 PN40, flanged",
+        "hsn": "84818030",
+        "quantity": "180",
+        "unit": "PCS",
+        "unit_price": "42.50",
+        "amount": "7650.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "CV-40921",
+      "total_packages": "6",
+      "package_type": "PALLETS",
+      "total_net_weight_kg": "1380.00",
+      "total_gross_weight_kg": "1460.00",
+      "container_numbers": "NRDU2049170",
+      "marks": "CO-F / NSA / P1-6"
+    },
+    "lines": [
+      {
+        "description": "Steel ball valve DN50 PN40, flanged",
+        "quantity": "180",
+        "packages": "6",
+        "net_weight_kg": "1380.00",
+        "gross_weight_kg": "1460.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "GOT0294418",
+      "shipper_name": "Company C Valves AB",
+      "consignee_name": "Company F Flow Controls Ltd",
+      "vessel": "NORDIC ANNA",
+      "voyage": "FA642W",
+      "port_of_loading": "Gothenburg, Sweden",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "NRDU2049170",
+      "seal_numbers": "SE0091822",
+      "total_packages": "6",
+      "package_type": "PALLETS",
+      "total_gross_weight_kg": "1460.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [],
+    "unreadable": [],
+    "scan": "clean",
+    "bilingual": false
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company H Antriebstechnik GmbH",
+      "supplier_country": "Germany",
+      "buyer_name": "Company G Packaging Pvt Ltd",
+      "invoice_number": "RE-2026-08840",
+      "invoice_date": "2026-10-21",
+      "currency": "EUR",
+      "incoterm": "FCA",
+      "incoterm_place": "Stuttgart",
+      "country_of_origin": "Germany",
+      "invoice_total": "14688.00",
+      "total_packages": "2",
+      "total_net_weight_kg": "312.00",
+      "total_gross_weight_kg": "298.00"
+    },
+    "lines": [
+      {
+        "description": "Servo motor 1.5 kW with brake",
+        "hsn": "85015290",
+        "quantity": "24",
+        "unit": "PCS",
+        "unit_price": "612.00",
+        "amount": "14688.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "RE-2026-08840",
+      "total_packages": "2",
+      "package_type": "PALLETS",
+      "total_net_weight_kg": "312.00",
+      "total_gross_weight_kg": "298.00",
+      "container_numbers": "RHNU5412662",
+      "marks": "CO-G / BHIWANDI / 1-2"
+    },
+    "lines": [
+      {
+        "description": "Servo motor 1.5 kW with brake",
+        "quantity": "24",
+        "packages": "2",
+        "net_weight_kg": "312.00",
+        "gross_weight_kg": "298.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "HAMNSA6631266",
+      "shipper_name": "Company H Antriebstechnik GmbH",
+      "consignee_name": "Company G Packaging Pvt Ltd",
+      "vessel": "RHINE TIGRIS",
+      "voyage": "0FM3TW1MA",
+      "port_of_loading": "Hamburg, Germany",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "RHNU5412662",
+      "seal_numbers": "DE7713491",
+      "total_packages": "2",
+      "package_type": "PALLETS",
+      "total_gross_weight_kg": "298.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [
+      "X6: net 312 kg > gross 298 kg"
+    ],
+    "unreadable": [],
+    "scan": "clean",
+    "bilingual": false
+  }
+}

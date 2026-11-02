@@ -1,0 +1,87 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company C Valves AB",
+      "supplier_country": "Sweden",
+      "buyer_name": "Company F Flow Controls Ltd",
+      "invoice_number": "CV-40977",
+      "invoice_date": "2026-10-18",
+      "currency": "EUR",
+      "incoterm": "CIF",
+      "incoterm_place": "Nhava Sheva",
+      "country_of_origin": "Sweden",
+      "invoice_total": "9285.00",
+      "total_packages": "4",
+      "total_net_weight_kg": "894.00",
+      "total_gross_weight_kg": "958.00"
+    },
+    "lines": [
+      {
+        "description": "Butterfly valve DN100 wafer type",
+        "hsn": "84818090",
+        "quantity": "60",
+        "unit": "PCS",
+        "unit_price": "118.00",
+        "amount": "7080.00"
+      },
+      {
+        "description": "Gear operator for DN100 valve",
+        "hsn": "84819090",
+        "quantity": "60",
+        "unit": "PCS",
+        "unit_price": "36.75",
+        "amount": "2205.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "CV-40977",
+      "total_packages": "4",
+      "package_type": "PALLETS",
+      "total_net_weight_kg": "894.00",
+      "total_gross_weight_kg": "958.00",
+      "container_numbers": "NRDU2050334",
+      "marks": "CO-F / NSA / P1-4"
+    },
+    "lines": [
+      {
+        "description": "Butterfly valve DN100 wafer type",
+        "quantity": "60",
+        "packages": "3",
+        "net_weight_kg": "744.00",
+        "gross_weight_kg": "790.00"
+      },
+      {
+        "description": "Gear operator for DN100 valve",
+        "quantity": "60",
+        "packages": "1",
+        "net_weight_kg": "150.00",
+        "gross_weight_kg": "168.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "GOT0294502",
+      "shipper_name": "Company C Valves AB",
+      "consignee_name": "Company F Flow Controls Ltd",
+      "vessel": "NORDIC ANNA",
+      "voyage": "FA644W",
+      "port_of_loading": "Gothenburg, Sweden",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "NRDU2050334",
+      "seal_numbers": "SE0091877",
+      "total_packages": "4",
+      "package_type": "PALLETS",
+      "total_gross_weight_kg": "958.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [],
+    "unreadable": [],
+    "scan": "clean",
+    "bilingual": false
+  }
+}
