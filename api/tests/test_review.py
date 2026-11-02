@@ -8,13 +8,17 @@ from tests.helpers import fake_result, run_next_job, shipment_id, upload
 
 
 def extracted_invoice(client, db, fake_gemini, overrides=None) -> tuple[int, int, dict]:
-    """Upload SHP-24812's invoice as Meera, extract it, return (shipment, document, fields)."""
+    """Upload SHP-24812's three documents as Meera (a clean shipment, so no cross-check fails),
+    extract them, and return (shipment, invoice document, invoice header fields)."""
     _, behaviour = fake_gemini
     behaviour["invoice"] = fake_result("invoice", overrides=overrides)
     c = login(client, EXEC)
     sid = shipment_id(db, "SHP-24812")
     doc_id = upload(c, sid, "invoice").json()["id"]
-    run_next_job()
+    upload(c, sid, "packing_list")
+    upload(c, sid, "bill_of_lading")
+    for _ in range(3):
+        run_next_job()
     return sid, doc_id, header_fields(c, doc_id)
 
 
