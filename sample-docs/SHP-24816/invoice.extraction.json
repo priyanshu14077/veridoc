@@ -1,0 +1,230 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 12007,
+ "tokens_in": 1141,
+ "tokens_out": 1412,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company J Packaging Joint Stock Company",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    44,
+    18,
+    77,
+    496
+   ]
+  },
+  "supplier_country": {
+   "value": "VIETNAM",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    255,
+    41,
+    269,
+    107
+   ]
+  },
+  "buyer_name": {
+   "value": "Company G Packaging Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    191,
+    495,
+    207,
+    730
+   ]
+  },
+  "invoice_number": {
+   "value": "JP/EX/26/0471",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    170,
+    24,
+    185,
+    146
+   ]
+  },
+  "invoice_date": {
+   "value": "11/10/2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    162,
+    246,
+    178,
+    333
+   ]
+  },
+  "currency": {
+   "value": "USD",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    145,
+    689,
+    159,
+    730
+   ]
+  },
+  "incoterm": {
+   "value": "FOB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    154,
+    467,
+    169,
+    506
+   ]
+  },
+  "incoterm_place": {
+   "value": "Cat Lai",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    155,
+    510,
+    169,
+    574
+   ]
+  },
+  "country_of_origin": {
+   "value": "Vietnam",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    291,
+    162,
+    303,
+    211
+   ]
+  },
+  "invoice_total": {
+   "value": "7,040.00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    340,
+    856,
+    357,
+    929
+   ]
+  },
+  "total_packages": {
+   "value": "80 ROLLS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    407,
+    161,
+    419,
+    237
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "19,200.00 KGS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    422,
+    137,
+    436,
+    252
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "19,680.00 KGS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    439,
+    148,
+    452,
+    257
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Kraft paper roll 120 gsm, 1200 mm",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      342,
+      94,
+      357,
+      321
+     ]
+    },
+    "hsn": {
+     "value": "48042900",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      332,
+      427,
+      345,
+      497
+     ]
+    },
+    "quantity": {
+     "value": "80",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      328,
+      617,
+      339,
+      638
+     ]
+    },
+    "unit": {
+     "value": "ROLLS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      326,
+      650,
+      338,
+      706
+     ]
+    },
+    "unit_price": {
+     "value": "88.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      321,
+      769,
+      332,
+      810
+     ]
+    },
+    "amount": {
+     "value": "7,040.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      316,
+      860,
+      328,
+      924
+     ]
+    }
+   }
+  ]
+ }
+}

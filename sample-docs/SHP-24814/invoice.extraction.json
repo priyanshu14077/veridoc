@@ -1,0 +1,298 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 13438,
+ "tokens_in": 1141,
+ "tokens_out": 1830,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company B Lighting Technology Co., Ltd.",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    240,
+    56,
+    252,
+    386
+   ]
+  },
+  "supplier_country": {
+   "value": "China",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    282,
+    59,
+    292,
+    102
+   ]
+  },
+  "buyer_name": {
+   "value": "Company E Lighting Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    225,
+    519,
+    238,
+    735
+   ]
+  },
+  "invoice_number": {
+   "value": "ZS-2026-1203",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    179,
+    56,
+    191,
+    166
+   ]
+  },
+  "invoice_date": {
+   "value": "Oct. 16, 2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    178,
+    277,
+    192,
+    383
+   ]
+  },
+  "currency": {
+   "value": "USD",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    179,
+    720,
+    190,
+    755
+   ]
+  },
+  "incoterm": {
+   "value": "FOB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    179,
+    517,
+    190,
+    552
+   ]
+  },
+  "incoterm_place": {
+   "value": "Shenzhen",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    178,
+    557,
+    190,
+    622
+   ]
+  },
+  "country_of_origin": {
+   "value": "China",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    304,
+    172,
+    315,
+    211
+   ]
+  },
+  "invoice_total": {
+   "value": "18,600.00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    405,
+    847,
+    417,
+    936
+   ]
+  },
+  "total_packages": {
+   "value": "320 CARTONS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    441,
+    160,
+    452,
+    274
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "2,100.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    458,
+    140,
+    469,
+    252
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "2,410.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    474,
+    153,
+    486,
+    254
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "LED downlight 12W round",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      112,
+      369,
+      283
+     ]
+    },
+    "hsn": {
+     "value": "94054290",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      454,
+      368,
+      526
+     ]
+    },
+    "quantity": {
+     "value": "6,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      613,
+      369,
+      654
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      666,
+      368,
+      700
+     ]
+    },
+    "unit_price": {
+     "value": "2.15",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      788,
+      368,
+      818
+     ]
+    },
+    "amount": {
+     "value": "12,900.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      874,
+      369,
+      936
+     ]
+    }
+   },
+   {
+    "description": {
+     "value": "LED driver 12W constant current",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      378,
+      112,
+      389,
+      323
+     ]
+    },
+    "hsn": {
+     "value": "85044090",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      378,
+      454,
+      388,
+      526
+     ]
+    },
+    "quantity": {
+     "value": "6,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      378,
+      613,
+      389,
+      654
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      378,
+      666,
+      388,
+      700
+     ]
+    },
+    "unit_price": {
+     "value": "0.95",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      378,
+      788,
+      388,
+      818
+     ]
+    },
+    "amount": {
+     "value": "5,700.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      378,
+      881,
+      389,
+      936
+     ]
+    }
+   }
+  ]
+ }
+}

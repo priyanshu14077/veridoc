@@ -1,0 +1,210 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 13472,
+ "tokens_in": 1061,
+ "tokens_out": 1281,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "RE-2026-08821",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    56,
+    169,
+    172
+   ]
+  },
+  "total_packages": {
+   "value": "5",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    305,
+    107,
+    316,
+    115
+   ]
+  },
+  "package_type": {
+   "value": "PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    305,
+    120,
+    316,
+    185
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "430,00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    327,
+    183,
+    338,
+    230
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "480,00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    340,
+    193,
+    351,
+    240
+   ]
+  },
+  "container_numbers": {
+   "value": "RHNU 541208-7",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    382,
+    56,
+    393,
+    178
+   ]
+  },
+  "marks": {
+   "value": "CO-F / NSA / 1-5",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    413,
+    193,
+    424,
+    308
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Pneumatic actuator double-acting DA-105",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      63,
+      238,
+      280
+     ]
+    },
+    "quantity": {
+     "value": "40",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      451,
+      225,
+      467
+     ]
+    },
+    "packages": {
+     "value": "4",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      538,
+      225,
+      547
+     ]
+    },
+    "net_weight_kg": {
+     "value": "392,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      626,
+      225,
+      668
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "436,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      214,
+      762,
+      225,
+      804
+     ]
+    }
+   },
+   {
+    "description": {
+     "value": "Solenoid valve 5/2 NAMUR 24V DC",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      247,
+      63,
+      258,
+      297
+     ]
+    },
+    "quantity": {
+     "value": "40",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      247,
+      451,
+      258,
+      467
+     ]
+    },
+    "packages": {
+     "value": "1",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      247,
+      538,
+      258,
+      545
+     ]
+    },
+    "net_weight_kg": {
+     "value": "38,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      247,
+      633,
+      258,
+      668
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "44,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      247,
+      769,
+      258,
+      804
+     ]
+    }
+   }
+  ]
+ }
+}

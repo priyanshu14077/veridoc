@@ -1,0 +1,149 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 10582,
+ "tokens_in": 1068,
+ "tokens_out": 589,
+ "response": {
+  "detected_doc_type": "bill_of_lading",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "bl_number": {
+   "value": "SGNNSA260471",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    70,
+    712,
+    85,
+    911
+   ]
+  },
+  "shipper_name": {
+   "value": "Company J Packaging Joint Stock Company",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    148,
+    33,
+    163,
+    377
+   ]
+  },
+  "consignee_name": {
+   "value": "Company G Packaging Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    237,
+    44,
+    252,
+    277
+   ]
+  },
+  "vessel": {
+   "value": "MEKONG STAR",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    122,
+    477,
+    137,
+    608
+   ]
+  },
+  "voyage": {
+   "value": "2613W",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    115,
+    687,
+    129,
+    742
+   ]
+  },
+  "port_of_loading": {
+   "value": "Cat Lai, Ho Chi Minh City, Vietnam",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    158,
+    482,
+    174,
+    755
+   ]
+  },
+  "port_of_discharge": {
+   "value": "Nhava Sheva, India",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    203,
+    483,
+    219,
+    642
+   ]
+  },
+  "container_numbers": {
+   "value": "MKSU7713010",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    440,
+    54,
+    452,
+    160
+   ]
+  },
+  "seal_numbers": {
+   "value": "VN771301A",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    440,
+    169,
+    452,
+    245
+   ]
+  },
+  "total_packages": {
+   "value": "80",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    433,
+    334,
+    447,
+    354
+   ]
+  },
+  "package_type": {
+   "value": "ROLLS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    433,
+    359,
+    447,
+    411
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "19,680.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    417,
+    827,
+    431,
+    934
+   ]
+  }
+ }
+}

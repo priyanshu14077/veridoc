@@ -4,13 +4,22 @@ All companies and people are fictional (PRD A13). The brief's convention ("Compa
 for suppliers so the sample rows from the brief map one to one.
 """
 
+import hashlib
+import json
 import os
+from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth.passwords import hash_password
-from app.models import Importer, Shipment, Supplier, User
+from app.extraction.gemini import ExtractionResult, response_model
+from app.extraction.pipeline import store_result
+from app.models import Document, Importer, Shipment, Supplier, User
+from app.storage import get_storage
+
+SAMPLES = Path(__file__).resolve().parents[2] / "sample-docs"
+DOC_TYPES = ("invoice", "packing_list", "bill_of_lading")
 
 # Demo password is public by design (it's printed in deployment.md); override per environment.
 DEMO_PASSWORD = os.environ.get("SEED_DEMO_PASSWORD", "crosscheck-demo")
@@ -113,9 +122,63 @@ def seed(db: Session) -> None:
     db.commit()
 
 
+def seed_documents(db: Session) -> int:
+    """Attach the sample PDFs to their shipments and replay the recorded Gemini output through
+    the same pipeline a live upload uses. Real model output, no API quota spent.
+    Shipments that already have documents are left alone."""
+    storage = get_storage()
+    added = 0
+    for ref, *_ in SHIPMENTS:
+        shipment = db.scalar(select(Shipment).where(Shipment.ref == ref))
+        folder = SAMPLES / ref
+        if shipment is None or not folder.is_dir():
+            continue
+        if db.scalar(select(Document.id).where(Document.shipment_id == shipment.id).limit(1)):
+            continue
+        uploader = shipment.assignee_id or shipment.created_by
+        for doc_type in DOC_TYPES:
+            pdf = folder / f"{doc_type}.pdf"
+            recorded = folder / f"{doc_type}.extraction.json"
+            if not pdf.exists() or not recorded.exists():
+                continue
+            data = pdf.read_bytes()
+            doc = Document(
+                shipment_id=shipment.id,
+                doc_type=doc_type,
+                file_key=storage.put(data, ".pdf"),
+                file_name=pdf.name,
+                mime="application/pdf",
+                size_bytes=len(data),
+                sha256=hashlib.sha256(data).hexdigest(),
+                page_count=1,
+                uploaded_by=uploader,
+            )
+            db.add(doc)
+            db.flush()
+            rec = json.loads(recorded.read_text())
+            parsed = response_model(doc_type).model_validate(rec["response"])
+            store_result(
+                db,
+                doc,
+                ExtractionResult(
+                    parsed=parsed,
+                    raw=rec["response"],
+                    model=rec["model"],
+                    latency_ms=rec["latency_ms"],
+                    tokens_in=rec["tokens_in"],
+                    tokens_out=rec["tokens_out"],
+                ),
+                attempt=1,
+            )
+            added += 1
+        db.commit()
+    return added
+
+
 if __name__ == "__main__":
     from app.db import SessionLocal
 
     with SessionLocal() as session:
         seed(session)
-    print(f"seeded {len(USERS)} users, {len(SHIPMENTS)} shipments")
+        n = seed_documents(session)
+    print(f"seeded {len(USERS)} users, {len(SHIPMENTS)} shipments, {n} documents")

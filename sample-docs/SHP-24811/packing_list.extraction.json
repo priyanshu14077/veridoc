@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 9970,
+ "tokens_in": 1061,
+ "tokens_out": 957,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "ZS-2026-1187",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    178,
+    55,
+    190,
+    163
+   ]
+  },
+  "total_packages": {
+   "value": "240",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    294,
+    107,
+    307,
+    137
+   ]
+  },
+  "package_type": {
+   "value": "CARTONS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    294,
+    150,
+    307,
+    215
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "2,880.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    316,
+    185,
+    327,
+    273
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "3,165.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    333,
+    191,
+    345,
+    290
+   ]
+  },
+  "container_numbers": {
+   "value": "LTSU 836104-0",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    373,
+    56,
+    385,
+    178
+   ]
+  },
+  "marks": {
+   "value": "CO-E / NHAVA SHEVA / C/NO. 1-240",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    404,
+    193,
+    417,
+    448
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "LED panel light 40W 600x600mm",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      68,
+      248,
+      283
+     ]
+    },
+    "quantity": {
+     "value": "2,400",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      427,
+      248,
+      467
+     ]
+    },
+    "packages": {
+     "value": "240",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      525,
+      248,
+      553
+     ]
+    },
+    "net_weight_kg": {
+     "value": "2,880.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      611,
+      248,
+      668
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "3,165.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      236,
+      739,
+      248,
+      799
+     ]
+    }
+   }
+  ]
+ }
+}
