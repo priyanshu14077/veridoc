@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/* Crosscheck tokens. Colour carries state only; everything else is ink on paper. */
+@theme {
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --color-paper: #fbfbfa;
+  --color-surface: #ffffff;
+  --color-line: #e6e5e1;
+  --color-line-strong: #d3d1cb;
+  --color-ink: #1c1d1f;
+  --color-ink-2: #4a4c50;
+  --color-muted: #7b7d82;
+
+  --color-accent: #1f4fd1;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #eef2fd;
+
+  --color-unsure: #a35f00;
+  --color-unsure-soft: #fdf4e3;
+  --color-conflict: #b42318;
+  --color-conflict-soft: #fdeceb;
+  --color-clear: #1d7a46;
+  --color-clear-soft: #e8f5ee;
+  --color-info: #4a4c50;
+  --color-info-soft: #f1f1ef;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numbers, refs and codes always line up. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #efeeeb 0, #f6f5f3 60px, #efeeeb 120px);
+  background-size: 400px 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius: var(--radius-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+
+@layer components {
+  .input {
+    height: 38px;
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-surface);
+    padding: 0 12px;
+    color: var(--color-ink);
+  }
+  .input:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -1px;
+    border-color: transparent;
+  }
+}

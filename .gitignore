@@ -1,0 +1,45 @@
+# secrets and env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# node / next
+node_modules/
+.next/
+out/
+build/
+dist/
+next-env.d.ts
+*.tsbuildinfo
+.vercel/
+coverage/
+
+# test artefacts
+test-results/
+playwright-report/
+
+# logs
+*.log
+npm-debug.log*
+
+# local data (uploads, exports)
+api/storage/
+
+# editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
