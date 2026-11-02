@@ -1,0 +1,57 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company C Valves AB",
+      "supplier_country": "Sweden",
+      "buyer_name": "Company F Flow Controls Ltd",
+      "invoice_number": "CV-41003",
+      "invoice_date": "2026-10-24",
+      "currency": "EUR",
+      "incoterm": "CIF",
+      "incoterm_place": "Nhava Sheva",
+      "country_of_origin": "Sweden",
+      "invoice_total": "5778.00",
+      "total_packages": "3",
+      "total_net_weight_kg": "810.00",
+      "total_gross_weight_kg": "866.00"
+    },
+    "lines": [
+      {
+        "description": "Check valve DN80 swing type",
+        "hsn": "84813000",
+        "quantity": "90",
+        "unit": "PCS",
+        "unit_price": "64.20",
+        "amount": "5778.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "CV-41003",
+      "total_packages": "3",
+      "package_type": "PALLETS",
+      "total_net_weight_kg": "810.00",
+      "total_gross_weight_kg": "866.00",
+      "container_numbers": "NRDU2051011",
+      "marks": "CO-F / NSA / P1-3"
+    },
+    "lines": [
+      {
+        "description": "Check valve DN80 swing type",
+        "quantity": "90",
+        "packages": "3",
+        "net_weight_kg": "810.00",
+        "gross_weight_kg": "866.00"
+      }
+    ]
+  },
+  "_meta": {
+    "faults": [
+      "B/L missing → X4, X5, X7 not checkable"
+    ],
+    "unreadable": [],
+    "scan": "clean",
+    "bilingual": false
+  }
+}

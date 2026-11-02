@@ -1,0 +1,90 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company H Antriebstechnik GmbH",
+      "supplier_country": "Germany",
+      "buyer_name": "Company F Flow Controls Ltd",
+      "invoice_number": "RE-2026-08812",
+      "invoice_date": "2026-10-09",
+      "currency": "EUR",
+      "incoterm": "FCA",
+      "incoterm_place": "Stuttgart",
+      "country_of_origin": "Germany",
+      "invoice_total": "16576.00",
+      "total_packages": "5",
+      "total_net_weight_kg": "430.00",
+      "total_gross_weight_kg": "480.00"
+    },
+    "lines": [
+      {
+        "description": "Pneumatic actuator double-acting DA-105",
+        "hsn": "84122100",
+        "quantity": "40",
+        "unit": "PCS",
+        "unit_price": "318.00",
+        "amount": "12720.00"
+      },
+      {
+        "description": "Solenoid valve 5/2 NAMUR 24V DC",
+        "hsn": "84812000",
+        "quantity": "40",
+        "unit": "PCS",
+        "unit_price": "96.40",
+        "amount": "3856.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "RE-2026-08821",
+      "total_packages": "5",
+      "package_type": "PALLETS",
+      "total_net_weight_kg": "430.00",
+      "total_gross_weight_kg": "480.00",
+      "container_numbers": "RHNU5412087",
+      "marks": "CO-F / NSA / 1-5"
+    },
+    "lines": [
+      {
+        "description": "Pneumatic actuator double-acting DA-105",
+        "quantity": "40",
+        "packages": "4",
+        "net_weight_kg": "392.00",
+        "gross_weight_kg": "436.00"
+      },
+      {
+        "description": "Solenoid valve 5/2 NAMUR 24V DC",
+        "quantity": "40",
+        "packages": "1",
+        "net_weight_kg": "38.00",
+        "gross_weight_kg": "44.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "HAMNSA6631208",
+      "shipper_name": "Company H Antriebstechnik GmbH",
+      "consignee_name": "Company F Flow Controls Ltd",
+      "vessel": "RHINE TIGRIS",
+      "voyage": "0FM3RW1MA",
+      "port_of_loading": "Hamburg, Germany",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "RHNU5412805",
+      "seal_numbers": "DE7713405",
+      "total_packages": "5",
+      "package_type": "PALLETS",
+      "total_gross_weight_kg": "480.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [
+      "X7: container differs PL vs B/L",
+      "X9: PL quotes RE-2026-08821"
+    ],
+    "unreadable": [],
+    "scan": "clean",
+    "bilingual": false
+  }
+}

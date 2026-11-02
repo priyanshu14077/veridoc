@@ -1,8 +1,11 @@
 import os
+import tempfile
 
 os.environ.setdefault(
     "DATABASE_URL", "postgresql+psycopg://crosscheck:crosscheck@localhost:5433/crosscheck_test"
 )
+os.environ["STORAGE_DIR"] = tempfile.mkdtemp(prefix="crosscheck-test-")
+os.environ["GEMINI_API_KEY"] = ""  # tests must never reach the real model
 
 from collections.abc import Iterator  # noqa: E402
 

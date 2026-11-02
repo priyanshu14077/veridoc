@@ -4,13 +4,16 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException, Query
 from fastapi import status as http
 from pydantic import BaseModel
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, text
+from sqlalchemy.orm import Session
 
 from app import audit
 from app.auth.deps import DB, CurrentUser
-from app.models import Importer, Shipment, Supplier
+from app.documents.router import DocumentOut, doc_out
+from app.models import Importer, Shipment, Supplier, User
 from app.privacy import mask_email, mask_name, mask_phone
 from app.shipments.access import can_see_contact, get_visible_shipment, visible_to
+from app.shipments.status import active_documents, open_flags
 
 router = APIRouter(prefix="/shipments", tags=["shipments"])
 
@@ -52,10 +55,26 @@ class ContactOut(BaseModel):
     masked: bool
 
 
+class FlagOut(BaseModel):
+    kind: str
+    document_id: int | None
+    field_id: int | None
+    check_id: int | None
+    message: str
+
+
 class ShipmentDetail(ShipmentRow):
     importer_iec: str
     contact: ContactOut
     can_reveal_contact: bool
+    documents: list[DocumentOut]
+    flags: list[FlagOut]
+
+
+class ShipmentIn(BaseModel):
+    importer_id: int
+    supplier_id: int | None = None
+    assignee_id: int | None = None
 
 
 def _row(s: Shipment) -> ShipmentRow:
@@ -68,7 +87,7 @@ def _row(s: Shipment) -> ShipmentRow:
         if s.supplier
         else None,
         assignee=PartyOut(id=s.assignee.id, name=s.assignee.name) if s.assignee else None,
-        open_flags=0,  # computed from fields/checks once extraction lands (TDD §3)
+        open_flags=s.open_flag_count,
         updated_at=s.updated_at,
     )
 
@@ -143,12 +162,59 @@ def _contact(s: Shipment, reveal: bool) -> ContactOut:
 def get_shipment(shipment_id: int, user: CurrentUser, db: DB) -> ShipmentDetail:
     s = get_visible_shipment(db, user, shipment_id)
     # Always masked here; the unmasked contact needs an explicit, logged reveal.
+    return _detail(db, user, s)
+
+
+def _detail(db: Session, user: User, s: Shipment) -> ShipmentDetail:
     return ShipmentDetail(
         **_row(s).model_dump(),
         importer_iec=s.importer.iec_code,
         contact=_contact(s, False),
         can_reveal_contact=can_see_contact(user, s),
+        documents=[doc_out(d) for d in active_documents(db, s.id)],
+        flags=[FlagOut(**vars(f)) for f in open_flags(db, s.id)],
     )
+
+
+@router.post("", response_model=ShipmentDetail, status_code=http.HTTP_201_CREATED)
+def create_shipment(body: ShipmentIn, user: CurrentUser, db: DB) -> ShipmentDetail:
+    if db.get(Importer, body.importer_id) is None:
+        raise HTTPException(http.HTTP_422_UNPROCESSABLE_CONTENT, "Unknown importer")
+    if body.supplier_id is not None and db.get(Supplier, body.supplier_id) is None:
+        raise HTTPException(http.HTTP_422_UNPROCESSABLE_CONTENT, "Unknown supplier")
+    assignee_id = body.assignee_id
+    if user.role == "executive":
+        # Executives create shipments for themselves; only managers assign to others.
+        if assignee_id not in (None, user.id):
+            raise HTTPException(http.HTTP_403_FORBIDDEN, "Only a manager can assign to others")
+        assignee_id = user.id
+    elif assignee_id is not None:
+        a = db.get(User, assignee_id)
+        if a is None or not a.is_active or a.role != "executive":
+            raise HTTPException(
+                http.HTTP_422_UNPROCESSABLE_CONTENT, "Assignee must be an executive"
+            )
+    seq = db.scalar(text("SELECT nextval('shipment_ref_seq')"))
+    s = Shipment(
+        ref=f"SHP-{seq:05d}",
+        importer_id=body.importer_id,
+        supplier_id=body.supplier_id,
+        assignee_id=assignee_id,
+        created_by=user.id,
+    )
+    db.add(s)
+    db.flush()
+    audit.record(
+        db,
+        actor_id=user.id,
+        entity="shipment",
+        entity_id=s.id,
+        action="created",
+        after=body.model_dump() | {"assignee_id": assignee_id},
+    )
+    db.commit()
+    db.refresh(s)
+    return _detail(db, user, s)
 
 
 @router.post("/{shipment_id}/contact/reveal", response_model=ContactOut)

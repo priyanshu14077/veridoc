@@ -1,0 +1,298 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 15128,
+ "tokens_in": 1141,
+ "tokens_out": 1838,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company J Packaging Joint Stock Company",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    193,
+    75,
+    207,
+    421
+   ]
+  },
+  "supplier_country": {
+   "value": "Vietnam",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    63,
+    407,
+    72,
+    452
+   ]
+  },
+  "buyer_name": {
+   "value": "Company G Packaging Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    203,
+    532,
+    218,
+    767
+   ]
+  },
+  "invoice_number": {
+   "value": "JP/EX/26/0457",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    146,
+    74,
+    159,
+    183
+   ]
+  },
+  "invoice_date": {
+   "value": "02/10/2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    151,
+    296,
+    163,
+    375
+   ]
+  },
+  "currency": {
+   "value": "USD",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    163,
+    737,
+    174,
+    773
+   ]
+  },
+  "incoterm": {
+   "value": "FOB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    517,
+    166,
+    550
+   ]
+  },
+  "incoterm_place": {
+   "value": "Cat Lai",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    555,
+    166,
+    613
+   ]
+  },
+  "country_of_origin": {
+   "value": "Vietnam",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    268,
+    185,
+    279,
+    235
+   ]
+  },
+  "invoice_total": {
+   "value": "9,840.00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    389,
+    869,
+    401,
+    940
+   ]
+  },
+  "total_packages": {
+   "value": "360 BUNDLES",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    406,
+    172,
+    417,
+    275
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "7,740.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    424,
+    142,
+    436,
+    241
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "8,165.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    440,
+    161,
+    452,
+    258
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Corrugated carton box 5-ply 600x400x400",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      324,
+      117,
+      338,
+      392
+     ]
+    },
+    "hsn": {
+     "value": "48191010",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      328,
+      466,
+      340,
+      538
+     ]
+    },
+    "quantity": {
+     "value": "12,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      333,
+      615,
+      345,
+      663
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      333,
+      674,
+      344,
+      706
+     ]
+    },
+    "unit_price": {
+     "value": "0.62",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      337,
+      799,
+      348,
+      830
+     ]
+    },
+    "amount": {
+     "value": "7,440.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      337,
+      887,
+      349,
+      946
+     ]
+    }
+   },
+   {
+    "description": {
+     "value": "Die-cut carton divider insert",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      350,
+      118,
+      362,
+      297
+     ]
+    },
+    "hsn": {
+     "value": "48239090",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      355,
+      467,
+      366,
+      533
+     ]
+    },
+    "quantity": {
+     "value": "6,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      622,
+      370,
+      662
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      358,
+      674,
+      369,
+      706
+     ]
+    },
+    "unit_price": {
+     "value": "0.35",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      361,
+      799,
+      372,
+      830
+     ]
+    },
+    "amount": {
+     "value": "2,100.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      362,
+      886,
+      374,
+      944
+     ]
+    }
+   }
+  ]
+ }
+}

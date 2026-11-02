@@ -1,0 +1,230 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 10436,
+ "tokens_in": 1141,
+ "tokens_out": 889,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company C Valves AB",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    200,
+    56,
+    215,
+    226
+   ]
+  },
+  "supplier_country": {
+   "value": "SWEDEN",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    232,
+    56,
+    243,
+    119
+   ]
+  },
+  "buyer_name": {
+   "value": "Company F Flow Controls Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    200,
+    518,
+    214,
+    747
+   ]
+  },
+  "invoice_number": {
+   "value": "CV-40921",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    55,
+    167,
+    131
+   ]
+  },
+  "invoice_date": {
+   "value": "2026-10-14",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    281,
+    167,
+    368
+   ]
+  },
+  "currency": {
+   "value": "EUR",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    720,
+    167,
+    755
+   ]
+  },
+  "incoterm": {
+   "value": "CIF",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    517,
+    167,
+    547
+   ]
+  },
+  "incoterm_place": {
+   "value": "Nhava Sheva",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    553,
+    167,
+    638
+   ]
+  },
+  "country_of_origin": {
+   "value": "Sweden",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    278,
+    172,
+    288,
+    225
+   ]
+  },
+  "invoice_total": {
+   "value": "7 650,00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    358,
+    866,
+    372,
+    935
+   ]
+  },
+  "total_packages": {
+   "value": "6 PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    392,
+    163,
+    403,
+    242
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "1 380,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    410,
+    138,
+    421,
+    237
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "1 460,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    428,
+    149,
+    439,
+    252
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Steel ball valve DN50 PN40, flanged",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      111,
+      343,
+      347
+     ]
+    },
+    "hsn": {
+     "value": "84818030",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      456,
+      341,
+      524
+     ]
+    },
+    "quantity": {
+     "value": "180",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      631,
+      341,
+      655
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      666,
+      341,
+      699
+     ]
+    },
+    "unit_price": {
+     "value": "42,50",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      783,
+      342,
+      824
+     ]
+    },
+    "amount": {
+     "value": "7 650,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      330,
+      881,
+      342,
+      935
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 9211,
+ "tokens_in": 1061,
+ "tokens_out": 943,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "JP/EX/26/0471",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    171,
+    26,
+    186,
+    146
+   ]
+  },
+  "total_packages": {
+   "value": "80",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    287,
+    85,
+    298,
+    105
+   ]
+  },
+  "package_type": {
+   "value": "ROLLS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    287,
+    110,
+    298,
+    161
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "19,200.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    303,
+    160,
+    314,
+    267
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "19,680.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    319,
+    175,
+    330,
+    283
+   ]
+  },
+  "container_numbers": {
+   "value": "MKSU 771301-0",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    365,
+    28,
+    377,
+    163
+   ]
+  },
+  "marks": {
+   "value": "CO-G / BHIWANDI",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    390,
+    183,
+    403,
+    313
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Kraft paper roll 120 gsm, 1200 mm",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      224,
+      43,
+      239,
+      266
+     ]
+    },
+    "quantity": {
+     "value": "80",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      216,
+      422,
+      227,
+      442
+     ]
+    },
+    "packages": {
+     "value": "80",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      508,
+      225,
+      526
+     ]
+    },
+    "net_weight_kg": {
+     "value": "19,200.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      212,
+      580,
+      222,
+      648
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "19,680.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      208,
+      696,
+      219,
+      765
+     ]
+    }
+   }
+  ]
+ }
+}

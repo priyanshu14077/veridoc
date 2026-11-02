@@ -1,0 +1,210 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 12250,
+ "tokens_in": 1061,
+ "tokens_out": 1315,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "JP/EX/26/0457",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    146,
+    72,
+    160,
+    184
+   ]
+  },
+  "total_packages": {
+   "value": "360",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    292,
+    126,
+    307,
+    158
+   ]
+  },
+  "package_type": {
+   "value": "BUNDLES",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    292,
+    164,
+    306,
+    222
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "7,740.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    314,
+    187,
+    329,
+    281
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "8,165.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    333,
+    201,
+    346,
+    298
+   ]
+  },
+  "container_numbers": {
+   "value": "MKSU 771230-7; MKSU 771245-7",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    371,
+    57,
+    404,
+    182
+   ]
+  },
+  "marks": {
+   "value": "CO-G / BHIWANDI",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    424,
+    196,
+    436,
+    320
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Corrugated carton box 5-ply 600x400x400",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      204,
+      76,
+      226,
+      260
+     ]
+    },
+    "quantity": {
+     "value": "12,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      211,
+      438,
+      224,
+      480
+     ]
+    },
+    "packages": {
+     "value": "300",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      212,
+      538,
+      223,
+      563
+     ]
+    },
+    "net_weight_kg": {
+     "value": "6,900.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      212,
+      626,
+      224,
+      680
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "7,260.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      212,
+      755,
+      223,
+      810
+     ]
+    }
+   },
+   {
+    "description": {
+     "value": "Die-cut carton divider insert",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      238,
+      77,
+      248,
+      255
+     ]
+    },
+    "quantity": {
+     "value": "6,000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      238,
+      444,
+      249,
+      480
+     ]
+    },
+    "packages": {
+     "value": "60",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      238,
+      545,
+      249,
+      563
+     ]
+    },
+    "net_weight_kg": {
+     "value": "840.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      238,
+      636,
+      249,
+      680
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "905.00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      238,
+      765,
+      249,
+      810
+     ]
+    }
+   }
+  ]
+ }
+}

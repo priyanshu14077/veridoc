@@ -1,0 +1,298 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 13411,
+ "tokens_in": 1141,
+ "tokens_out": 1830,
+ "response": {
+  "detected_doc_type": "invoice",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "supplier_name": {
+   "value": "Company H Antriebstechnik GmbH",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    41,
+    57,
+    57,
+    431
+   ]
+  },
+  "supplier_country": {
+   "value": "Germany",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    229,
+    66,
+    239,
+    137
+   ]
+  },
+  "buyer_name": {
+   "value": "Company F Flow Controls Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    202,
+    517,
+    215,
+    747
+   ]
+  },
+  "invoice_number": {
+   "value": "RE-2026-08812",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    60,
+    166,
+    175
+   ]
+  },
+  "invoice_date": {
+   "value": "09.10.2026",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    279,
+    166,
+    355
+   ]
+  },
+  "currency": {
+   "value": "EUR",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    720,
+    166,
+    752
+   ]
+  },
+  "incoterm": {
+   "value": "FCA",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    517,
+    166,
+    549
+   ]
+  },
+  "incoterm_place": {
+   "value": "Stuttgart",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    155,
+    554,
+    167,
+    610
+   ]
+  },
+  "country_of_origin": {
+   "value": "Germany",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    278,
+    170,
+    289,
+    219
+   ]
+  },
+  "invoice_total": {
+   "value": "16.576,00",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    380,
+    843,
+    393,
+    938
+   ]
+  },
+  "total_packages": {
+   "value": "5 PALLETS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    416,
+    172,
+    427,
+    248
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "430,00 KGS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    432,
+    142,
+    444,
+    216
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "480,00 KGS",
+   "confidence": 0.98,
+   "page": 1,
+   "box_2d": [
+    449,
+    154,
+    461,
+    227
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Pneumatic actuator double-acting DA-105",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      112,
+      343,
+      381
+     ]
+    },
+    "hsn": {
+     "value": "84122100",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      456,
+      341,
+      524
+     ]
+    },
+    "quantity": {
+     "value": "40",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      638,
+      341,
+      655
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      670,
+      341,
+      698
+     ]
+    },
+    "unit_price": {
+     "value": "318,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      775,
+      343,
+      820
+     ]
+    },
+    "amount": {
+     "value": "12.720,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      331,
+      874,
+      343,
+      938
+     ]
+    }
+   },
+   {
+    "description": {
+     "value": "Solenoid valve 5/2 NAMUR 24V DC",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      356,
+      112,
+      366,
+      340
+     ]
+    },
+    "hsn": {
+     "value": "84812000",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      356,
+      456,
+      366,
+      524
+     ]
+    },
+    "quantity": {
+     "value": "40",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      356,
+      638,
+      366,
+      655
+     ]
+    },
+    "unit": {
+     "value": "PCS",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      356,
+      670,
+      366,
+      698
+     ]
+    },
+    "unit_price": {
+     "value": "96,40",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      356,
+      783,
+      367,
+      820
+     ]
+    },
+    "amount": {
+     "value": "3.856,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      356,
+      881,
+      367,
+      938
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -35,7 +35,7 @@ The core rule behind the design: **the AI proposes and a person disposes.** The 
 | Job queue | A Postgres `jobs` table + worker process | One fewer service (no Redis/Celery). The queue is transactional with the data. 1,100 shipments a month is about 3,300 jobs, far below where Postgres queues struggle | Celery + Redis: more infrastructure for no gain at this volume |
 | Database | Postgres 16 | Relational data, JSONB for raw AI output, row locks for the queue | |
 | Storage | `Storage` interface: local driver (dev) and S3 driver (prod) | Runs with zero setup locally. In prod, a private bucket in Mumbai | MinIO in dev: one more container to start |
-| AI | Gemini (Flash-class model, set by `GEMINI_MODEL`) through the `google-genai` SDK | Free tier available (the client's constraint for this build). Native PDF input. JSON schema output. Same SDK as Vertex AI, so moving to Vertex is a config change | OCR + LLM (decided against in the PRD: more to build in 14 h) |
+| AI | Gemini `gemini-3.5-flash` (set by `GEMINI_MODEL`, with fallbacks) through the `google-genai` SDK | Free tier available (the client's constraint for this build). Native PDF input. JSON schema output. Same SDK as Vertex AI, so moving to Vertex is a config change | OCR + LLM (decided against in the PRD: more to build in 14 h) |
 | Auth | Server-side sessions in Postgres, argon2id password hashes, httpOnly cookie | Simple to reason about, can be revoked, no JWTs in localStorage | Auth SaaS: an outside dependency plus data outside India |
 
 **Why one API plus one worker rather than microservices:** a 14-person team at a single site needs one deployable unit. The worker is a second process running the same code. It exists only so a slow AI call never holds up an HTTP request.
@@ -145,26 +145,30 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
 | Wrong value, model confident | Validator fails or a cross-check fails | Flagged. This is why the checks exist |
 | Wrong value, confident, passes every check | Not detectable by design | Measured as **unflagged error rate** in the eval (§5.6) and reported honestly |
 | Unreadable page | `readable=false`, or ≥ 70% of required fields null **[A16]** | Document set to `manual`. Empty fields beside the image |
-| Invalid JSON or schema mismatch | Pydantic validation | 1 retry, then `failed` |
-| 429 / 5xx / timeout | SDK error | Backoff 5 s → 20 s → 60 s (3 attempts), then `failed` with **Retry** and **Enter manually** |
+| Invalid JSON or schema mismatch | Pydantic validation | Retried like a 5xx, then `failed` |
+| 503 / 504 / timeout | SDK error | Next model in `GEMINI_FALLBACK_MODELS` at once; if all fail, backoff 5 s → 20 s → 60 s (3 attempts), then `failed` with **Retry** and **Enter by hand** |
+| 429 quota exhausted | SDK error with Google's `RetryInfo` | Next model (each has its own quota). If every model is out, the job waits until the provider's reset time **without spending an attempt**, and the document shows "Daily AI limit reached, retrying at HH:MM IST" with **Enter by hand** |
+| User picks manual entry while a job waits, or replaces the file mid-call | Worker re-reads the document under `FOR UPDATE` before saving | Queued job is cancelled; an in-flight result is discarded, never written over manual work |
 | Prompt injection in document text | Model has no tools. Output is schema-bound and treated as data | At worst a wrong value, which is caught like any other wrong value |
 | Wrong document type uploaded | `detected_doc_type` ≠ chosen type | Warning with a one-click "change type" |
 
-### 5.6 Evaluation *(fill after build)*
+### 5.6 Evaluation
 - `scripts/generate_docs.py` renders invoice, PL and B/L PDFs from a JSON spec, with "scanned" variants: rotated 1–4°, Gaussian noise, JPEG artefacts, a stamp overlay, and one Chinese + English set. **The spec is the ground truth**, so labels are exact.
-- `make eval` extracts 20 shipments (60 documents) and reports:
+- `scripts/record_fixtures.py` runs real Gemini extraction on every sample and saves the raw output; `scripts/eval.py` scores those recordings against the ground truth. It reports:
   - **field accuracy**: normalised value == truth, per field and overall;
   - **flag recall**: of the fields that are wrong, the share that are flagged. This is the safety metric;
   - **unflagged error rate**: wrong and not flagged, out of all fields. The aim is ≤ 1%;
   - **review load**: flagged fields per shipment. This drives the client's 15-minute target.
 - **Choosing the threshold:** the lowest threshold that keeps the unflagged error rate ≤ 1%. The trade-off table goes here.
+- **First results (2026-11-02, 18 documents / 291 fields, `gemini-3.5-flash`):** 291/291 fields correct after normalisation. The first run scored 287/291, and all 4 misses were *our* normaliser bugs (country casing, "360 BUNDLES" as a number), not model errors; both were fixed with tests.
+- **Finding: self-reported confidence doesn't catch the hard case.** On SHP-24817 a rubber stamp covers the invoice total. The model read it correctly but reported 0.95 confidence, the same as clean text. A threshold can't separate "covered by a stamp" from "clean" if the model doesn't. This is the strongest argument for the deterministic cross-checks: they catch a wrong value regardless of how confident the model is.
 - Limitation stated up front: synthetic documents are cleaner than real scans, so these numbers are an upper bound. The real 200-shipment check is the first step after go-live.
 
 ### 5.7 Provider, privacy and cost
 - **Demo:** free-tier Gemini API key, **synthetic data only** [A11]. The free tier's terms allow Google to use submitted content to improve its products, so the free tier must never see real client documents.
 - **Production design:** the same SDK pointed at **Vertex AI** (`GOOGLE_GENAI_USE_VERTEXAI=true`) in an Indian region. Vertex AI's terms say customer data is not used for training. *Check available models in `asia-south1` before final submission.*
-- Cost at the client's volume *(fill with measured tokens)*: 3,300 documents a month × average tokens × price.
-- Free-tier rate limit: the worker runs at concurrency 1 with a token bucket set by `GEMINI_RPM`. Seed shipments are stored already extracted, so the demo doesn't spend quota.
+- **Measured tokens:** about 1,060–1,140 input and 600–1,850 output tokens per one-page document; latency 7.5–16 s (median about 11 s). Cost at the client's volume = 3,300 documents/month × these tokens × the paid price for the chosen model *(fill in from the current price list)*.
+- **Free tier is capped at 20 requests per model per day** (Google's `GenerateRequestsPerDayPerProjectPerModel-FreeTier`; the `gemini-3.5-flash` alias counts against `gemini-3.6-flash`). That's about 6 shipments a day per model. The worker falls back across models (each has its own quota) and then waits for the reset (§5.5). The worker also paces calls with `GEMINI_RPM`. Seed shipments replay recorded real extractions, so the demo doesn't spend quota. Production needs a paid tier, which also removes the training-on-data concern.
 
 ## 6. API surface
 

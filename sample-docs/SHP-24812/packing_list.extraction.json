@@ -1,0 +1,153 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 7507,
+ "tokens_in": 1061,
+ "tokens_out": 933,
+ "response": {
+  "detected_doc_type": "packing_list",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "invoice_reference": {
+   "value": "CV-40921",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    156,
+    56,
+    169,
+    131
+   ]
+  },
+  "total_packages": {
+   "value": "6",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    273,
+    102,
+    285,
+    112
+   ]
+  },
+  "package_type": {
+   "value": "PALLETS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    273,
+    116,
+    286,
+    192
+   ]
+  },
+  "total_net_weight_kg": {
+   "value": "1 380,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    293,
+    182,
+    304,
+    273
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "1 460,00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    310,
+    193,
+    321,
+    290
+   ]
+  },
+  "container_numbers": {
+   "value": "NRDU 204917-0",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    351,
+    56,
+    363,
+    180
+   ]
+  },
+  "marks": {
+   "value": "CO-F / NSA / P1-6",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    381,
+    192,
+    392,
+    320
+   ]
+  },
+  "lines": [
+   {
+    "description": {
+     "value": "Steel ball valve DN50 PN40, flanged",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      62,
+      228,
+      303
+     ]
+    },
+    "quantity": {
+     "value": "180",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      442,
+      227,
+      467
+     ]
+    },
+    "packages": {
+     "value": "6",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      538,
+      227,
+      547
+     ]
+    },
+    "net_weight_kg": {
+     "value": "1 380,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      613,
+      227,
+      668
+     ]
+    },
+    "gross_weight_kg": {
+     "value": "1 460,00",
+     "confidence": 0.99,
+     "page": 1,
+     "box_2d": [
+      215,
+      743,
+      227,
+      800
+     ]
+    }
+   }
+  ]
+ }
+}

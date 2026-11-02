@@ -1,0 +1,149 @@
+{
+ "model": "gemini-3.5-flash",
+ "prompt_version": "v1",
+ "latency_ms": 9691,
+ "tokens_in": 1068,
+ "tokens_out": 919,
+ "response": {
+  "detected_doc_type": "bill_of_lading",
+  "pages": [
+   {
+    "page": 1,
+    "readable": true,
+    "reason": null
+   }
+  ],
+  "bl_number": {
+   "value": "SZXNSA2611874",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    83,
+    772,
+    97,
+    946
+   ]
+  },
+  "shipper_name": {
+   "value": "Company B Lighting Technology Co., Ltd.",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    133,
+    58,
+    146,
+    386
+   ]
+  },
+  "consignee_name": {
+   "value": "Company E Lighting Pvt Ltd",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    226,
+    58,
+    238,
+    283
+   ]
+  },
+  "vessel": {
+   "value": "SEA LOTUS 512",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    128,
+    508,
+    140,
+    638
+   ]
+  },
+  "voyage": {
+   "value": "W061",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    128,
+    712,
+    140,
+    762
+   ]
+  },
+  "port_of_loading": {
+   "value": "Shenzhen (Yantian), China",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    167,
+    508,
+    180,
+    720
+   ]
+  },
+  "port_of_discharge": {
+   "value": "Nhava Sheva, India",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    206,
+    508,
+    220,
+    663
+   ]
+  },
+  "container_numbers": {
+   "value": "LTSU8361040",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    60,
+    442,
+    159
+   ]
+  },
+  "seal_numbers": {
+   "value": "CN4471203",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    172,
+    442,
+    245
+   ]
+  },
+  "total_packages": {
+   "value": "240",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    313,
+    442,
+    339
+   ]
+  },
+  "package_type": {
+   "value": "CARTONS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    344,
+    442,
+    411
+   ]
+  },
+  "total_gross_weight_kg": {
+   "value": "3,165.00 KGS",
+   "confidence": 0.99,
+   "page": 1,
+   "box_2d": [
+    430,
+    846,
+    442,
+    940
+   ]
+  }
+ }
+}

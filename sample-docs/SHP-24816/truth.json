@@ -1,0 +1,72 @@
+{
+  "invoice": {
+    "header": {
+      "supplier_name": "Company J Packaging Joint Stock Company",
+      "supplier_country": "Vietnam",
+      "buyer_name": "Company G Packaging Pvt Ltd",
+      "invoice_number": "JP/EX/26/0471",
+      "invoice_date": "2026-10-11",
+      "currency": "USD",
+      "incoterm": "FOB",
+      "incoterm_place": "Cat Lai",
+      "country_of_origin": "Vietnam",
+      "invoice_total": "7040.00",
+      "total_packages": "80",
+      "total_net_weight_kg": "19200.00",
+      "total_gross_weight_kg": "19680.00"
+    },
+    "lines": [
+      {
+        "description": "Kraft paper roll 120 gsm, 1200 mm",
+        "hsn": "48042900",
+        "quantity": "80",
+        "unit": "ROLLS",
+        "unit_price": "88.00",
+        "amount": "7040.00"
+      }
+    ]
+  },
+  "packing_list": {
+    "header": {
+      "invoice_reference": "JP/EX/26/0471",
+      "total_packages": "80",
+      "package_type": "ROLLS",
+      "total_net_weight_kg": "19200.00",
+      "total_gross_weight_kg": "19680.00",
+      "container_numbers": "MKSU7713010",
+      "marks": "CO-G / BHIWANDI"
+    },
+    "lines": [
+      {
+        "description": "Kraft paper roll 120 gsm, 1200 mm",
+        "quantity": "80",
+        "packages": "80",
+        "net_weight_kg": "19200.00",
+        "gross_weight_kg": "19680.00"
+      }
+    ]
+  },
+  "bill_of_lading": {
+    "header": {
+      "bl_number": "SGNNSA260471",
+      "shipper_name": "Company J Packaging Joint Stock Company",
+      "consignee_name": "Company G Packaging Pvt Ltd",
+      "vessel": "MEKONG STAR",
+      "voyage": "2613W",
+      "port_of_loading": "Cat Lai, Ho Chi Minh City, Vietnam",
+      "port_of_discharge": "Nhava Sheva, India",
+      "container_numbers": "MKSU7713010",
+      "seal_numbers": "VN771301A",
+      "total_packages": "80",
+      "package_type": "ROLLS",
+      "total_gross_weight_kg": "19680.00"
+    },
+    "lines": []
+  },
+  "_meta": {
+    "faults": [],
+    "unreadable": [],
+    "scan": "heavy",
+    "bilingual": false
+  }
+}

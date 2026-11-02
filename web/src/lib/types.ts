@@ -39,10 +39,81 @@ export interface Contact {
   masked: boolean;
 }
 
+export type DocType = "invoice" | "packing_list" | "bill_of_lading";
+export type ExtractionStatus = "pending" | "running" | "done" | "failed" | "manual";
+
+export interface DocumentSummary {
+  id: number;
+  doc_type: DocType;
+  file_name: string;
+  mime: string;
+  size_bytes: number;
+  page_count: number | null;
+  extraction_status: ExtractionStatus;
+  detected_type: DocType | null;
+  error: string | null;
+  created_at: string;
+  flag_count: number;
+}
+
+export type FlagKind =
+  | "low_confidence"
+  | "missing_required"
+  | "check_failed"
+  | "check_not_checkable"
+  | "extraction_failed"
+  | "extraction_pending";
+
+export interface Flag {
+  kind: FlagKind;
+  document_id: number | null;
+  field_id: number | null;
+  check_id: number | null;
+  message: string;
+}
+
 export interface ShipmentDetail extends ShipmentRow {
   importer_iec: string;
   contact: Contact;
   can_reveal_contact: boolean;
+  documents: DocumentSummary[];
+  flags: Flag[];
+}
+
+export interface FieldValue {
+  id: number;
+  key: string;
+  label: string;
+  section: "parties" | "document" | "shipping" | "totals" | "lines";
+  kind: string;
+  required: boolean;
+  line_index: number | null;
+  value: string | null;
+  normalized: unknown;
+  ai_value: string | null;
+  confidence: number;
+  validator_errors: string[];
+  status: "ai" | "confirmed" | "edited" | "manual";
+  page: number | null;
+  bbox: number[] | null;
+  version: number;
+  flag: FlagKind | null;
+}
+
+export interface DocumentDetail extends DocumentSummary {
+  fields: FieldValue[];
+}
+
+export interface Importer {
+  id: number;
+  name: string;
+  iec_code: string;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+  country: string;
 }
 
 export interface TeamMember {

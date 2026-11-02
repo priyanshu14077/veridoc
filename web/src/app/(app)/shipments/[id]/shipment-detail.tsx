@@ -1,10 +1,11 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Eye, FileText, Lock } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Eye, FileText, Lock, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
+import { DocumentsPanel } from "@/components/documents-panel";
 import { StatusChip } from "@/components/status-chip";
 import { Button, EmptyState, ErrorState } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
@@ -15,6 +16,15 @@ export function ShipmentDetailView() {
   const q = useQuery({
     queryKey: ["shipment", id],
     queryFn: () => api<ShipmentDetail>(`/shipments/${encodeURIComponent(id)}`),
+    // Poll only while something is being read; stop as soon as extraction settles.
+    refetchInterval: (query) => {
+      const waiting = (query.state.data?.documents ?? []).filter((d) =>
+        ["pending", "running"].includes(d.extraction_status),
+      );
+      if (!waiting.length) return false;
+      // Documents waiting out a daily quota won't change for a while; poll gently.
+      return waiting.every((d) => d.error) ? 30_000 : 2000;
+    },
   });
 
   useEffect(() => {
@@ -59,13 +69,10 @@ export function ShipmentDetailView() {
           </p>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
-            <section className="rounded-md border border-line bg-surface">
-              <h2 className="border-b border-line px-4 py-3 font-medium">Documents</h2>
-              <EmptyState
-                title="No documents yet"
-                body="The invoice, packing list and bill of lading for this shipment will appear here."
-              />
-            </section>
+            <div className="space-y-6">
+              <FlagSummary shipment={q.data} />
+              <DocumentsPanel shipment={q.data} />
+            </div>
 
             <aside className="space-y-6">
               <dl className="rounded-md border border-line bg-surface p-4 text-sm">
@@ -139,5 +146,50 @@ function ContactCard({
         </p>
       )}
     </section>
+  );
+}
+
+function FlagSummary({ shipment }: { shipment: ShipmentDetail }) {
+  const reviewable = shipment.flags.filter((f) => f.kind !== "extraction_pending");
+  if (shipment.documents.length === 0) {
+    return (
+      <p className="rounded-md border border-dashed border-line-strong px-4 py-3 text-sm text-muted">
+        Start by uploading the invoice, packing list and bill of lading below. Each one is read
+        automatically, and anything uncertain is flagged for you.
+      </p>
+    );
+  }
+  if (shipment.status === "extracting") {
+    return (
+      <p className="rounded-md bg-accent-soft px-4 py-3 text-sm text-accent">
+        Reading documents. This usually takes 10 to 20 seconds per document. You can leave this
+        page; it keeps going.
+      </p>
+    );
+  }
+  if (reviewable.length === 0) {
+    return (
+      <p className="flex items-center gap-2 rounded-md bg-clear-soft px-4 py-3 text-sm text-clear">
+        <CheckCircle2 aria-hidden className="size-4" /> Nothing needs you. Every field was read with
+        confidence.
+      </p>
+    );
+  }
+  const byDoc = new Map<number | null, number>();
+  for (const f of reviewable) byDoc.set(f.document_id, (byDoc.get(f.document_id) ?? 0) + 1);
+  return (
+    <div className="rounded-md bg-unsure-soft px-4 py-3 text-sm">
+      <p className="flex items-center gap-2 font-medium text-unsure">
+        <TriangleAlert aria-hidden className="size-4" />
+        {reviewable.length} thing{reviewable.length > 1 ? "s" : ""} need
+        {reviewable.length > 1 ? "" : "s"} you before export
+      </p>
+      <ul className="mt-2 space-y-1 text-ink-2">
+        {reviewable.slice(0, 5).map((f, i) => (
+          <li key={i}>· {f.message}</li>
+        ))}
+        {reviewable.length > 5 && <li className="text-muted">and {reviewable.length - 5} more</li>}
+      </ul>
+    </div>
   );
 }
