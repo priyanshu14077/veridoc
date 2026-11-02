@@ -16,9 +16,12 @@ from sqlalchemy.orm import Session  # noqa: E402
 
 from app.config import get_settings  # noqa: E402
 from app.db import SessionLocal, engine  # noqa: E402
+from app.extraction import gemini  # noqa: E402
+from app.extraction.gemini import ExtractionResult  # noqa: E402
 from app.main import app  # noqa: E402
 from app.migrate import migrate  # noqa: E402
 from app.seed import DEMO_PASSWORD, seed  # noqa: E402
+from tests.helpers import fake_result  # noqa: E402
 
 ORIGIN = {"Origin": "http://localhost:3000"}
 
@@ -71,3 +74,19 @@ def login(client: TestClient, email: str) -> TestClient:
 EXEC = "meera.exec@crosscheck.demo"
 EXEC2 = "rohan.exec@crosscheck.demo"
 MANAGER = "anil.manager@crosscheck.demo"
+
+
+@pytest.fixture
+def fake_gemini(monkeypatch):
+    calls: list[str] = []
+    behaviour: dict = {}
+
+    def _extract(data: bytes, mime: str, doc_type: str) -> ExtractionResult:
+        calls.append(doc_type)
+        b = behaviour.get(doc_type)
+        if isinstance(b, Exception):
+            raise b
+        return b or fake_result(doc_type)
+
+    monkeypatch.setattr(gemini, "extract", _extract)
+    return calls, behaviour
