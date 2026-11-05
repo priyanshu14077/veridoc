@@ -7,6 +7,8 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { ChecksPanel } from "@/components/checks-panel";
 import { DocumentsPanel } from "@/components/documents-panel";
+import { ExportCard } from "@/components/export-card";
+import { ExportPreview } from "@/components/export-preview";
 import { StatusChip } from "@/components/status-chip";
 import { Button, EmptyState, ErrorState } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
@@ -75,13 +77,17 @@ export function ShipmentDetailView() {
           </p>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
               <FlagSummary shipment={q.data} />
+              {/* On a phone the export comes straight after the summary, not below everything. */}
+              <ExportCard shipment={q.data} className="lg:hidden" />
               <ChecksPanel shipment={q.data} />
               <DocumentsPanel shipment={q.data} />
+              <ExportPreview shipment={q.data} />
             </div>
 
-            <aside className="space-y-6">
+            <aside className="min-w-0 space-y-6">
+              <ExportCard shipment={q.data} className="hidden lg:block" />
               <dl className="rounded-md border border-line bg-surface p-4 text-sm">
                 <Row label="Assignee" value={q.data.assignee?.name ?? "Unassigned"} />
                 <Row
@@ -181,14 +187,22 @@ function FlagSummary({ shipment }: { shipment: ShipmentDetail }) {
       </p>
     );
   }
+  if (shipment.status === "exported") {
+    return (
+      <p className="flex items-center gap-2 rounded-md bg-info-soft px-4 py-3 text-sm text-ink-2">
+        <Lock aria-hidden className="size-4 shrink-0" />
+        Exported. Everything here is read-only until a manager reopens it.
+      </p>
+    );
+  }
   if (reviewable.length === 0) {
     const accepted = shipment.checks.filter((c) => c.accepted).length;
     return (
       <p className="flex items-center gap-2 rounded-md bg-clear-soft px-4 py-3 text-sm text-clear">
         <CheckCircle2 aria-hidden className="size-4 shrink-0" />
         {accepted
-          ? `Nothing needs you. ${accepted} mismatch${accepted > 1 ? "es were" : " was"} accepted with a reason.`
-          : "Nothing needs you. Every field was read with confidence and every cross-check passes."}
+          ? `Ready to export. ${accepted} mismatch${accepted > 1 ? "es were" : " was"} accepted with a reason.`
+          : "Ready to export. Every field was read with confidence and every cross-check passes."}
       </p>
     );
   }
