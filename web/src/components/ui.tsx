@@ -6,6 +6,18 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean;
 };
 
+/** Button styling, also for links that should look like buttons (e.g. a file download). */
+export function buttonClass(variant: ButtonProps["variant"] = "secondary", className?: string) {
+  return clsx(
+    "inline-flex h-9 items-center justify-center gap-2 rounded-md px-3.5 text-sm font-medium transition-colors",
+    "disabled:cursor-not-allowed disabled:opacity-55",
+    variant === "primary" && "bg-accent text-accent-ink hover:bg-[#1a43b3]",
+    variant === "secondary" && "border border-line-strong bg-surface text-ink hover:bg-paper",
+    variant === "ghost" && "text-ink-2 hover:bg-info-soft hover:text-ink",
+    className,
+  );
+}
+
 export function Button({
   variant = "secondary",
   loading,
@@ -15,19 +27,7 @@ export function Button({
   ...rest
 }: ButtonProps) {
   return (
-    <button
-      {...rest}
-      disabled={disabled || loading}
-      className={clsx(
-        "inline-flex h-9 items-center justify-center gap-2 rounded-md px-3.5 text-sm font-medium transition-colors",
-        "disabled:cursor-not-allowed disabled:opacity-55",
-        variant === "primary" && "bg-accent text-accent-ink hover:bg-[#1a43b3]",
-        variant === "secondary" &&
-          "border border-line-strong bg-surface text-ink hover:bg-paper",
-        variant === "ghost" && "text-ink-2 hover:bg-info-soft hover:text-ink",
-        className,
-      )}
-    >
+    <button {...rest} disabled={disabled || loading} className={buttonClass(variant, className)}>
       {loading && <Loader2 aria-hidden className="size-4 animate-spin" />}
       {children}
     </button>
