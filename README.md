@@ -67,7 +67,7 @@ flowchart LR
     subgraph DATA["Data · ap-south-1 in production"]
         direction TB
         pg[("PostgreSQL 16 · :5433 dev<br/>data · sessions · jobs · audit log")]
-        store[("Object storage<br/>local disk dev · S3 prod")]
+        store[("File storage<br/>local disk / Docker volume")]
     end
 
     gemini{{"Gemini vision model<br/>JSON-schema output"}}
@@ -117,7 +117,7 @@ flowchart LR
 | **api** | FastAPI, Pydantic v2, SQLAlchemy 2, psycopg 3 | 8000 | Auth, role and ownership checks, input validation, shipments, upload, checks, export, manager reports | ✅ |
 | **worker** | Python, same codebase as `api` (`python -m app.worker`) | n/a | Claims extraction jobs from Postgres, calls Gemini, normalises and scores fields, then reruns the cross-checks | ✅ |
 | **db** | PostgreSQL 16 (Docker) | 5433 | All data, sessions, the **job queue** and the append-only audit log | ✅ |
-| **storage** | Local disk (dev) / S3 `ap-south-1` (prod) | n/a | Uploaded documents and export files, private, never served from a public path | ✅ local |
+| **storage** | Local disk; a Docker volume on the server (S3 `ap-south-1` is the next step) | n/a | Uploaded documents and export files, private, never served from a public path | ✅ local |
 | **Gemini** | `gemini-3.5-flash`, falling back to other Flash models on 503/429 | n/a | Vision extraction with a JSON response schema. Free tier on synthetic data for the demo; Vertex AI (India region) in production | ✅ |
 
 **Why there's no Redis or Celery:** about 3,300 documents a month is far below where a Postgres-backed queue struggles. Keeping jobs in the same database makes "save the upload and enqueue the job" one transaction. See [TDD §2](docs/TDD.md#2-architecture).
@@ -355,7 +355,7 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │  │  ├─ extraction/       catalog, Gemini client, prompts, normalisers, validators, confidence
 │  │  ├─ jobs.py           Postgres job queue (SKIP LOCKED, backoff)
 │  │  ├─ worker.py         extraction worker
-│  │  ├─ storage.py        local disk / S3 interface
+│  │  ├─ storage.py        storage interface (local disk driver)
 │  │  ├─ audit.py          append-only audit writer
 │  │  ├─ privacy.py        personal-data masking
 │  │  ├─ migrate.py        SQL migration runner
