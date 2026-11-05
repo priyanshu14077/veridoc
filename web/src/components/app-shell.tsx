@@ -13,7 +13,10 @@ export function useMe() {
   return useQuery({ queryKey: ["me"], queryFn: () => api<Me>("/auth/me"), staleTime: 300_000 });
 }
 
-const NAV = [{ href: "/shipments", label: "Shipments" }];
+const NAV = [
+  { href: "/shipments", label: "Shipments", managerOnly: false },
+  { href: "/overrides", label: "Overrides", managerOnly: true },
+];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const me = useMe();
@@ -30,7 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-6 px-4 sm:px-6">
+        <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
           <Link href="/shipments" className="flex items-center gap-2 font-semibold tracking-tight">
             <Logo />
             Crosscheck
@@ -81,9 +84,11 @@ function Nav() {
 }
 
 function NavLinks({ pathname }: { pathname: string }) {
+  const me = useMe();
+  const links = NAV.filter((n) => !n.managerOnly || me.data?.role === "manager");
   return (
     <nav className="flex items-center gap-1" aria-label="Main">
-      {NAV.map((n) => {
+      {links.map((n) => {
         const active = pathname.startsWith(n.href);
         return (
           <Link

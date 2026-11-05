@@ -35,7 +35,12 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   } catch {
     throw new ApiError(0, "Can't reach the server. Check your connection and try again.");
   }
-  if (res.status === 401 && typeof window !== "undefined" && !path.startsWith("/auth/login")) {
+  if (
+    res.status === 401 &&
+    typeof window !== "undefined" &&
+    !path.startsWith("/auth/login") &&
+    window.location.pathname !== "/login" // already there, e.g. a refetch right after sign-out
+  ) {
     const next = window.location.pathname + window.location.search;
     // Outside React, and a hard navigation also drops any cached data from the old session.
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination

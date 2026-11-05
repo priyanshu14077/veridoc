@@ -165,6 +165,20 @@ class CheckResult(Base):
     )
 
 
+class Export(Base):
+    __tablename__ = "exports"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    shipment_id: Mapped[int] = mapped_column(ForeignKey("shipments.id", ondelete="CASCADE"))
+    version: Mapped[int] = mapped_column(Integer)
+    format: Mapped[str] = mapped_column(Text)
+    file_key: Mapped[str] = mapped_column(Text)
+    sha256: Mapped[str] = mapped_column(Text)
+    row_count: Mapped[int] = mapped_column(Integer)
+    created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    creator: Mapped[User] = relationship(lazy="joined")
+
+
 class AuditLog(Base):
     __tablename__ = "audit_log"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)

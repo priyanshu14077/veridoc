@@ -19,7 +19,7 @@ from app.config import get_settings
 from app.extraction.catalog import HEADER, LINES, field_def
 from app.extraction.confidence import score
 from app.models import CheckResult, Document, FieldRow, Shipment, User
-from app.shipments.access import get_visible_shipment
+from app.shipments.access import EXPORTED, get_visible_shipment, lock_editable
 from app.shipments.status import field_flag, recompute_status
 from app.storage import get_storage
 
@@ -86,7 +86,7 @@ class DocumentDetail(DocumentOut):
 def read_only_reason(doc: Document, shipment: Shipment) -> str | None:
     """Why fields can't be changed right now, or None. The field routes enforce the same rules."""
     if shipment.status == "exported":
-        return "This shipment is exported. A manager must reopen it first."
+        return EXPORTED
     if doc.superseded_at is not None:
         return "A newer upload replaced this document."
     if doc.extraction_status not in ("done", "manual"):
@@ -202,9 +202,7 @@ async def upload_document(
 ) -> DocumentOut:
     shipment = get_visible_shipment(db, user, shipment_id)
     if shipment.status == "exported":
-        raise HTTPException(
-            http.HTTP_409_CONFLICT, "This shipment is exported. A manager must reopen it first."
-        )
+        raise HTTPException(http.HTTP_409_CONFLICT, EXPORTED)
     s = get_settings()
     limit = s.max_upload_mb * 1024 * 1024
     data = await file.read(limit + 1)
@@ -222,6 +220,7 @@ async def upload_document(
             f"Documents can have up to {s.max_pages} pages; this one has {pages}.",
         )
 
+    lock_editable(db, shipment)  # an export may have committed while the file was read
     key = get_storage().put(data, suffix)
     now = datetime.now(UTC)
     previous = db.scalar(

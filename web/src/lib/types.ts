@@ -62,7 +62,8 @@ export type FlagKind =
   | "check_failed"
   | "check_not_checkable"
   | "extraction_failed"
-  | "extraction_pending";
+  | "extraction_pending"
+  | "missing_document";
 
 export interface Flag {
   kind: FlagKind;
@@ -171,4 +172,43 @@ export interface TeamMember {
   id: number;
   name: string;
   role: Role;
+}
+
+export interface ExportRecord {
+  id: number;
+  version: number;
+  format: string;
+  sha256: string;
+  row_count: number;
+  created_by: string;
+  created_at: string;
+  file_name: string;
+}
+
+export interface ExportPreview {
+  status: ShipmentStatus;
+  blockers: Flag[];
+  columns: string[];
+  rows: Record<string, string>[];
+}
+
+export type OverrideKind = "accepted" | "edited" | "reopened";
+
+export interface OverrideRow {
+  id: number;
+  kind: OverrideKind;
+  at: string;
+  actor: string | null;
+  shipment_id: number | null;
+  shipment_ref: string | null;
+  subject: string;
+  detail: string;
+  reason: string | null;
+  still_applies: boolean | null;
+}
+
+export interface Overrides {
+  since: string;
+  items: OverrideRow[];
+  counts: Record<OverrideKind, number>;
 }
