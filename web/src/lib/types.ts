@@ -212,3 +212,36 @@ export interface Overrides {
   items: OverrideRow[];
   counts: Record<OverrideKind, number>;
 }
+
+export type AccuracyGroup = "field" | "supplier";
+
+export interface AccuracyMiss {
+  shipment_id: number;
+  shipment_ref: string;
+  field: string;
+  ai_value: string | null;
+  final_value: string | null;
+  flagged: boolean;
+}
+
+export interface AccuracyRow {
+  key: string;
+  label: string;
+  fields: number;
+  correct: number;
+  corrected: number;
+  flagged: number;
+  /** Corrected, but never flagged: the errors only a careful reviewer catches. */
+  missed: number;
+  examples: AccuracyMiss[];
+}
+
+export interface Accuracy {
+  group: AccuracyGroup;
+  threshold: number;
+  shipments: number;
+  documents: number;
+  manual_documents: number;
+  total: AccuracyRow;
+  rows: AccuracyRow[];
+}
