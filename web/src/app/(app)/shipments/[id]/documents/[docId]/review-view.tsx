@@ -14,10 +14,12 @@ import {
   Plus,
   Trash2,
   TriangleAlert,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AcceptForm } from "@/components/accept-form";
 import { type Box, DocViewer } from "@/components/doc-viewer";
 import { Button, EmptyState, ErrorState } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
@@ -103,6 +105,9 @@ export function ReviewView() {
   );
 }
 
+/** A field needs attention: its own flag, or an open cross-check that reads it. */
+const needsCheck = (f: FieldValue) => Boolean(f.flag || f.conflicts.length);
+
 /** Header fields in section order, then line items in line order. J/K walk this list. */
 function orderFields(fields: FieldValue[]): FieldValue[] {
   const header = SECTIONS.flatMap((s) =>
@@ -139,6 +144,8 @@ function useReviewMutations(docKey: string, docId: number, shipmentId: string) {
       replace(res.fields);
       afterWrite(res);
       qc.invalidateQueries({ queryKey: ["history", f.id] });
+      // A correction can settle a cross-check that other fields are part of.
+      qc.invalidateQueries({ queryKey: key });
     },
     onError: (e) => {
       // Someone saved first: show their value so the reviewer decides with current data.
@@ -183,7 +190,7 @@ function Review({
   initialFieldId: number | null;
 }) {
   const ordered = useMemo(() => orderFields(doc.fields), [doc.fields]);
-  const flagged = ordered.filter((f) => f.flag);
+  const flagged = ordered.filter(needsCheck);
   const lineIndexes = [
     ...new Set(ordered.flatMap((f) => (f.line_index === null ? [] : [f.line_index]))),
   ];
@@ -218,12 +225,12 @@ function Review({
     const idx = from ? list.findIndex((f) => f.id === from.id) : -1;
     for (let i = 1; i <= n; i++) {
       const f = list[(((idx + dir * i) % n) + n) % n];
-      if (f.flag && f.id !== from?.id) return select(f);
+      if (needsCheck(f) && f.id !== from?.id) return select(f);
     }
   }
 
   function write(f: FieldValue, body: { action?: "confirm"; value?: string }) {
-    const wasFlagged = Boolean(f.flag);
+    const wasFlagged = needsCheck(f);
     save.mutate(
       { f, body },
       {
@@ -233,7 +240,7 @@ function Review({
           const latest = qc.getQueryData<DocumentDetail>(["document", docKey]);
           const now = latest && orderFields(latest.fields);
           const updated = now?.find((x) => x.id === f.id);
-          if (wasFlagged && now && updated && !updated.flag) step(1, updated, now);
+          if (wasFlagged && now && updated && !needsCheck(updated)) step(1, updated, now);
         },
       },
     );
@@ -349,6 +356,7 @@ function Review({
               error={save.error?.message ?? null}
               left={flagged.length}
               onStep={step}
+              shipmentId={shipmentId}
             />
           )}
 
@@ -462,6 +470,7 @@ function FocusCard({
   error,
   left,
   onStep,
+  shipmentId,
 }: {
   f: FieldValue;
   line: number | null;
@@ -475,8 +484,10 @@ function FocusCard({
   error: string | null;
   left: number;
   onStep: (dir: 1 | -1) => void;
+  shipmentId: string;
 }) {
   const [showHistory, setShowHistory] = useState(false);
+  const [accepting, setAccepting] = useState<number | null>(null);
   const reason = flagReason(f);
 
   return (
@@ -484,7 +495,7 @@ function FocusCard({
       aria-label="Selected field"
       className={clsx(
         "sticky top-0 z-10 rounded-md border bg-surface shadow-[0_1px_0_var(--color-line)]",
-        f.flag ? "border-unsure/40" : "border-line",
+        f.conflicts.length ? "border-conflict/40" : f.flag ? "border-unsure/40" : "border-line",
       )}
     >
       <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
@@ -539,6 +550,37 @@ function FocusCard({
               </p>
             )}
             {reason && <p className="mt-2 text-sm text-unsure">{reason}</p>}
+            {f.conflicts.map((c) => (
+              <div key={c.check_id} className="mt-2 rounded-md bg-conflict-soft px-3 py-2 text-sm">
+                <p className="flex gap-1.5 text-conflict">
+                  <XCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
+                  <span>
+                    <span className="num font-medium">{c.rule_id}</span> {c.message}
+                  </span>
+                </p>
+                {!readOnly &&
+                  (accepting === c.check_id ? (
+                    <AcceptForm
+                      checkId={c.check_id}
+                      shipmentId={shipmentId}
+                      onDone={() => setAccepting(null)}
+                      onCancel={() => setAccepting(null)}
+                    />
+                  ) : (
+                    <p className="mt-1.5 pl-5.5 text-ink-2">
+                      Correct the value that&apos;s wrong, or{" "}
+                      <button
+                        type="button"
+                        onClick={() => setAccepting(c.check_id)}
+                        className="font-medium text-ink underline underline-offset-2"
+                      >
+                        accept the mismatch with a reason
+                      </button>
+                      .
+                    </p>
+                  ))}
+              </div>
+            ))}
             {!reason &&
               f.status !== "ai" &&
               f.validator_errors.map((e) => (
@@ -709,7 +751,11 @@ function FieldButton({
       className={clsx(
         "grid w-full grid-cols-[130px_1fr_auto] items-start gap-3 px-4 py-2.5 text-left",
         "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
-        f.flag ? "bg-unsure-soft/60 hover:bg-unsure-soft" : "hover:bg-paper",
+        f.conflicts.length
+          ? "bg-conflict-soft/70 hover:bg-conflict-soft"
+          : f.flag
+            ? "bg-unsure-soft/60 hover:bg-unsure-soft"
+            : "hover:bg-paper",
         active && "shadow-[inset_3px_0_0_var(--color-accent)]",
       )}
     >
@@ -724,7 +770,11 @@ function FieldButton({
       <span className="flex items-center gap-1.5 pt-0.5">
         <Confidence f={f} />
         <StatusBadge f={f} />
-        {f.flag && <TriangleAlert aria-label="Needs checking" className="size-4 text-unsure" />}
+        {f.conflicts.length > 0 ? (
+          <XCircle aria-label="Conflicts with another document" className="size-4 text-conflict" />
+        ) : (
+          f.flag && <TriangleAlert aria-label="Needs checking" className="size-4 text-unsure" />
+        )}
       </span>
     </button>
   );
@@ -813,18 +863,29 @@ function Lines({
                         onClick={() => onSelect(f)}
                         onDoubleClick={() => onEdit(f)}
                         aria-current={f.id === activeId || undefined}
-                        aria-label={`${f.label}, line ${n + 1}: ${f.value ?? "empty"}${f.flag ? ", needs checking" : ""}`}
+                        aria-label={`${f.label}, line ${n + 1}: ${f.value ?? "empty"}${f.conflicts.length ? ", conflicts with another document" : f.flag ? ", needs checking" : ""}`}
                         className={clsx(
                           "block w-full px-3 py-2 text-left",
                           "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
                           k !== "description" && "num whitespace-nowrap",
-                          f.flag ? "bg-unsure-soft/60 hover:bg-unsure-soft" : "hover:bg-paper",
+                          f.conflicts.length
+                            ? "bg-conflict-soft/70 hover:bg-conflict-soft"
+                            : f.flag
+                              ? "bg-unsure-soft/60 hover:bg-unsure-soft"
+                              : "hover:bg-paper",
                           f.id === activeId && "outline-2 -outline-offset-2 outline-accent",
                         )}
                       >
                         {f.value ?? <span className="text-muted">—</span>}
-                        {f.flag && (
-                          <TriangleAlert aria-hidden className="ml-1 inline size-3.5 text-unsure" />
+                        {f.conflicts.length > 0 ? (
+                          <XCircle aria-hidden className="ml-1 inline size-3.5 text-conflict" />
+                        ) : (
+                          f.flag && (
+                            <TriangleAlert
+                              aria-hidden
+                              className="ml-1 inline size-3.5 text-unsure"
+                            />
+                          )
                         )}
                         {f.status !== "ai" && f.value && (
                           <Check aria-hidden className="ml-1 inline size-3.5 text-clear" />

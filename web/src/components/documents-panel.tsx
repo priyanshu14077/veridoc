@@ -12,6 +12,7 @@ import {
   RefreshCw,
   TriangleAlert,
   Upload,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -27,6 +28,13 @@ const ACCEPT = "application/pdf,image/png,image/jpeg";
 export function DocumentsPanel({ shipment }: { shipment: ShipmentDetail }) {
   const byType = new Map(shipment.documents.map((d) => [d.doc_type, d]));
   const locked = shipment.status === "exported";
+  // Open cross-checks that show a value from each document.
+  const conflicts = new Map<DocType, number>();
+  for (const c of shipment.checks) {
+    if (c.status === "pass" || c.accepted) continue;
+    for (const t of new Set(c.shown.flatMap((s) => (s.doc ? [s.doc] : []))))
+      conflicts.set(t, (conflicts.get(t) ?? 0) + 1);
+  }
   return (
     <section className="rounded-md border border-line bg-surface">
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
@@ -35,7 +43,14 @@ export function DocumentsPanel({ shipment }: { shipment: ShipmentDetail }) {
       </div>
       <ul className="divide-y divide-line">
         {SLOTS.map((t) => (
-          <Slot key={t} shipmentId={shipment.id} docType={t} doc={byType.get(t)} locked={locked} />
+          <Slot
+            key={t}
+            shipmentId={shipment.id}
+            docType={t}
+            doc={byType.get(t)}
+            locked={locked}
+            conflicts={conflicts.get(t) ?? 0}
+          />
         ))}
       </ul>
     </section>
@@ -47,11 +62,13 @@ function Slot({
   docType,
   doc,
   locked,
+  conflicts,
 }: {
   shipmentId: number;
   docType: DocType;
   doc: DocumentSummary | undefined;
   locked: boolean;
+  conflicts: number;
 }) {
   const qc = useQueryClient();
   const input = useRef<HTMLInputElement>(null);
@@ -134,10 +151,10 @@ function Slot({
         }}
       />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <StateIcon doc={doc} busy={busy} />
+        <StateIcon doc={doc} busy={busy} conflicts={conflicts} />
         <div className="min-w-0 flex-1">
           <div className="font-medium">{DOC_LABEL[docType]}</div>
-          <Subline doc={doc} progress={progress} />
+          <Subline doc={doc} progress={progress} conflicts={conflicts} />
         </div>
         <div className="flex w-full shrink-0 flex-wrap items-center gap-2 pl-9 sm:w-auto sm:pl-0">
           {doc && (doc.extraction_status === "done" || doc.extraction_status === "manual") && (
@@ -145,7 +162,7 @@ function Slot({
               href={`/shipments/${shipmentId}/documents/${doc.id}`}
               className="inline-flex h-9 items-center rounded-md border border-line-strong px-3 text-sm font-medium hover:bg-paper"
             >
-              {doc.flag_count > 0 ? "Review" : "View fields"}
+              {doc.flag_count > 0 || conflicts > 0 ? "Review" : "View fields"}
             </Link>
           )}
           {doc?.extraction_status === "failed" && (
@@ -190,7 +207,15 @@ function Slot({
   );
 }
 
-function StateIcon({ doc, busy }: { doc: DocumentSummary | undefined; busy: boolean }) {
+function StateIcon({
+  doc,
+  busy,
+  conflicts,
+}: {
+  doc: DocumentSummary | undefined;
+  busy: boolean;
+  conflicts: number;
+}) {
   const base = "size-5 shrink-0";
   if (doc?.extraction_status === "pending" && doc.error)
     return <Clock aria-hidden className={clsx(base, "text-unsure")} />;
@@ -199,12 +224,21 @@ function StateIcon({ doc, busy }: { doc: DocumentSummary | undefined; busy: bool
   if (!doc) return <FileText aria-hidden className={clsx(base, "text-muted")} />;
   if (doc.extraction_status === "failed")
     return <AlertOctagon aria-hidden className={clsx(base, "text-conflict")} />;
+  if (conflicts > 0) return <XCircle aria-hidden className={clsx(base, "text-conflict")} />;
   if (doc.flag_count > 0)
     return <TriangleAlert aria-hidden className={clsx(base, "text-unsure")} />;
   return <CheckCircle2 aria-hidden className={clsx(base, "text-clear")} />;
 }
 
-function Subline({ doc, progress }: { doc: DocumentSummary | undefined; progress: number | null }) {
+function Subline({
+  doc,
+  progress,
+  conflicts,
+}: {
+  doc: DocumentSummary | undefined;
+  progress: number | null;
+  conflicts: number;
+}) {
   if (progress !== null)
     return (
       <div className="mt-1.5 flex items-center gap-3">
@@ -246,10 +280,17 @@ function Subline({ doc, progress }: { doc: DocumentSummary | undefined; progress
     default:
       return (
         <div className="text-sm">
+          {conflicts > 0 && (
+            <span className="text-conflict">
+              {conflicts} conflict{conflicts > 1 ? "s" : ""} with other documents ·{" "}
+            </span>
+          )}
           {doc.flag_count > 0 ? (
             <span className="text-unsure">
               {doc.flag_count} field{doc.flag_count > 1 ? "s" : ""} to check
             </span>
+          ) : conflicts > 0 ? (
+            <span className="text-muted">Fields read confidently</span>
           ) : (
             <span className="text-clear">All fields confident</span>
           )}{" "}

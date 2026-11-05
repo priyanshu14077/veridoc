@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from app.auth.router import router as auth_router
+from app.checks.router import router as checks_router
 from app.config import get_settings
 from app.db import engine
 from app.documents.router import router as documents_router
@@ -37,6 +38,7 @@ for r in (
     shipments_router,
     documents_router,
     fields_router,
+    checks_router,
     parties_router,
     users_router,
 ):

@@ -127,7 +127,9 @@ def test_low_confidence_and_validator_failures_are_flagged(client, db, fake_gemi
     assert flagged["incoterm"]["confidence"] == 0.4
     assert flagged["incoterm"]["validator_errors"] == ["unknown_incoterm"]
     detail = c.get(f"/api/shipments/{sid}").json()
-    assert detail["status"] == "needs_review" and detail["open_flags"] == len(detail["flags"]) == 2
+    assert detail["status"] == "needs_review" and detail["open_flags"] == len(detail["flags"])
+    # Two field flags; the rest are cross-checks that can't run without the PL and B/L.
+    assert len([f for f in detail["flags"] if f["field_id"]]) == 2
 
 
 def test_unreadable_page_falls_back_to_manual_entry(client, db, fake_gemini) -> None:
@@ -157,7 +159,7 @@ def test_retryable_errors_back_off_then_fail_then_retry_endpoint(client, db, fak
         assert status == ("failed" if attempt == jobs.MAX_ATTEMPTS else "pending")
     detail = c.get(f"/api/shipments/{sid}").json()
     assert detail["status"] == "needs_review"
-    assert [f["kind"] for f in detail["flags"]] == ["extraction_failed"]
+    assert [f["kind"] for f in detail["flags"] if f["document_id"]] == ["extraction_failed"]
 
     behaviour.pop("invoice")
     assert c.post(f"/api/documents/{doc_id}/retry").status_code == 202

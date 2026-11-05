@@ -18,6 +18,7 @@ from app import audit
 from app.auth.deps import DB, CurrentUser
 from app.documents.router import (
     FieldOut,
+    conflicts_by_field,
     doc_out,
     field_out,
     get_visible_document,
@@ -94,8 +95,9 @@ def _result(
     recompute_status(db, shipment)
     db.commit()
     db.refresh(shipment)
+    conflicts = conflicts_by_field(db, shipment.id)
     return ReviewResult(
-        fields=[field_out(doc, f) for f in changed],
+        fields=[field_out(doc, f, conflicts) for f in changed],
         document_flag_count=doc_out(doc).flag_count,
         shipment_status=shipment.status,
         shipment_open_flags=shipment.open_flag_count,

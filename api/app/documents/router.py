@@ -14,10 +14,11 @@ from sqlalchemy.orm import Session
 
 from app import audit, jobs
 from app.auth.deps import DB, CurrentUser
+from app.checks.router import is_accepted
 from app.config import get_settings
 from app.extraction.catalog import HEADER, LINES, field_def
 from app.extraction.confidence import score
-from app.models import Document, FieldRow, Shipment, User
+from app.models import CheckResult, Document, FieldRow, Shipment, User
 from app.shipments.access import get_visible_shipment
 from app.shipments.status import field_flag, recompute_status
 from app.storage import get_storage
@@ -46,6 +47,15 @@ class DocumentOut(BaseModel):
     flag_count: int
 
 
+class ConflictOut(BaseModel):
+    """An open cross-check that reads this field."""
+
+    check_id: int
+    rule_id: str
+    status: str
+    message: str
+
+
 class FieldOut(BaseModel):
     id: int
     key: str
@@ -64,6 +74,7 @@ class FieldOut(BaseModel):
     bbox: list[int] | None
     version: int
     flag: str | None
+    conflicts: list[ConflictOut] = []
 
 
 class DocumentDetail(DocumentOut):
@@ -131,7 +142,21 @@ def doc_out(doc: Document) -> DocumentOut:
     )
 
 
-def field_out(doc: Document, f: FieldRow) -> FieldOut:
+def conflicts_by_field(db: Session, shipment_id: int) -> dict[int, list[ConflictOut]]:
+    out: dict[int, list[ConflictOut]] = {}
+    for c in db.scalars(select(CheckResult).where(CheckResult.shipment_id == shipment_id)):
+        if c.status == "pass" or is_accepted(c):
+            continue
+        for fid in c.inputs.get("field_ids", []):
+            out.setdefault(fid, []).append(
+                ConflictOut(check_id=c.id, rule_id=c.rule_id, status=c.status, message=c.message)
+            )
+    return out
+
+
+def field_out(
+    doc: Document, f: FieldRow, conflicts: dict[int, list[ConflictOut]] | None = None
+) -> FieldOut:
     fd = field_def(doc.doc_type, f.key, f.line_index is not None)
     flag = field_flag(doc, f)
     return FieldOut(
@@ -152,6 +177,7 @@ def field_out(doc: Document, f: FieldRow) -> FieldOut:
         bbox=f.bbox,
         version=f.version,
         flag=flag.kind if flag else None,
+        conflicts=(conflicts or {}).get(f.id, []),
     )
 
 
@@ -184,7 +210,7 @@ async def upload_document(
     data = await file.read(limit + 1)
     if len(data) > limit:
         raise HTTPException(
-            http.HTTP_413_REQUEST_ENTITY_TOO_LARGE, f"Files can be up to {s.max_upload_mb} MB."
+            http.HTTP_413_CONTENT_TOO_LARGE, f"Files can be up to {s.max_upload_mb} MB."
         )
     if not data:
         raise HTTPException(http.HTTP_422_UNPROCESSABLE_CONTENT, "The file is empty.")
@@ -245,9 +271,10 @@ async def upload_document(
 @router.get("/documents/{document_id}", response_model=DocumentDetail)
 def get_document(document_id: int, user: CurrentUser, db: DB) -> DocumentDetail:
     doc, shipment = get_visible_document(db, user, document_id)
+    conflicts = conflicts_by_field(db, shipment.id)
     return DocumentDetail(
         **doc_out(doc).model_dump(),
-        fields=[field_out(doc, f) for f in doc.fields],
+        fields=[field_out(doc, f, conflicts) for f in doc.fields],
         shipment_id=shipment.id,
         read_only_reason=read_only_reason(doc, shipment),
     )

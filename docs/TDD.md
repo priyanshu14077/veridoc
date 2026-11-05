@@ -133,9 +133,12 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
 
 ### 5.4 Cross-check engine
 - Lives in `api/app/checks/`. Each rule is a pure function `(ShipmentView) -> CheckResult`, with no I/O and no AI. All arithmetic uses `Decimal`.
-- Rules X1–X10 and their tolerances are as in PRD §8.3. Each rule declares the field keys it reads, so an edit reruns only the rules affected.
-- **Matching lines for X3 (invoice ↔ PL quantities):** match by HSN first, then by description similarity (rapidfuzz `token_set_ratio ≥ 85`). Lines left unmatched on either side fail the rule and are listed.
+- Rules X1–X10 and their tolerances are as in PRD §8.3. `recompute_status()` reruns all ten after every write; they're pure and take microseconds, so tracking which rule reads which field isn't worth it **[A22]**. Each result stores the field ids it read, so the review screen marks exactly those fields. A row is rewritten only when its inputs change. Checks don't run while a document is still being read, or once the shipment is exported.
+- **X8 (same importer)** compares the invoice buyer and the B/L consignee against the importer on the shipment record, not only against each other.
+- **Matching lines for X3 (invoice ↔ PL quantities):** the packing list has no HSN, so lines are paired by description similarity (rapidfuzz `token_set_ratio ≥ 85`), best match first. When each document has exactly one line they're paired regardless of wording **[A23]**. Lines left unmatched on either side fail the rule and are listed.
 - **Missing input → `not_checkable`.** This is a flag, never a silent pass.
+- **Result on the 12 sample shipments (real recorded model output):** each one fails exactly its planted rules: X5 on SHP-24811, X1 on 24813, X4 on 24814, X7 and X9 on 24815, X6 on 24819. X4, X5 and X7 can't be checked on 24820 (unreadable B/L) and 24821 (no B/L). There are no false alarms on the six other shipments. A test locks this in.
+- **Accepting:** any non-passing check, including *can't check*, can be accepted with a reason of 10+ characters **[A24]**. The acceptance records who accepted, when and why, and goes into the audit log.
 - **Acceptance validity:** an acceptance stores `inputs_hash`. If anyone later edits an input, the hash changes and the acceptance no longer counts. This stops the case where someone accepts a mismatch and then edits the value to something new nobody reviewed.
 
 ### 5.5 When the AI is wrong or unavailable
@@ -314,3 +317,6 @@ crosscheck/
 | A19 | A person's value must parse as the field's type (a number, a date) so cross-checks and export can use it. Other format warnings (an HSN that isn't 8 digits, a container check digit) are shown but don't block the save, since the document may really say that |
 | A20 | Every invoice and packing list keeps at least one line item. A document with no lines can't be exported |
 | A21 | After a person confirms or edits a field, its AI confidence no longer decides whether it's flagged. Only an empty required value is |
+| A22 | All ten rules rerun after every write instead of only the ones that read the edited field. The result is the same; the code is simpler |
+| A23 | An invoice and a packing list with one line each describe the same goods, even if worded differently |
+| A24 | A "can't check" result (for example, the B/L hasn't arrived) can be accepted with a reason, like a mismatch. *Alternative: only failures can be accepted, and a missing document always blocks export*

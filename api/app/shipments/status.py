@@ -7,6 +7,7 @@ from typing import Literal
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.checks.engine import run_checks
 from app.extraction.catalog import field_def
 from app.extraction.confidence import is_low
 from app.models import CheckResult, Document, FieldRow, Shipment
@@ -75,14 +76,19 @@ def open_flags(db: Session, shipment_id: int) -> list[Flag]:
 
 
 def recompute_status(db: Session, shipment: Shipment) -> str:
+    """Rerun the cross-checks, then derive flags and status. Called after every write."""
     docs = active_documents(db, shipment.id)
+    reading = any(d.extraction_status in ("pending", "running") for d in docs)
+    if shipment.status != "exported" and not reading:
+        # While a document is being read the checks would only see a partial shipment.
+        run_checks(db, shipment, docs)
     flags = open_flags(db, shipment.id)
     shipment.open_flag_count = sum(f.kind not in ("extraction_pending",) for f in flags)
     if shipment.status == "exported":
         new = "exported"  # leaving 'exported' needs an explicit manager reopen (day 5)
     elif not docs:
         new = "draft"
-    elif any(d.extraction_status in ("pending", "running") for d in docs):
+    elif reading:
         new = "extracting"
     elif flags:
         new = "needs_review"

@@ -27,7 +27,8 @@ A documentation executive drops in a shipment's **invoice, packing list and bill
 | Confidence scoring, format validators, unreadable → manual entry | ✅ Done |
 | Synthetic sample documents + recorded extractions + eval script | ✅ Done |
 | Review screen: pdf.js viewer with field highlight, confirm / edit with optimistic locking, J/K keys, line items, edit history | ✅ Done |
-| Cross-check engine, export gate, CSV export | 🔜 Planned |
+| Cross-checks X1–X10 between invoice, packing list and B/L; accept a mismatch with a reason (lapses if a value changes) | ✅ Done |
+| Export gate, CSV export, manager reopen | 🔜 Planned |
 | Accuracy report, manager override review | 🔜 Planned |
 
 ---
@@ -343,6 +344,7 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │  │  ├─ shipments/        access policy, routes, flags and status
 │  │  ├─ documents/        upload, file streaming, retry, manual entry
 │  │  ├─ fields/           confirm / edit (version-checked), line items, history
+│  │  ├─ checks/           rules X1–X10 (pure), engine, accept-with-reason route
 │  │  ├─ extraction/       catalog, Gemini client, prompts, normalisers, validators, confidence
 │  │  ├─ jobs.py           Postgres job queue (SKIP LOCKED, backoff)
 │  │  ├─ worker.py         extraction worker
