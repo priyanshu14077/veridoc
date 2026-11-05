@@ -1,5 +1,9 @@
-"""Manager reports. The overrides log: every accepted mismatch, every value a person changed from
-what the AI read, and every reopen, with who, when and why (PRD F3, D1)."""
+"""Manager reports (PRD F3, D1).
+
+- Overrides log: every accepted mismatch, every value a person changed from what the AI read, and
+  every reopen, with who, when and why.
+- Accuracy: the share of AI values people left unchanged on exported shipments (accuracy.py).
+"""
 
 from datetime import UTC, date, datetime, time, timedelta
 from typing import Annotated, Literal
@@ -10,8 +14,11 @@ from sqlalchemy import select
 
 from app.auth.deps import DB, require_role
 from app.checks.router import TITLES, is_accepted
+from app.config import get_settings
 from app.extraction.catalog import field_def
 from app.models import AuditLog, CheckResult, Document, Shipment, User
+from app.reports import accuracy
+from app.reports.accuracy import Group
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 Manager = Annotated[User, Depends(require_role("manager"))]
@@ -138,3 +145,61 @@ def overrides(
     if kind:
         items = [i for i in items if i.kind in kind]
     return OverridesOut(since=since, items=items[:limit], counts=counts)
+
+
+class MissOut(BaseModel):
+    shipment_id: int
+    shipment_ref: str
+    field: str
+    ai_value: str | None
+    final_value: str | None
+    flagged: bool
+
+
+class AccuracyRow(BaseModel):
+    key: str
+    label: str
+    fields: int
+    correct: int
+    corrected: int
+    flagged: int
+    missed: int  # corrected, but never flagged: the errors only a careful reviewer catches
+    examples: list[MissOut]
+
+
+class AccuracyOut(BaseModel):
+    group: Group
+    threshold: float
+    shipments: int
+    documents: int
+    manual_documents: int
+    total: AccuracyRow
+    rows: list[AccuracyRow]
+
+
+def _row(t: accuracy.Tally) -> AccuracyRow:
+    return AccuracyRow(
+        key=t.key,
+        label=t.label,
+        fields=t.fields,
+        correct=t.correct,
+        corrected=t.corrected,
+        flagged=t.flagged,
+        missed=t.missed,
+        examples=[MissOut(**vars(m)) for m in t.examples],
+    )
+
+
+@router.get("/accuracy", response_model=AccuracyOut)
+def accuracy_report(_: Manager, db: DB, group: Group = "field") -> AccuracyOut:
+    """Share of AI values left unchanged on exported shipments, by field or by supplier."""
+    r = accuracy.build(db, group)
+    return AccuracyOut(
+        group=group,
+        threshold=get_settings().confidence_threshold,
+        shipments=r.shipments,
+        documents=r.documents,
+        manual_documents=r.manual_documents,
+        total=_row(r.total),
+        rows=[_row(t) for t in r.rows],
+    )
