@@ -13,7 +13,7 @@ from app import audit
 from app.auth.deps import DB, CurrentUser
 from app.checks.rules import RULES
 from app.models import CheckResult, User
-from app.shipments.access import get_visible_shipment
+from app.shipments.access import get_visible_shipment, lock_editable
 from app.shipments.status import recompute_status
 
 router = APIRouter(tags=["checks"])
@@ -77,12 +77,8 @@ def accept_check(check_id: int, body: AcceptIn, user: CurrentUser, db: DB) -> Ch
     c = db.get(CheckResult, check_id)
     if c is None:
         raise HTTPException(http.HTTP_404_NOT_FOUND, "Check not found")
-    shipment = get_visible_shipment(db, user, c.shipment_id)
-    if shipment.status == "exported":
-        raise HTTPException(
-            http.HTTP_409_CONFLICT, "This shipment is exported. A manager must reopen it first."
-        )
-    db.refresh(c, with_for_update=True)
+    shipment = lock_editable(db, get_visible_shipment(db, user, c.shipment_id))
+    db.refresh(c)
     if c.status == "pass":
         raise HTTPException(http.HTTP_409_CONFLICT, "This check passes; there's nothing to accept.")
     c.accepted_by = user.id

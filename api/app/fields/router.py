@@ -28,6 +28,7 @@ from app.extraction.catalog import LINES, field_def
 from app.extraction.confidence import score
 from app.extraction.validators import normalize_and_validate
 from app.models import AuditLog, Document, FieldRow, Shipment, User
+from app.shipments.access import lock_shipment
 from app.shipments.status import recompute_status
 
 router = APIRouter(tags=["fields"])
@@ -66,6 +67,7 @@ class HistoryEntry(BaseModel):
 
 def _editable(db: Session, user: User, document_id: int) -> tuple[Document, Shipment]:
     doc, shipment = get_visible_document(db, user, document_id)
+    lock_shipment(db, shipment)  # serialise with an export of the same shipment
     if reason := read_only_reason(doc, shipment):
         raise HTTPException(http.HTTP_409_CONFLICT, reason)
     return doc, shipment
