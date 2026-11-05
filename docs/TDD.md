@@ -25,16 +25,16 @@ The core rule behind the design: **the AI proposes and a person disposes.** The 
                        │          │  claims jobs with SELECT … FOR UPDATE SKIP LOCKED
                        │          ├─► Gemini API (vision extraction, JSON schema output)
                        ▼          ▼
-                   Object storage (local disk in dev, S3 ap-south-1 in prod)
+                   File storage (local disk; a Docker volume on the server in the demo)
 ```
 
 | Component | Choice | Why | Rejected |
 |---|---|---|---|
-| Frontend | Next.js (App Router, TypeScript), Tailwind with custom tokens, Radix primitives, TanStack Query, pdf.js | Fast to build a polished UI. Radix gives accessible behaviour without a default look. Query handles polling and caching | Plain shadcn defaults (looks generic) |
+| Frontend | Next.js (App Router, TypeScript), Tailwind with custom tokens, hand-built components, TanStack Query, pdf.js | Fast to build a polished UI with a look of its own. Query handles polling and caching | Plain shadcn defaults (looks generic) |
 | API | FastAPI + Pydantic v2 + SQLAlchemy 2 | Python suits PDF and image handling and the Gemini SDK. Pydantic models give one source for request validation **and** the AI output schema | Node API: we'd validate the same shapes twice |
 | Job queue | A Postgres `jobs` table + worker process | One fewer service (no Redis/Celery). The queue is transactional with the data. 1,100 shipments a month is about 3,300 jobs, far below where Postgres queues struggle | Celery + Redis: more infrastructure for no gain at this volume |
 | Database | Postgres 16 | Relational data, JSONB for raw AI output, row locks for the queue | |
-| Storage | `Storage` interface: local driver (dev) and S3 driver (prod) | Runs with zero setup locally. In prod, a private bucket in Mumbai | MinIO in dev: one more container to start |
+| Storage | `Storage` interface with a local-disk driver. The demo keeps files on a Docker volume on the server's disk | Runs with zero setup. An S3 driver (private bucket in Mumbai) is one class behind the same interface, listed in §13 | MinIO in dev: one more container to start |
 | AI | Gemini `gemini-3.5-flash` (set by `GEMINI_MODEL`, with fallbacks) through the `google-genai` SDK | Free tier available (the client's constraint for this build). Native PDF input. JSON schema output. Same SDK as Vertex AI, so moving to Vertex is a config change | OCR + LLM (decided against in the PRD: more to build in 14 h) |
 | Auth | Server-side sessions in Postgres, argon2id password hashes, httpOnly cookie | Simple to reason about, can be revoked, no JWTs in localStorage | Auth SaaS: an outside dependency plus data outside India |
 
@@ -205,7 +205,7 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
 | GET | `/api/reports/overrides?since&kind` | manager | Accepted mismatches (and whether each still applies), corrected values, reopens |
 | GET | `/api/reports/accuracy?group=field\|supplier` | manager | Share of AI values left unchanged on exported shipments, per row: fields, corrected, flagged, corrected-but-not-flagged, up to 3 examples **[A29–A31]** |
 
-"Scoped" means one dependency, `require_shipment_access(user, shipment)`, used on every route that loads a shipment or one of its children. A test checks every route against both roles.
+"Scoped" means one dependency, `require_shipment_access(user, shipment)`, used on every route that loads a shipment or one of its children. `tests/test_route_access.py` walks the API's route table: every route except login and health returns 401 when signed out, the manager-only routes return 403 for an executive, and no route refuses a manager. A new route that forgets its auth dependency fails CI.
 
 ## 7. Export layout [A3]
 
@@ -231,7 +231,7 @@ The layout is one module (`api/app/export/layout.py`), so the real filing-softwa
 | Uploads | Magic-byte check, size and page limits, random storage keys, never served from a public path |
 | Personal data (DPDP) | Importer contact masked by default (`R*** K***`, `+91 ••••• ••321`). Revealed only to the assignee or a manager, and each reveal is logged. The seed data is fictional |
 | Confidential prices | Same scoping. Executives don't see shipments they aren't assigned to (apart from unassigned ones) |
-| Data residency | Production: S3 + Postgres in ap-south-1. AI on Vertex in an Indian region (§5.7) |
+| Data residency | Demo: one EC2 server in Mumbai (ap-south-1) holds the database and the files. Production adds S3 in ap-south-1 and Vertex AI in an Indian region (§5.7) |
 | Audit | Append-only `audit_log`. The app's DB role has no UPDATE or DELETE on it **[A17]** |
 
 ## 9. UI and design decisions
@@ -269,21 +269,22 @@ The layout is one module (`api/app/export/layout.py`), so the real filing-softwa
 | Eval | Accuracy and flag recall on 20 synthetic shipments | `make eval` (manual, needs a key) |
 | E2E (stretch) | Sign in → review → resolve → export | Playwright |
 
-CI: GitHub Actions runs lint (ruff, eslint), type checks (mypy-lite, tsc) and tests on every push.
+CI: GitHub Actions runs on every push: ruff (lint and format), pytest against Postgres, eslint, tsc, a production `next build`, and a build of both Docker images.
 
 ## 11. Repository layout
 
 ```
-crosscheck/
-├─ api/                 FastAPI app + worker (python -m app.worker)
-│  ├─ app/{auth,shipments,documents,extraction,checks,export,reports,audit}/
+veridoc/
+├─ api/                 FastAPI app + worker (python -m app.worker), Dockerfile
+│  ├─ app/{auth,shipments,documents,extraction,fields,checks,export,reports}/
 │  ├─ migrations/       hand-written SQL migrations
+│  ├─ scripts/          generate_docs.py, record_fixtures.py, eval.py
 │  └─ tests/
-├─ web/                 Next.js app
-├─ scripts/             generate_docs.py, seed.py, eval.py
-├─ sample-docs/         generated PDFs used by the seed (synthetic)
+├─ web/                 Next.js app, Dockerfile
+├─ sample-docs/         generated PDFs + recorded extractions used by the seed (synthetic)
+├─ deploy/              compose.yml (db, api, worker, web, Caddy), Caddyfile, .env.example
 ├─ docs/                PRD.md, TDD.md, deployment.md
-└─ docker-compose.yml   postgres (+ api, worker, web for one-command run)
+└─ docker-compose.yml   Postgres for local development
 ```
 
 ## 12. Build plan (about 14 h)

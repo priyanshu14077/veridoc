@@ -1,4 +1,4 @@
-"""File storage behind one small interface: local disk in dev, S3 in production (TDD §2)."""
+"""File storage behind one small interface. Local disk today; S3 fits behind it (TDD §2)."""
 
 import secrets
 from pathlib import Path

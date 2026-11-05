@@ -4,6 +4,8 @@ import type { NextConfig } from "next";
 const API_ORIGIN = process.env.API_ORIGIN ?? "http://localhost:8000";
 
 const nextConfig: NextConfig = {
+  // A self-contained server for the Docker image (deploy/). API_ORIGIN is read at build time.
+  output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
