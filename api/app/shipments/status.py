@@ -19,6 +19,7 @@ FlagKind = Literal[
     "check_not_checkable",
     "extraction_failed",
     "extraction_pending",
+    "missing_document",
 ]
 
 
@@ -54,7 +55,11 @@ def field_flag(doc: Document, f: FieldRow) -> Flag | None:
 
 def open_flags(db: Session, shipment_id: int) -> list[Flag]:
     flags: list[Flag] = []
-    for doc in active_documents(db, shipment_id):
+    docs = active_documents(db, shipment_id)
+    if docs and not any(d.doc_type == "invoice" for d in docs):
+        # The export's line rows come from the invoice, so it can't be accepted away (TDD §7).
+        flags.append(Flag("missing_document", message="Upload the invoice: the export needs it"))
+    for doc in docs:
         if doc.extraction_status in ("pending", "running"):
             flags.append(Flag("extraction_pending", doc.id, message="Extraction in progress"))
             continue
@@ -85,7 +90,7 @@ def recompute_status(db: Session, shipment: Shipment) -> str:
     flags = open_flags(db, shipment.id)
     shipment.open_flag_count = sum(f.kind not in ("extraction_pending",) for f in flags)
     if shipment.status == "exported":
-        new = "exported"  # leaving 'exported' needs an explicit manager reopen (day 5)
+        new = "exported"  # leaving 'exported' needs a manager's reopen (export/router.py)
     elif not docs:
         new = "draft"
     elif reading:
