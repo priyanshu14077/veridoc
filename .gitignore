@@ -43,3 +43,6 @@ api/storage/
 .idea/
 .vscode/
 *.swp
+
+# local AI-assistant tooling
+.serena/
