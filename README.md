@@ -28,8 +28,9 @@ A documentation executive drops in a shipment's **invoice, packing list and bill
 | Synthetic sample documents + recorded extractions + eval script | ✅ Done |
 | Review screen: pdf.js viewer with field highlight, confirm / edit with optimistic locking, J/K keys, line items, edit history | ✅ Done |
 | Cross-checks X1–X10 between invoice, packing list and B/L; accept a mismatch with a reason (lapses if a value changes) | ✅ Done |
-| Export gate, CSV export, manager reopen | 🔜 Planned |
-| Accuracy report, manager override review | 🔜 Planned |
+| Export gate (409 with blockers), versioned CSV export with a formula-injection guard, manager reopen | ✅ Done |
+| Manager overrides log (accepted mismatches, corrections, reopens) | ✅ Done |
+| Accuracy report | 🔜 Planned |
 
 ---
 
@@ -52,7 +53,8 @@ flowchart LR
         ships["shipments<br/>role scoping · contact masking"]
         docs["documents<br/>upload · validation"]
         checks["checks<br/>cross-check rules X1–X10"]
-        export["export<br/>gate · CSV layout"]
+        export["export<br/>gate · CSV layout · versions · reopen"]
+        reports["reports<br/>overrides log (manager)"]
     end
 
     subgraph WORKER["worker · Python · same codebase"]
@@ -75,6 +77,7 @@ flowchart LR
     rewrite --> docs
     rewrite --> checks
     rewrite --> export
+    rewrite --> reports
 
     auth --> pg
     ships --> pg
@@ -82,6 +85,8 @@ flowchart LR
     docs -->|row + job, one transaction| pg
     checks --> pg
     export --> pg
+    export -->|CSV file| store
+    reports --> pg
 
     claim -->|poll jobs| pg
     claim --> extract
@@ -93,8 +98,7 @@ flowchart LR
     classDef built fill:#e8f5ee,stroke:#1d7a46,color:#1c1d1f
     classDef planned fill:#fbfbfa,stroke:#a35f00,stroke-dasharray:5 4,color:#4a4c50
     classDef ext fill:#eef2fd,stroke:#1f4fd1,color:#1c1d1f
-    class proxy,ui,rewrite,auth,ships,docs,claim,extract,pg,store built
-    class checks,export planned
+    class proxy,ui,rewrite,auth,ships,docs,checks,export,reports,claim,extract,pg,store built
     class gemini ext
     style WEB fill:#ffffff,stroke:#d3d1cb
     style API fill:#ffffff,stroke:#d3d1cb
@@ -102,15 +106,15 @@ flowchart LR
     style DATA fill:#ffffff,stroke:#d3d1cb
 ```
 
-<sub>Green = built · dashed amber = planned · blue = external service</sub>
+<sub>Green = built · blue = external service</sub>
 
 ### Services
 
 | Service | Tech | Port (dev) | Responsibility | State |
 |---|---|---|---|---|
 | **web** | Next.js 16 (App Router, TypeScript), Tailwind v4, TanStack Query | 3000 | UI. Forwards `/api/*` to the API so the browser only talks to one origin (first-party cookie, no CORS) | ✅ |
-| **api** | FastAPI, Pydantic v2, SQLAlchemy 2, psycopg 3 | 8000 | Auth, role and ownership checks, input validation, shipments, upload, checks, export | ✅ partial |
-| **worker** | Python, same codebase as `api` (`python -m app.worker`) | n/a | Claims extraction jobs from Postgres, calls Gemini, normalises and scores fields; cross-checks next | ✅ |
+| **api** | FastAPI, Pydantic v2, SQLAlchemy 2, psycopg 3 | 8000 | Auth, role and ownership checks, input validation, shipments, upload, checks, export, manager reports | ✅ |
+| **worker** | Python, same codebase as `api` (`python -m app.worker`) | n/a | Claims extraction jobs from Postgres, calls Gemini, normalises and scores fields, then reruns the cross-checks | ✅ |
 | **db** | PostgreSQL 16 (Docker) | 5433 | All data, sessions, the **job queue** and the append-only audit log | ✅ |
 | **storage** | Local disk (dev) / S3 `ap-south-1` (prod) | n/a | Uploaded documents and export files, private, never served from a public path | ✅ local |
 | **Gemini** | `gemini-3.5-flash`, falling back to other Flash models on 503/429 | n/a | Vision extraction with a JSON response schema. Free tier on synthetic data for the demo; Vertex AI (India region) in production | ✅ |
@@ -157,8 +161,8 @@ sequenceDiagram
     alt open flags remain
         A-->>W: 409 + list of blockers
     else all clear
-        A->>S: Store CSV
-        A-->>W: CSV download (versioned)
+        A->>S: Store CSV (v1, v2, … kept forever)
+        A-->>W: Export record, then GET /api/exports/{id}/file
     end
 ```
 
@@ -200,7 +204,7 @@ stateDiagram-v2
     needs_review --> cleared: last flag resolved
     cleared --> needs_review: edit or new upload raises a flag
     cleared --> exported: export (executive or manager)
-    exported --> needs_review: manager reopens
+    exported --> needs_review: manager reopens (reason required)
     exported --> [*]
 ```
 
@@ -345,6 +349,8 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │  │  ├─ documents/        upload, file streaming, retry, manual entry
 │  │  ├─ fields/           confirm / edit (version-checked), line items, history
 │  │  ├─ checks/           rules X1–X10 (pure), engine, accept-with-reason route
+│  │  ├─ export/           CSV layout (one file), gate, versions, download, reopen
+│  │  ├─ reports/          manager overrides log
 │  │  ├─ extraction/       catalog, Gemini client, prompts, normalisers, validators, confidence
 │  │  ├─ jobs.py           Postgres job queue (SKIP LOCKED, backoff)
 │  │  ├─ worker.py         extraction worker
@@ -358,8 +364,8 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │  └─ tests/               pytest, against a separate test database
 ├─ web/                    Next.js 16 app
 │  └─ src/
-│     ├─ app/              login, shipments list / detail, documents/[docId] review screen
-│     ├─ components/       app shell, documents panel, pdf.js viewer, UI primitives
+│     ├─ app/              login, shipments list / detail, documents/[docId] review screen, overrides
+│     ├─ components/       app shell, documents, checks and export panels, pdf.js viewer, UI primitives
 │     ├─ lib/              API client, types, formatting
 │     └─ proxy.ts          route guard (Next 16's replacement for middleware)
 ├─ sample-docs/            synthetic invoices, packing lists, B/Ls + ground truth + recorded extractions

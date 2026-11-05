@@ -98,10 +98,15 @@ draft ──upload──► extracting ──all docs done──► needs_review
 4. The UI polls `GET /api/shipments/{id}` every 2 s while anything is `extracting`, using TanStack Query's `refetchInterval` (switched off once nothing is extracting).
 
 **Review edit**
-`PATCH /api/fields/{id}` with `{value, version}` → validate → normalise → update with `version+1` (409 on a version mismatch) → audit row → **rerun only the rules that read this field** → `recompute_status()` → return the updated field, checks and flag count. The UI applies this response directly, so a correction gives instant feedback.
+`PATCH /api/fields/{id}` with `{value, version}` → validate → normalise → update with `version+1` (409 on a version mismatch) → audit row → `recompute_status()`, which reruns the cross-checks [A22] → return the updated field, checks and flag count. The UI applies this response directly, so a correction gives instant feedback.
 
 **Export**
-`POST /api/shipments/{id}/export` → `open_flags()` inside the transaction → if any are open, return 409 `{blockers: [...]}`. Otherwise build the CSV, store it, insert an `exports` row, set status to `exported`, add an audit row, and return the file.
+`POST /api/shipments/{id}/export` → take the shipment's row lock (`SELECT … FOR UPDATE`) → `recompute_status()` → `open_flags()` → if any are open, return 409 `{message, blockers: [...]}`. Otherwise build the CSV, store it, insert an `exports` row (next version number, SHA-256, row count, user), set status to `exported` and add an audit row with the hashes of the source documents. It returns the export record; the browser then downloads `GET /api/exports/{id}/file`.
+
+Every other write to a shipment (field edit, line added or removed, upload, accept) takes the same row lock first. So an edit and an export can't interleave: whichever commits second sees the other's result, and an edit that arrives after the export gets 409.
+
+**Reopen (manager)**
+`POST /api/shipments/{id}/reopen` with a reason of at least 10 characters → 409 unless exported → status is recomputed from the data, so it lands on *Needs review* if anything is open and *Cleared* if not **[A26]** → audit row with the reason and the last version. Earlier exports are never touched; the next export is v2.
 
 ## 5. The AI part
 
@@ -190,23 +195,28 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
 | PATCH | `/api/fields/{id}` | scoped | `{value, version}` or `{action:"confirm", version}`. 409 with the winning value on a version mismatch. 422 if the value doesn't parse as the field's type **[A19]** |
 | POST · DELETE | `/api/documents/{id}/lines` · `/lines/{line_index}` | scoped | Add an empty line item / remove one. The last line can't be removed **[A20]** |
 | POST | `/api/checks/{id}/accept` | scoped | `{reason}` of at least 10 characters |
-| POST | `/api/shipments/{id}/export` | scoped | 409 with blockers |
-| GET | `/api/shipments/{id}/exports` | scoped | |
-| POST | `/api/shipments/{id}/reopen` | manager | |
+| GET | `/api/shipments/{id}/export/preview` | scoped | The rows the CSV would contain now, plus the blockers |
+| POST | `/api/shipments/{id}/export` | scoped | 201 with the export record, or 409 `{message, blockers}` |
+| GET | `/api/shipments/{id}/exports` · `/api/exports/{id}/file` | scoped | Version history, newest first · the stored CSV as an attachment |
+| POST | `/api/shipments/{id}/reopen` | manager | `{reason}` of at least 10 characters. 409 unless exported |
 | GET | `/api/importers/{id}/contact` | scoped | Unmasked. Logs a reveal |
 | GET | `/api/fields/{id}/history` | scoped | From `audit_log`, newest first, with names |
-| GET | `/api/reports/accuracy?group=field\|supplier` · `/overrides` | manager | P1 |
+| GET | `/api/reports/overrides?since&kind` | manager | Accepted mismatches (and whether each still applies), corrected values, reopens |
+| GET | `/api/reports/accuracy?group=field\|supplier` | manager | P1, day 6 |
 
 "Scoped" means one dependency, `require_shipment_access(user, shipment)`, used on every route that loads a shipment or one of its children. A test checks every route against both roles.
 
 ## 7. Export layout [A3]
 
-A single UTF-8 CSV with a BOM (Excel opens it correctly). The `record_type` column splits header and lines:
+A single UTF-8 CSV with a BOM (Excel opens it correctly), `\r\n` line endings, and **one column-header line** that lists every column. The `record_type` column splits the rows: the H row leaves the line columns blank and each L row leaves the header columns blank **[A25]**.
 
-- **H row:** `record_type=H, shipment_ref, importer_name, importer_iec, supplier_name, supplier_country, invoice_no, invoice_date (DD/MM/YYYY), currency, incoterm, incoterm_place, invoice_value, bl_no, vessel_voyage, port_of_loading, port_of_discharge, total_packages, package_type, gross_weight_kg, net_weight_kg, container_nos (; separated)`
-- **L rows:** `record_type=L, shipment_ref, line_no, description, hsn, qty, unit, unit_price, line_amount, country_of_origin`
+- **Columns, in order:** `record_type, shipment_ref`, then the H columns `invoice_no, invoice_date, currency, incoterm, incoterm_place, invoice_value, importer_name, importer_iec, supplier_name, supplier_country, bl_no, vessel_voyage, port_of_loading, port_of_discharge, total_packages, package_type, gross_weight_kg, net_weight_kg, container_nos`, then the L columns `line_no, description, hsn, qty, unit, unit_price, line_amount, country_of_origin`.
+- **One H row**, then **one L row per invoice line**, numbered from 1.
+- **Values** are the normalised forms: numbers without thousands separators and with two decimals (`3165.00`), dates as `DD/MM/YYYY`, ISO currency and Incoterm codes, container numbers joined with `; `.
+- **Sources** **[A28]**: the importer name and IEC come from the client record (the documents don't carry the IEC). The supplier is taken as printed on the invoice. Packages, package type and weights come from the packing list, with the B/L filling in a gap. `vessel_voyage` is `vessel / voyage` from the B/L.
+- **An invoice is required.** Without one there are no L rows, so a shipment with documents but no invoice carries a `missing_document` flag that can't be accepted away **[A27]**.
 
-The layout is one mapping module (`api/app/export/layout.py`), so the real filing-software layout can replace it in one file. **CSV injection guard:** a cell starting with `= + - @` or a tab gets a leading `'`.
+The layout is one module (`api/app/export/layout.py`), so the real filing-software layout can replace it in one file. **CSV injection guard:** a cell starting with `= + - @`, a tab or a carriage return gets a leading `'`, so a spreadsheet shows it as text instead of running it. A test types `=HYPERLINK(…)` into a field and checks the exported cell.
 
 ## 8. Security and privacy
 
@@ -240,7 +250,8 @@ The layout is one mapping module (`api/app/export/layout.py`), so the real filin
   - Keyboard: `J`/`K` next/previous flag, `Enter` confirm, `E` edit, `Esc` cancel. Focusing a field jumps the viewer to its page and highlights its box (P1).
   - A header progress bar ("3 of 7 flags left") and an Export button that is disabled with a reason until everything is clear.
 - **Cross-checks:** one row per rule, with a value column per document, so a disagreement reads left to right. Tolerance is shown, so a small accepted difference makes sense.
-- **Export:** the blockers listed as links straight to the flag. When clear, a row preview and the download.
+- **Export:** a card beside the shipment (straight under the summary on a phone). Export is disabled with the reason in words until the shipment is *Cleared*; if the server still refuses, its blockers are listed. After export: the version, who, when, row count, the file hash and a download; earlier versions stay downloadable. Managers get **Reopen for changes** with a required reason. A collapsible preview shows the H row and the L rows built from the current values, with the raw column names.
+- **Overrides (manager):** one list of accepted mismatches, corrected values and reopens, with who, when and why, filterable by kind and period. An acceptance whose values have since changed is marked "no longer applies".
 - **States:** skeleton loaders that match the final layout. Empty states with one next action ("No shipments yet. Create one"). Errors that say what happened and offer Retry.
 
 *(Add screenshots after build.)*
@@ -320,3 +331,7 @@ crosscheck/
 | A22 | All ten rules rerun after every write instead of only the ones that read the edited field. The result is the same; the code is simpler |
 | A23 | An invoice and a packing list with one line each describe the same goods, even if worded differently |
 | A24 | A "can't check" result (for example, the B/L hasn't arrived) can be accepted with a reason, like a mismatch. *Alternative: only failures can be accepted, and a missing document always blocks export*
+| A25 | The CSV has one column-header line with every column, and H and L rows leave the other record's columns blank. Any CSV reader and Excel open it as one table. *Alternative: no header line, or a separate header line per record type, if the filing software wants that* |
+| A26 | After a reopen, the status is recomputed from the data like any other write: *Needs review* if something is open, *Cleared* if not, so a reopen made by mistake can be re-exported straight away. *Alternative: always force Needs review until someone touches a field* |
+| A27 | The invoice is the one document a shipment can't be exported without, because the line rows come from it. A missing packing list or B/L can still be accepted with a reason [A24] |
+| A28 | Export values: the importer name and IEC from the client record; everything else as the documents say; packing-list totals preferred over the B/L's (they agree within tolerance once X4/X5 pass) |
