@@ -77,6 +77,10 @@ SHIPMENTS = [
     ("SHP-24822", 2, 0, "rohan.exec@crosscheck.demo"),
 ]
 
+# Cleared shipments the seed files as an executive would, so the manager's accuracy report and
+# overrides log have history. The rest stay open for the demo (SHP-24812 is left to export live).
+HISTORY = ("SHP-24816", "SHP-24817", "SHP-24818", "SHP-24822")
+
 
 def seed(db: Session) -> None:
     users: dict[str, User] = {}
@@ -175,10 +179,46 @@ def seed_documents(db: Session) -> int:
     return added
 
 
+def seed_history(db: Session) -> int:
+    """Review and export the HISTORY shipments through the same code the API runs: wherever the
+    AI's value differs from the sample's ground truth, the assignee corrects it (audited), then
+    exports. Shipments that are already exported, or still have open items, are left alone."""
+    from app.export.router import export_shipment
+    from app.extraction.catalog import field_def
+    from app.fields.router import FieldPatch, patch_field
+    from app.models import Export
+    from app.reports.accuracy import comparable
+    from app.shipments.status import active_documents
+
+    exported = 0
+    for ref in HISTORY:
+        s = db.scalar(select(Shipment).where(Shipment.ref == ref))
+        if s is None or db.scalar(select(Export.id).where(Export.shipment_id == s.id).limit(1)):
+            continue
+        user = db.get(User, s.assignee_id or s.created_by)
+        assert user is not None
+        truth = json.loads((SAMPLES / ref / "truth.json").read_text())
+        country = s.supplier.country if s.supplier else None
+        for doc in active_documents(db, s.id):
+            t = truth[doc.doc_type]
+            for f in list(doc.fields):
+                is_line = f.line_index is not None
+                want = (t["lines"][f.line_index] if is_line else t["header"]).get(f.key)
+                fd = field_def(doc.doc_type, f.key, is_line)
+                if want and comparable(fd, f.value, country) != comparable(fd, want, country):
+                    patch_field(f.id, FieldPatch(version=f.version, value=want), user, db)
+        db.refresh(s)
+        if s.status == "cleared":
+            export_shipment(s.id, user, db)
+            exported += 1
+    return exported
+
+
 if __name__ == "__main__":
     from app.db import SessionLocal
 
     with SessionLocal() as session:
         seed(session)
         n = seed_documents(session)
-    print(f"seeded {len(USERS)} users, {len(SHIPMENTS)} shipments, {n} documents")
+        h = seed_history(session)
+    print(f"seeded {len(USERS)} users, {len(SHIPMENTS)} shipments, {n} documents, {h} exports")

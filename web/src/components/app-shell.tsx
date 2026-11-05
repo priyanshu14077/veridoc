@@ -16,6 +16,7 @@ export function useMe() {
 const NAV = [
   { href: "/shipments", label: "Shipments", managerOnly: false },
   { href: "/overrides", label: "Overrides", managerOnly: true },
+  { href: "/accuracy", label: "Accuracy", managerOnly: true },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -36,7 +37,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
           <Link href="/shipments" className="flex items-center gap-2 font-semibold tracking-tight">
             <Logo />
-            Crosscheck
+            <span className={clsx(me.data?.role === "manager" && "hidden sm:inline")}>
+              Crosscheck
+            </span>
           </Link>
           <Suspense fallback={<NavLinks pathname="" />}>
             <Nav />

@@ -30,7 +30,8 @@ A documentation executive drops in a shipment's **invoice, packing list and bill
 | Cross-checks X1–X10 between invoice, packing list and B/L; accept a mismatch with a reason (lapses if a value changes) | ✅ Done |
 | Export gate (409 with blockers), versioned CSV export with a formula-injection guard, manager reopen | ✅ Done |
 | Manager overrides log (accepted mismatches, corrections, reopens) | ✅ Done |
-| Accuracy report | 🔜 Planned |
+| Manager accuracy report by field and supplier (exported shipments; corrections the flags missed) | ✅ Done |
+| Not-found page, app error boundary, phone layout for every screen | ✅ Done |
 
 ---
 
@@ -54,7 +55,7 @@ flowchart LR
         docs["documents<br/>upload · validation"]
         checks["checks<br/>cross-check rules X1–X10"]
         export["export<br/>gate · CSV layout · versions · reopen"]
-        reports["reports<br/>overrides log (manager)"]
+        reports["reports<br/>overrides log, accuracy (manager)"]
     end
 
     subgraph WORKER["worker · Python · same codebase"]
@@ -350,7 +351,7 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │  │  ├─ fields/           confirm / edit (version-checked), line items, history
 │  │  ├─ checks/           rules X1–X10 (pure), engine, accept-with-reason route
 │  │  ├─ export/           CSV layout (one file), gate, versions, download, reopen
-│  │  ├─ reports/          manager overrides log
+│  │  ├─ reports/          manager overrides log and accuracy report
 │  │  ├─ extraction/       catalog, Gemini client, prompts, normalisers, validators, confidence
 │  │  ├─ jobs.py           Postgres job queue (SKIP LOCKED, backoff)
 │  │  ├─ worker.py         extraction worker
@@ -389,7 +390,7 @@ cd api
 cp .env.example .env
 uv sync
 uv run python -m app.migrate        # apply SQL migrations
-uv run python -m app.seed           # demo users, 12 shipments, 35 documents (safe to re-run)
+uv run python -m app.seed           # demo users, 12 shipments, 35 documents, 4 exported (safe to re-run)
 uv run uvicorn app.main:app --port 8000
 
 # 3. Extraction worker (second terminal; needs GEMINI_API_KEY in api/.env)
