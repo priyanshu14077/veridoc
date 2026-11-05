@@ -10,6 +10,7 @@ from app.documents.router import router as documents_router
 from app.export.router import router as export_router
 from app.fields.router import router as fields_router
 from app.parties import router as parties_router
+from app.reports.router import router as reports_router
 from app.shipments.router import router as shipments_router
 from app.users import router as users_router
 
@@ -42,6 +43,7 @@ for r in (
     checks_router,
     export_router,
     parties_router,
+    reports_router,
     users_router,
 ):
     app.include_router(r, prefix="/api")

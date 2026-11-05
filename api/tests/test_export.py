@@ -183,3 +183,34 @@ def test_other_executives_cannot_see_or_download_exports(client, db, fake_gemini
     assert other.get(f"/api/shipments/{sid}/exports").status_code == 404
     assert other.get(f"/api/exports/{e['id']}/file").status_code == 404
     assert other.post(f"/api/shipments/{sid}/export").status_code == 404
+
+
+# ---------- overrides log ----------
+
+
+def test_overrides_log_lists_acceptances_edits_and_reopens_for_managers_only(
+    client, db, fake_gemini
+) -> None:
+    sid = cleared(client, db, fake_gemini)
+    f = invoice_field(client, sid, "incoterm_place")
+    client.patch(f"/api/fields/{f['id']}", json={"version": f["version"], "value": "Shenzhen"})
+    client.post(f"/api/shipments/{sid}/export")
+    assert client.get("/api/reports/overrides").status_code == 403
+    client.post("/api/auth/logout")
+
+    m = login(client, MANAGER)
+    m.post(f"/api/shipments/{sid}/reopen", json={"reason": "Importer sent a revised invoice"})
+    out = m.get("/api/reports/overrides").json()
+    assert out["counts"] == {"accepted": 1, "edited": 1, "reopened": 1}
+    kinds = {i["kind"]: i for i in out["items"]}
+    assert kinds["accepted"]["subject"].startswith("X5") and kinds["accepted"]["still_applies"]
+    assert kinds["accepted"]["reason"] == REASON["reason"]
+    assert kinds["edited"]["subject"] == "Invoice · Incoterm place"
+    assert kinds["edited"]["detail"].endswith("→ Shenzhen")
+    assert kinds["reopened"]["shipment_ref"] == "SHP-24811"
+
+    # Once the accepted values change, the log says the acceptance no longer holds.
+    gross = invoice_field(m, sid, "total_gross_weight_kg")
+    m.patch(f"/api/fields/{gross['id']}", json={"version": gross["version"], "value": "3,000"})
+    only = m.get("/api/reports/overrides", params={"kind": "accepted"}).json()["items"]
+    assert len(only) == 1 and only[0]["still_applies"] is False
