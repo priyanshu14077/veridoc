@@ -1,0 +1,88 @@
+# Production: Postgres, API, extraction worker, web and Caddy (HTTPS) on one server.
+# Run from the repo root:  docker compose -f deploy/compose.yml --env-file deploy/.env up -d --build
+name: crosscheck
+
+x-api: &api
+  build:
+    context: ..
+    dockerfile: api/Dockerfile
+  image: crosscheck-api
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql+psycopg://crosscheck:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/crosscheck
+    COOKIE_SECURE: "true"
+    ALLOWED_ORIGINS: '["https://${SITE_ADDRESS:?set SITE_ADDRESS}"]'
+    TRUST_PROXY: "true"
+  volumes:
+    - storage:/data/storage
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crosscheck
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: crosscheck
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crosscheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    # No ports: only the other containers can reach the database.
+
+  api:
+    <<: *api
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 6
+
+  worker:
+    <<: *api
+    command: ["python", "-m", "app.worker"]
+    depends_on:
+      api:
+        condition: service_healthy  # the API runs the migrations first
+
+  web:
+    build:
+      context: ../web
+      args:
+        API_ORIGIN: http://api:8000
+    image: crosscheck-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+volumes:
+  pgdata:
+  storage:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,25 @@
+# One address for everything, so the session cookie is first-party and there's no CORS.
+# Caddy gets and renews the HTTPS certificate for SITE_ADDRESS on its own.
+{$SITE_ADDRESS} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# The API checks the 15 MB limit itself; this only stops absurd bodies early.
+	request_body /api/* {
+		max_size 20MB
+	}
+
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+	handle {
+		reverse_proxy web:3000
+	}
+}
