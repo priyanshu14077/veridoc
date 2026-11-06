@@ -231,7 +231,7 @@ The layout is one module (`api/app/export/layout.py`), so the real filing-softwa
 | Uploads | Magic-byte check, size and page limits, random storage keys, never served from a public path |
 | Personal data (DPDP) | Importer contact masked by default (`R*** K***`, `+91 ••••• ••321`). Revealed only to the assignee or a manager, and each reveal is logged. The seed data is fictional |
 | Confidential prices | Same scoping. Executives don't see shipments they aren't assigned to (apart from unassigned ones) |
-| Data residency | Demo: one EC2 server in Mumbai (ap-south-1) holds the database and the files. Production adds S3 in ap-south-1 and Vertex AI in an Indian region (§5.7) |
+| Data residency | Production: the server, S3 and Vertex AI all in India (EC2 and S3 in Mumbai, ap-south-1; Vertex in an Indian region, §5.7). The demo runs on one EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open Mumbai **[A32]**. The demo holds only fictional data, and the compose setup is the same in any region |
 | Audit | Append-only `audit_log`. The app's DB role has no UPDATE or DELETE on it **[A17]** |
 
 ## 9. UI and design decisions
@@ -341,3 +341,4 @@ veridoc/
 | A29 | The value filed on an exported shipment is the truth for the accuracy report. A change of letter case or spacing, or a number written differently ("3,165.00 KGS" vs "3165"), is not a correction. A line a person added counts as a miss for each of its values; a line a person removed isn't counted |
 | A30 | Documents that went to manual entry have no AI values and are left out of accuracy (shown as a count) |
 | A31 | Accuracy counts shipments whose current status is Exported. A reopened shipment drops out until it's exported again, so the numbers always describe values that were filed |
+| A32 | The live demo is hosted in Sydney (ap-southeast-2), not India: the AWS account available for this exercise is limited to that region. It holds only fictional data, so no personal data leaves India. A real deployment runs the same stack in Mumbai (ap-south-1) |
