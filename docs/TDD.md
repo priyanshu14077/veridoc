@@ -1,6 +1,6 @@
 # Technical Design Document: Crosscheck
 
-**GitHub:** `https://github.com/<user>/crosscheck` *(fill in)* · **Live app:** *(fill in after deploy)*
+**GitHub:** https://github.com/priyanshu14077/veridoc · **Live app:** https://16-179-13-144.sslip.io (demo logins in [deployment.md](./deployment.md))
 Version 0.1 · 2026-11-02 · Author: Priyanshu Kumar · Companion to [PRD.md](./PRD.md)
 
 > Assumptions carry the PRD's tags **[A#]**. New ones introduced here start at **[A14]**. Sections marked *(fill after build)* will be finished with measured numbers before submission.

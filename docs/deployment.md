@@ -1,6 +1,6 @@
 # Deployment: Crosscheck
 
-**Live app:** *(fill in)* · **Repository:** https://github.com/priyanshu14077/veridoc
+**Live app:** https://16-179-13-144.sslip.io · **Repository:** https://github.com/priyanshu14077/veridoc
 
 Crosscheck runs as five containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
 
@@ -60,8 +60,9 @@ open https://localhost                        # accept the local certificate war
 1. In the AWS console, set the region (top right) *before* creating anything: **Asia Pacific (Mumbai) ap-south-1** for real use. A server can't be moved to another region later. (The live demo is in Sydney, ap-southeast-2, the only region its account allows.)
 2. **EC2 → Launch instance**:
    - Image: **Ubuntu Server 24.04 LTS** (64-bit x86)
+   - Name: `veridoc`
    - Type: **t3.small** (2 GB RAM). 1 GB isn't enough for Postgres, the API, the worker and Next.js together.
-   - Key pair: create one and save the `.pem` file outside the repository (for example `~/.ssh/crosscheck.pem`).
+   - Key pair: create one and save the `.pem` file outside the repository (for example `~/.ssh/veridoc.pem`).
    - Network: allow **SSH from My IP**, **HTTP from anywhere** and **HTTPS from anywhere**.
    - Storage: 30 GB gp3.
 3. **EC2 → Elastic IPs → Allocate**, then **Associate** it with the instance, so the address survives a restart.
@@ -69,8 +70,8 @@ open https://localhost                        # accept the local certificate war
 ### 3.2 Prepare the server
 
 ```bash
-chmod 400 ~/.ssh/crosscheck.pem
-ssh -i ~/.ssh/crosscheck.pem ubuntu@<elastic-ip>
+chmod 400 ~/.ssh/veridoc.pem
+ssh -i ~/.ssh/veridoc.pem ubuntu@<elastic-ip>
 
 sudo apt-get update && sudo apt-get -y upgrade
 curl -fsSL https://get.docker.com | sudo sh
@@ -85,7 +86,7 @@ exit                                          # log in again so the docker group
 ### 3.3 Configure and start
 
 ```bash
-ssh -i ~/.ssh/crosscheck.pem ubuntu@<elastic-ip>
+ssh -i ~/.ssh/veridoc.pem ubuntu@<elastic-ip>
 git clone https://github.com/priyanshu14077/veridoc.git && cd veridoc
 cp deploy/.env.example deploy/.env
 nano deploy/.env
