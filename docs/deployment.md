@@ -2,7 +2,7 @@
 
 **Live app:** *(fill in)* · **Repository:** https://github.com/priyanshu14077/veridoc
 
-Crosscheck runs as five containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. The demo runs on one AWS EC2 server in Mumbai (ap-south-1), so the database and the uploaded files stay in India.
+Crosscheck runs as five containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
 
 ```
 Internet ──443──► Caddy ──/api/*──► api (FastAPI) ──► db (Postgres)
@@ -53,11 +53,11 @@ docker compose -f deploy/compose.yml --env-file deploy/.env up -d --build
 open https://localhost                        # accept the local certificate warning
 ```
 
-## 3. Deploy to AWS EC2 (Mumbai)
+## 3. Deploy to AWS EC2
 
 ### 3.1 Create the server
 
-1. In the AWS console, set the region (top right) to **Asia Pacific (Mumbai) ap-south-1** *before* creating anything. A server can't be moved to another region later.
+1. In the AWS console, set the region (top right) *before* creating anything: **Asia Pacific (Mumbai) ap-south-1** for real use. A server can't be moved to another region later. (The live demo is in Sydney, ap-southeast-2, the only region its account allows.)
 2. **EC2 → Launch instance**:
    - Image: **Ubuntu Server 24.04 LTS** (64-bit x86)
    - Type: **t3.small** (2 GB RAM). 1 GB isn't enough for Postgres, the API, the worker and Next.js together.
@@ -147,6 +147,7 @@ Names only. Real values live in `api/.env` (development) or `deploy/.env` (serve
 
 ## 5. Limits of this deployment
 
+- The live demo is in Sydney, not India (TDD A32). Production runs in Mumbai.
 - One server, no replica. A backup is a manual `pg_dump` (above).
 - Files are on the server's disk (a Docker volume), not S3. The storage interface takes an S3 driver without other changes.
 - The Gemini free tier allows about 20 extractions per model per day. The seeded shipments don't use it. Production would move to Vertex AI in an Indian region (TDD §5.7).
