@@ -4,6 +4,8 @@
 
 **AI document extraction and cross-checks for a customs broker's import shipments.**
 
+**Live demo:** https://16-179-13-144.sslip.io · sign in as `anil.manager@crosscheck.demo` / `crosscheck-demo` (more accounts in [docs/deployment.md](docs/deployment.md))
+
 A documentation executive drops in a shipment's **invoice, packing list and bill of lading**. A vision model extracts the fields with a confidence score on each. Deterministic rules check the three documents against each other (totals, packages, weights, containers). **Nothing exports until a person has cleared every uncertain or conflicting value.** The export is a file the existing customs filing software can import, so that software doesn't change.
 
 | | |
