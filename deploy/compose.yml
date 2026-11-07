@@ -4,14 +4,28 @@
 # start new, empty volumes, and Postgres only reads POSTGRES_USER/DB when it first creates them.
 name: crosscheck
 
+# Every container logs JSON lines to a capped file (Docker's default never rotates and can fill
+# the disk). The compose service name rides along on each line, so the collector can tell apart
+# api, worker, web, caddy and db logs.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+    labels: com.docker.compose.service
+
 x-api: &api
   build:
     context: ..
     dockerfile: api/Dockerfile
   image: veridoc-api
   restart: unless-stopped
+  logging: *logging
   env_file: .env
   environment:
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+    # Stable HTTP names: http_route holds the route template, so IDs don't each make a new series.
+    OTEL_SEMCONV_STABILITY_OPT_IN: http
     DATABASE_URL: postgresql+psycopg://crosscheck:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/crosscheck
     COOKIE_SECURE: "true"
     ALLOWED_ORIGINS: '["https://${SITE_ADDRESS:?set SITE_ADDRESS}"]'
@@ -23,6 +37,7 @@ services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_USER: crosscheck
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
@@ -62,6 +77,9 @@ services:
         API_ORIGIN: http://api:8000
     image: veridoc-web
     restart: unless-stopped
+    logging: *logging
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
     depends_on:
       api:
         condition: service_healthy
@@ -69,12 +87,17 @@ services:
   caddy:
     image: caddy:2.10-alpine
     restart: unless-stopped
+    logging: *logging
     ports:
       - "80:80"
       - "443:443"
       - "443:443/udp"
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS}
+      # Caddy starts each request's trace and passes it on to the API and web (traceparent).
+      OTEL_SERVICE_NAME: caddy
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_INSECURE: "true"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -82,9 +105,117 @@ services:
     depends_on:
       - web
       - api
+      - grafana
+
+  # ── Observability ────────────────────────────────────────────────────────────────────────
+  # Five small containers with hard memory caps, so monitoring can never starve the app.
+  # None publishes a port; Grafana is reached through Caddy at /grafana, behind its own login.
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.164.0
+    restart: unless-stopped
+    logging: *logging
+    command: ["--config=/etc/otelcol/config.yaml"]
+    # Root, read-only mounts: reading other containers' log files, the Docker socket (container
+    # stats) and /proc of the host needs it. The collector has no published port.
+    user: "0"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      GOMEMLIMIT: 110MiB
+      # Set by deploy.sh: changes when deploy/observability changes, which recreates the
+      # container, because editing a mounted file alone doesn't restart anything.
+      CONFIG_HASH: ${OBS_CONFIG_HASH:-}
+    volumes:
+      - ./observability/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - otel_state:/var/lib/otelcol
+    mem_limit: 160m
+    depends_on:
+      - victoriametrics
+      - victorialogs
+      - victoriatraces
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.154.1
+    restart: unless-stopped
+    logging: *logging
+    command:
+      - -storageDataPath=/storage
+      - -retentionPeriod=15d
+      - -memory.allowedPercent=25  # caches are sized from the container limit; keep them small
+    volumes:
+      - vmdata:/storage
+    mem_limit: 256m
+
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.53.0
+    restart: unless-stopped
+    logging: *logging
+    command:
+      - -storageDataPath=/vlogs
+      - -retentionPeriod=7d
+      - -retention.maxDiskSpaceUsageBytes=2GiB
+      - -memory.allowedPercent=50
+    volumes:
+      - vldata:/vlogs
+    mem_limit: 192m
+
+  victoriatraces:
+    image: victoriametrics/victoria-traces:v0.12.1
+    restart: unless-stopped
+    logging: *logging
+    command:
+      - -storageDataPath=/vtraces
+      - -retentionPeriod=3d
+      - -retention.maxDiskSpaceUsageBytes=1GiB
+      - -memory.allowedPercent=50
+    volumes:
+      - vtdata:/vtraces
+    mem_limit: 192m
+
+  grafana:
+    image: grafana/grafana:13.2.5
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      CONFIG_HASH: ${OBS_CONFIG_HASH:-}  # see otel-collector
+      GOMEMLIMIT: 300MiB  # collect garbage before the container limit, not at it
+      GF_SERVER_ROOT_URL: https://${SITE_ADDRESS}/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD}
+      GF_SECURITY_COOKIE_SECURE: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_PLUGINS_PREINSTALL: victoriametrics-logs-datasource
+      # Alert email through Gmail SMTP with an app password. Off until SMTP_USER is set.
+      GF_SMTP_ENABLED: ${SMTP_ENABLED:-false}
+      GF_SMTP_HOST: smtp.gmail.com:587
+      GF_SMTP_USER: ${SMTP_USER:-}
+      GF_SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      GF_SMTP_FROM_ADDRESS: ${SMTP_USER:-alerts@veridoc.invalid}
+      GF_SMTP_FROM_NAME: Veridoc alerts
+      ALERT_EMAIL: ${ALERT_EMAIL:-alerts@veridoc.invalid}
+    volumes:
+      - ./observability/grafana:/etc/grafana/provisioning:ro
+      - grafana:/var/lib/grafana
+    mem_limit: 384m  # measured ~280 MB in use: Grafana is the heaviest piece here
+    depends_on:
+      - victoriametrics
+      - victorialogs
+      - victoriatraces
 
 volumes:
   pgdata:
   storage:
   caddy_data:
   caddy_config:
+  otel_state:
+  vmdata:
+  vldata:
+  vtdata:
+  grafana:

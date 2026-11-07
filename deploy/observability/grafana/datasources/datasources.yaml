@@ -1,0 +1,24 @@
+# Provisioned at start; edits in the UI are not kept (the files in git are the source of truth).
+apiVersion: 1
+datasources:
+  - name: VictoriaMetrics
+    uid: vm
+    type: prometheus  # VictoriaMetrics speaks PromQL, so the built-in data source works
+    access: proxy
+    url: http://victoriametrics:8428
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 30s
+  - name: VictoriaLogs
+    uid: vlogs
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: http://victorialogs:9428
+    editable: false
+  - name: VictoriaTraces
+    uid: traces
+    type: jaeger  # VictoriaTraces serves the Jaeger query API
+    access: proxy
+    url: http://victoriatraces:10428/select/jaeger
+    editable: false

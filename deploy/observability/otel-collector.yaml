@@ -1,0 +1,136 @@
+# OpenTelemetry Collector: the one place telemetry enters and leaves.
+#   in:  OTLP from the API, worker and web; host, container and Postgres stats; Docker log files
+#   out: metrics → VictoriaMetrics, logs → VictoriaLogs, traces → VictoriaTraces
+# Apps only know "send OTLP to the collector", so changing a backend is a change in this file only.
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  file_storage:
+    create_directory: true
+    directory: /var/lib/otelcol  # remembers how far each log file was read, across restarts
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+      grpc:
+        endpoint: 0.0.0.0:4317  # Caddy exports over gRPC
+
+  host_metrics:
+    collection_interval: 30s
+    root_path: /hostfs
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.utilization: {enabled: true}
+      memory:
+        metrics:
+          system.memory.utilization: {enabled: true}
+      load: {}
+      paging: {}
+      network: {}
+      filesystem:
+        # Real disks only. Read-only images (snaps are squashfs, always "100% full") and virtual
+        # filesystems would make the disk alert fire forever.
+        exclude_fs_types:
+          fs_types: [squashfs, erofs, iso9660, tmpfs, devtmpfs, overlay, proc, sysfs, cgroup2, nsfs, autofs, fuse.lxcfs]
+          match_type: strict
+        exclude_devices:
+          devices: ["^/dev/loop"]
+          match_type: regexp
+        metrics:
+          system.filesystem.utilization: {enabled: true}
+
+  docker_stats:
+    endpoint: unix:///var/run/docker.sock
+    collection_interval: 30s
+
+  postgresql:
+    endpoint: db:5432
+    username: crosscheck
+    password: ${env:POSTGRES_PASSWORD}
+    databases: [crosscheck]
+    collection_interval: 30s
+    tls:
+      insecure: true  # same Docker network; Postgres has no published port
+
+  # Every container's stdout, from Docker's json-file logs. Docker adds the compose service name
+  # to each line (deploy/compose.yml, x-logging), which becomes service.name here.
+  file_log:
+    include: [/var/lib/docker/containers/*/*-json.log]
+    start_at: end
+    storage: file_storage
+    operators:
+      - type: json_parser
+        timestamp:
+          parse_from: attributes.time
+          layout_type: gotime
+          layout: "2006-01-02T15:04:05.999999999Z07:00"
+      - type: move  # containers started outside compose have no label; keep their lines anyway
+        if: attributes.attrs != nil and attributes.attrs["com.docker.compose.service"] != nil
+        from: attributes.attrs["com.docker.compose.service"]
+        to: resource["service.name"]
+      - type: move
+        from: attributes.log
+        to: body
+      - type: remove
+        if: attributes.attrs != nil
+        field: attributes.attrs
+      - type: remove
+        field: attributes.time
+      # The API, worker and Caddy log JSON: lift its fields so they are searchable.
+      - type: json_parser
+        if: body matches "^\\s*\\{"
+        parse_from: body
+        parse_to: attributes
+      - type: severity_parser
+        if: attributes.level != nil
+        parse_from: attributes.level
+      - type: move
+        if: attributes.msg != nil
+        from: attributes.msg
+        to: body
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 100
+    spike_limit_mib: 25
+  batch:
+    timeout: 5s
+  resource/env:
+    attributes:
+      - key: deployment.environment.name
+        value: production
+        action: upsert
+
+exporters:
+  prometheus_remote_write:
+    endpoint: http://victoriametrics:8428/api/v1/write
+    resource_to_telemetry_conversion:
+      enabled: true  # service.name, container.name, … become labels
+  otlp_http/victorialogs:
+    logs_endpoint: http://victorialogs:9428/insert/opentelemetry/v1/logs
+  otlp_http/victoriatraces:
+    traces_endpoint: http://victoriatraces:10428/insert/opentelemetry/v1/traces
+
+service:
+  extensions: [health_check, file_storage]
+  telemetry:
+    logs:
+      level: warn
+  pipelines:
+    metrics:
+      receivers: [otlp, host_metrics, docker_stats, postgresql]
+      processors: [memory_limiter, resource/env, batch]
+      exporters: [prometheus_remote_write]
+    logs:
+      receivers: [otlp, file_log]
+      processors: [memory_limiter, resource/env, batch]
+      exporters: [otlp_http/victorialogs]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource/env, batch]
+      exporters: [otlp_http/victoriatraces]

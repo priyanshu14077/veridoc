@@ -3,6 +3,17 @@
 {$SITE_ADDRESS} {
 	encode zstd gzip
 
+	# One JSON line per request (status, duration, trace id). Cookies and auth headers are
+	# redacted by Caddy itself. The collector ships these to VictoriaLogs.
+	log {
+		output stdout
+		format json
+	}
+	# Start a trace for every request and pass it on, so API and web spans join it.
+	tracing {
+		span http.request
+	}
+
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options "nosniff"
@@ -18,6 +29,10 @@
 
 	handle /api/* {
 		reverse_proxy api:8000
+	}
+	# Dashboards and alerts. Grafana has its own login (admin password in deploy/.env).
+	handle /grafana* {
+		reverse_proxy grafana:3000
 	}
 	handle {
 		reverse_proxy web:3000

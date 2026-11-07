@@ -1,0 +1,179 @@
+# Alert rules, the email contact point and the routing policy, provisioned from git.
+# Each rule is one PromQL query (A) and a threshold (C). Alerts fire only after `for`, so a single
+# slow minute doesn't page anyone. Limits (what this can't catch): if the whole server is down,
+# Grafana is down too and can't send anything. That needs an outside check (see docs).
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: email
+    receivers:
+      - uid: email
+        type: email
+        settings:
+          addresses: ${ALERT_EMAIL}
+          singleEmail: true
+
+policies:
+  - orgId: 1
+    receiver: email
+    group_by: [alertname]
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 4h
+
+groups:
+  - orgId: 1
+    name: veridoc
+    folder: Veridoc
+    interval: 1m
+    rules:
+      - uid: api-silent
+        title: API stopped reporting
+        condition: C
+        for: 3m
+        noDataState: OK  # no result from absent_over_time means the API is reporting
+        execErrState: Error
+        labels: {severity: critical}
+        annotations:
+          summary: The API has sent no telemetry for 5 minutes. It is down or restarting in a loop.
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 600, to: 0}
+            model: {refId: A, instant: true, expr: 'absent_over_time(target_info{job="veridoc-api"}[5m])'}
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [0]}}]}
+
+      - uid: worker-silent
+        title: Extraction worker stopped reporting
+        condition: C
+        for: 3m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: critical}
+        annotations:
+          summary: The worker has sent no telemetry for 5 minutes. Uploads will wait in the queue.
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 600, to: 0}
+            model: {refId: A, instant: true, expr: 'absent_over_time(target_info{job="veridoc-worker"}[5m])'}
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [0]}}]}
+
+      - uid: api-5xx
+        title: API errors above 5%
+        condition: C
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: warning}
+        annotations:
+          summary: More than 5% of API requests failed with a 5xx over 15 minutes (with at least 20 requests).
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 900, to: 0}
+            model:
+              refId: A
+              instant: true
+              expr: >-
+                (sum(increase(http_server_request_duration_seconds_count{service_name="veridoc-api",http_response_status_code=~"5.."}[15m]))
+                / sum(increase(http_server_request_duration_seconds_count{service_name="veridoc-api"}[15m])))
+                and sum(increase(http_server_request_duration_seconds_count{service_name="veridoc-api"}[15m])) >= 20
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [0.05]}}]}
+
+      - uid: queue-stuck
+        title: Extraction queue stuck
+        condition: C
+        for: 2m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: warning}
+        annotations:
+          summary: A document has waited more than 10 minutes for extraction.
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 300, to: 0}
+            model: {refId: A, instant: true, expr: 'max(veridoc_jobs_oldest_age_seconds{status="queued"})'}
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [600]}}]}
+
+      - uid: gemini-quota
+        title: Gemini quota hit
+        condition: C
+        for: 0m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: info}
+        annotations:
+          summary: A Gemini model answered 429 (out of quota) in the last hour. Extractions wait for the reset.
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 3600, to: 0}
+            model: {refId: A, instant: true, expr: 'sum(increase(veridoc_gemini_calls_total{outcome="quota"}[1h]))'}
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [0]}}]}
+
+      - uid: gemini-failing
+        title: Gemini calls failing
+        condition: C
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: warning}
+        annotations:
+          summary: More than 3 Gemini calls failed (not quota) in 15 minutes.
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 900, to: 0}
+            model: {refId: A, instant: true, expr: 'sum(increase(veridoc_gemini_calls_total{outcome!~"ok|quota"}[15m]))'}
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [3]}}]}
+
+      - uid: disk-full
+        title: Disk above 85%
+        condition: C
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: warning}
+        annotations:
+          summary: The server's disk is more than 85% full. Postgres stops writing when it is full.
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 600, to: 0}
+            model: {refId: A, instant: true, expr: 'max(system_filesystem_utilization_ratio)'}
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [0.85]}}]}
+
+      - uid: memory-high
+        title: Memory above 90%
+        condition: C
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: warning}
+        annotations:
+          summary: The server has used more than 90% of its RAM for 10 minutes. Containers may be killed.
+        data:
+          - refId: A
+            datasourceUid: vm
+            relativeTimeRange: {from: 600, to: 0}
+            model: {refId: A, instant: true, expr: 'max(system_memory_utilization_ratio{state="used"})'}
+          - refId: C
+            datasourceUid: __expr__
+            model: {refId: C, type: threshold, expression: A, conditions: [{evaluator: {type: gt, params: [0.9]}}]}
