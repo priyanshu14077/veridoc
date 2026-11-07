@@ -1,6 +1,6 @@
 import { targets } from "@/content";
 import { CountUp } from "./motion";
-import { PortScene } from "./port-scene";
+import { Backdrop } from "./backdrop";
 import { Eyebrow, Section, TwoTone, stagger } from "./ui";
 
 /** The client's targets, in the place other pages put a customer story. Labelled as targets. */
@@ -8,13 +8,13 @@ export function Targets() {
   return (
     <Section labelledBy="targets-title">
       <div className="reveal grid grid-cols-1 overflow-hidden rounded-2xl border border-line bg-surface p-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        <PortScene variant="water" seed={45} className="min-h-64 rounded-xl lg:min-h-full">
+        <Backdrop image="aurorix" position="20% 50%" className="min-h-64 rounded-xl lg:min-h-full">
           <div className="flex h-full items-end p-5">
             <span className="rounded-full bg-surface/90 px-3 py-1 text-xs font-medium text-ink backdrop-blur">
               Target, not a result
             </span>
           </div>
-        </PortScene>
+        </Backdrop>
         <div className="p-6 sm:p-10">
           <Eyebrow>{targets.eyebrow}</Eyebrow>
           <TwoTone id="targets-title" title={targets.title} className="mt-4 text-3xl sm:text-4xl" />

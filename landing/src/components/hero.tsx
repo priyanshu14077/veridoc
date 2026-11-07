@@ -4,54 +4,57 @@ import { Check, CheckCircle2, Download, FileText, Loader2, Pencil, TriangleAlert
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { memo, useEffect, useRef, useState } from "react";
 import { hero, links, live, queue, type Status } from "@/content";
-import { PortScene } from "./port-scene";
+import { HeroVideo } from "./backdrop";
 import { AppWindow, ButtonLink, Container, StatusChip, stagger } from "./ui";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden">
-      <Container className="grid grid-cols-1 items-center gap-12 pb-16 pt-14 sm:pb-24 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-12">
-        <div className="min-w-0">
-          <a
-            href="#product"
-            className="rise group inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1 pl-1 pr-3 text-sm text-ink-2 transition-colors duration-300 hover:border-line-strong"
-          >
-            <span className="rounded-full bg-ink px-2 py-0.5 text-xs font-medium text-surface">{hero.chipLabel}</span>
-            {hero.chip}
-            <span aria-hidden className="transition-transform duration-300 ease-smooth group-hover:translate-x-0.5">→</span>
-          </a>
-          {/* Static on purpose: the headline is the first thing read (and the LCP element). */}
-          <h1 id="hero-title" className="display mt-6 text-[2.6rem] text-balance sm:text-6xl lg:text-[3.5rem] xl:text-[3.9rem]">
-            {hero.title.map((line, i) => (
-              <span key={line} className={`block ${i === 1 ? "text-muted" : "text-ink"}`}>
-                {line}
-              </span>
-            ))}
-          </h1>
-          <p className="rise mt-6 max-w-xl text-base leading-relaxed text-ink-2 sm:text-lg" style={stagger(0, 380)}>
-            {hero.sub}
-          </p>
-          <div className="rise mt-8 flex flex-col gap-3 sm:flex-row sm:items-center" style={stagger(0, 470)}>
-            <ButtonLink href={links.demo} external>
-              Try the live demo
-            </ButtonLink>
-            <ButtonLink href="#how-it-works" variant="ghost">
-              See how it works
-            </ButtonLink>
-          </div>
-          <p className="rise mt-6 text-sm text-muted" style={stagger(0, 540)}>
-            {hero.note}
-          </p>
-        </div>
+    <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
+      {/* The video: a sunlit valley under a white sky. Text sits on the sky, the product on the meadow. */}
+      <div aria-hidden className="absolute inset-x-0 bottom-0 top-[30%] -z-10 sm:top-0">
+        <HeroVideo />
+        {/* Paper fades into the sky at the top, so the nav and text sit on a clean, even ground. */}
+        <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-paper via-paper/70 to-transparent sm:h-2/5" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper to-transparent" />
+      </div>
 
-        <div className="mock-in min-w-0" style={stagger(0, 300)}>
-          <PortScene variant="wide" seed={24817} className="aspect-[2/3] rounded-2xl sm:aspect-[4/3] lg:aspect-[1/1.04]">
-            <div className="absolute inset-x-4 top-8 [transform:translateZ(0)] sm:inset-x-auto sm:left-[8%] sm:top-[12%] sm:w-[118%]">
-              <Autopilot />
-            </div>
-          </PortScene>
+      <Container className="flex flex-col items-center pb-10 pt-14 text-center sm:pt-20">
+        <a
+          href="#product"
+          className="rise group inline-flex items-center gap-2 rounded-full border border-line bg-surface/90 py-1 pl-1 pr-3 text-sm text-ink-2 shadow-sm backdrop-blur transition-colors duration-300 hover:border-line-strong"
+        >
+          <span className="rounded-full bg-ink px-2 py-0.5 text-xs font-medium text-surface">{hero.chipLabel}</span>
+          <span className="text-left">{hero.chip}</span>
+          <span aria-hidden className="transition-transform duration-300 ease-smooth group-hover:translate-x-0.5">→</span>
+        </a>
+        {/* Static on purpose: the headline is the first thing read (and the LCP element). */}
+        <h1 id="hero-title" className="display mt-6 max-w-5xl text-[2.6rem] text-balance sm:text-6xl lg:text-7xl">
+          {hero.title.map((line, i) => (
+            <span key={line} className={`block ${i === 1 ? "text-ink-2" : "text-ink"}`}>
+              {line}
+            </span>
+          ))}
+        </h1>
+        <p className="rise mt-6 max-w-2xl text-base leading-relaxed text-ink-2 sm:text-lg" style={stagger(0, 160)}>
+          {hero.sub}
+        </p>
+        <div className="rise mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row" style={stagger(0, 240)}>
+          <ButtonLink href={links.demo} external className="w-full sm:w-auto">
+            Try the live demo
+          </ButtonLink>
+          <ButtonLink href="#how-it-works" variant="secondary" className="w-full bg-surface/80 backdrop-blur sm:w-auto">
+            See how it works
+          </ButtonLink>
+        </div>
+        <p className="rise mt-5 text-sm text-ink-2" style={stagger(0, 300)}>
+          {hero.note}
+        </p>
+
+        {/* The product rises over the meadow. Its own compositing layer, so the video never repaints it. */}
+        <div className="mock-in mt-12 w-full max-w-5xl text-left [transform:translateZ(0)] sm:mt-16" style={stagger(0, 380)}>
+          <Autopilot />
         </div>
       </Container>
     </section>

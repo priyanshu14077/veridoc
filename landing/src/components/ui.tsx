@@ -49,10 +49,12 @@ export function Wordmark() {
 }
 
 /** Small label above a section heading, with the logo's tick as its marker. */
-export function Eyebrow({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+export type Tone = "light" | "dark";
+
+export function Eyebrow({ children, className = "", tone = "light" }: { children: React.ReactNode; className?: string; tone?: Tone }) {
   return (
-    <p className={`flex items-center gap-2 text-sm text-muted ${className}`}>
-      <svg viewBox="0 0 12 12" aria-hidden className="size-3 text-accent">
+    <p className={`flex items-center gap-2 text-sm ${tone === "dark" ? "text-white/80" : "text-muted"} ${className}`}>
+      <svg viewBox="0 0 12 12" aria-hidden className={`size-3 ${tone === "dark" ? "text-[#9db4ff]" : "text-accent"}`}>
         <path d="M2 6.5l2.5 2.5L10 3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
       {children}
@@ -66,18 +68,20 @@ export function TwoTone({
   title,
   as: Tag = "h2",
   className = "",
+  tone = "light",
 }: {
   id: string;
   title: Title;
   as?: "h1" | "h2";
   className?: string;
+  tone?: Tone;
 }) {
   return (
     <Tag id={id} className={`display text-balance ${className}`}>
-      <span className="reveal block text-ink" style={stagger(1)}>
+      <span className={`reveal block ${tone === "dark" ? "text-white" : "text-ink"}`} style={stagger(1)}>
         {title[0]}
       </span>{" "}
-      <span className="reveal block text-muted" style={stagger(2)}>
+      <span className={`reveal block ${tone === "dark" ? "text-white/70" : "text-muted"}`} style={stagger(2)}>
         {title[1]}
       </span>
     </Tag>
@@ -90,19 +94,24 @@ export function SectionHeader({
   title,
   intro,
   center = false,
+  tone = "light",
 }: {
   id: string;
   eyebrow: string;
   title: Title;
   intro?: string;
   center?: boolean;
+  tone?: Tone;
 }) {
   return (
     <div className={`max-w-3xl ${center ? "mx-auto text-center [&>p:first-child]:justify-center" : ""}`}>
-      <Eyebrow className="reveal">{eyebrow}</Eyebrow>
-      <TwoTone id={id} title={title} className="mt-4 text-4xl sm:text-5xl" />
+      <Eyebrow className="reveal" tone={tone}>{eyebrow}</Eyebrow>
+      <TwoTone id={id} title={title} tone={tone} className="mt-4 text-4xl sm:text-5xl" />
       {intro && (
-        <p className={`reveal mt-5 max-w-2xl text-base leading-relaxed text-ink-2 sm:text-lg ${center ? "mx-auto" : ""}`} style={stagger(3)}>
+        <p
+          className={`reveal mt-5 max-w-2xl text-base leading-relaxed sm:text-lg ${tone === "dark" ? "text-white/80" : "text-ink-2"} ${center ? "mx-auto" : ""}`}
+          style={stagger(3)}
+        >
           {intro}
         </p>
       )}
@@ -196,7 +205,7 @@ export function AppWindow({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-lg border border-line bg-surface text-ink shadow-[0_24px_60px_-20px_rgb(5_8_30/0.65),0_2px_6px_rgb(5_8_30/0.25)] ${className}`}
+      className={`overflow-hidden rounded-lg border border-line bg-surface text-ink shadow-[0_30px_70px_-24px_rgb(5_8_30/0.6),0_2px_8px_rgb(5_8_30/0.18)] ${className}`}
     >
       <div className="flex h-9 items-center gap-2 border-b border-line bg-surface px-3">
         <span className="flex gap-1">

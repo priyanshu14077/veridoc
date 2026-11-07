@@ -7,7 +7,7 @@ import {
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { failing, links, live, queue, rules, tour } from "@/content";
-import { PortScene } from "./port-scene";
+import { Backdrop } from "./backdrop";
 import { AppWindow, ButtonLink, Kbd, Section, SectionHeader, StatusChip } from "./ui";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -129,7 +129,7 @@ export function Tour() {
             </div>
           </div>
 
-          <PortScene variant="wide" seed={9000} className="min-h-[440px] rounded-xl sm:min-h-[500px]">
+          <Backdrop image="velvex" position="50% 35%" className="min-h-[440px] rounded-xl sm:min-h-[500px]">
             <div className="absolute inset-x-3 top-6 sm:left-8 sm:right-auto sm:top-10 sm:w-[115%] lg:w-[108%]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -146,7 +146,7 @@ export function Tour() {
             <p className="absolute bottom-3 right-4 rounded-full bg-black/40 px-2.5 py-0.5 text-[11px] text-white/80 backdrop-blur">
               Recreated from the app · synthetic, illustrative data
             </p>
-          </PortScene>
+          </Backdrop>
         </div>
       </div>
     </Section>

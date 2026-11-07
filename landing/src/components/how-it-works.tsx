@@ -4,11 +4,12 @@ import { Check, CheckCircle2, Download, FileText, Lock, XCircle } from "lucide-r
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { how } from "@/content";
-import { PortScene, type SceneVariant } from "./port-scene";
+import { Backdrop } from "./backdrop";
 import { Section, SectionHeader, stagger } from "./ui";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const scenes: [SceneVariant, number][] = [["stacks", 11], ["crane", 23], ["wide", 37], ["water", 51]];
+// Four crops of one landscape, left to right, so the row reads as one continuous view.
+const crops = ["4% 40%", "36% 70%", "62% 85%", "96% 45%"];
 
 export function HowItWorks() {
   const snippets = [<UploadSnippet key="u" />, <ExtractSnippet key="e" />, <CheckSnippet key="c" />, <ExportSnippet key="x" />];
@@ -18,13 +19,13 @@ export function HowItWorks() {
       <ol className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {how.steps.map((s, i) => (
           <li key={s.title} style={stagger(i)} className="reveal flex min-w-0 flex-col">
-            <PortScene variant={scenes[i][0]} seed={scenes[i][1]} className="h-60 rounded-xl">
+            <Backdrop image="velvex" position={crops[i]} className="h-60 rounded-xl">
               <div aria-hidden className="flex h-full items-center justify-center p-4">
                 <div className="w-full max-w-[250px] rounded-lg border border-line bg-surface p-3 text-[12px] shadow-[0_18px_40px_-16px_rgb(5_8_30/0.7)]">
                   {snippets[i]}
                 </div>
               </div>
-            </PortScene>
+            </Backdrop>
             <div className="pt-5">
               <h3 className="flex items-baseline gap-2 font-semibold text-ink">
                 <span className="mono text-xs font-normal text-muted">{i + 1}</span>

@@ -144,6 +144,23 @@ body {
   .packet { animation: travel 2.4s var(--ease-smooth) infinite; animation-delay: var(--d, 0ms); }
 }
 
+/* Background images drift as they pass through the viewport (scroll-driven, compositor only).
+   Without support or with reduced motion they simply sit still, slightly zoomed. */
+.parallax { transform: scale(1.12); transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .parallax {
+      animation: parallax linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+@keyframes parallax {
+  from { transform: scale(1.12) translateY(-4%); }
+  to { transform: scale(1.12) translateY(4%); }
+}
+
 /* Reading progress under the nav. Informational, so it stays on with reduced motion. */
 @supports (animation-timeline: scroll()) {
   .scroll-progress {

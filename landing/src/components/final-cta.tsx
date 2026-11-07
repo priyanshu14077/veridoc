@@ -4,7 +4,7 @@ import { Check, Copy } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { demo, links, live } from "@/content";
-import { PortScene } from "./port-scene";
+import { Backdrop } from "./backdrop";
 import { AppWindow, ButtonLink, Section, StatusChip, TwoTone } from "./ui";
 
 export function FinalCta() {
@@ -25,7 +25,7 @@ export function FinalCta() {
           </div>
           <p className="mt-6 text-sm text-muted">{demo.note}</p>
         </div>
-        <PortScene variant="stacks" seed={2026} className="min-h-80 rounded-xl">
+        <Backdrop image="velvex" position="50% 88%" className="min-h-80 rounded-xl">
           <div className="flex h-full items-center justify-center p-6 sm:p-10">
             <div
               role="img"
@@ -65,7 +65,7 @@ export function FinalCta() {
               </AppWindow>
             </div>
           </div>
-        </PortScene>
+        </Backdrop>
       </div>
     </Section>
   );

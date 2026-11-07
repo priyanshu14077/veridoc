@@ -4,7 +4,7 @@ import { Check, Download, FileUp, Lock, LockOpen, Pencil, RotateCcw, ShieldCheck
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { failing, live, story } from "@/content";
-import { PortScene } from "./port-scene";
+import { Backdrop } from "./backdrop";
 import { AppWindow, Kbd, Section, SectionHeader } from "./ui";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -29,13 +29,19 @@ export function Story() {
   }, []);
 
   return (
-    <Section labelledBy="story-title">
-      <SectionHeader id="story-title" eyebrow={story.eyebrow} title={story.title} />
+    <Section labelledBy="story-title" className="relative isolate overflow-clip">
+      {/* Perplex stays put while the section scrolls over it (a sticky, viewport-sized layer). */}
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[#0c0d10]">
+        <Backdrop image="perplex" position="50% 45%" className="sticky top-0 h-svh" />
+        {/* Darkened so white text clears 4.5:1 even over the bright ring. */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_40%,rgb(0_0_0/0.35),rgb(0_0_0/0.72))]" />
+      </div>
+      <SectionHeader id="story-title" eyebrow={story.eyebrow} title={story.title} tone="dark" />
       <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
         {/* Pinned picture (large screens) */}
         <div className="hidden lg:block">
           <div className="sticky top-24">
-            <PortScene variant="crane" seed={4471} className="aspect-[1/1.02] rounded-2xl">
+            <div className="relative aspect-[1/1.02] rounded-2xl border border-white/15 bg-white/[0.06]">
               <div className="flex h-full items-center justify-center p-8">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -58,7 +64,7 @@ export function Story() {
                   />
                 ))}
               </div>
-            </PortScene>
+            </div>
           </div>
         </div>
 
@@ -73,19 +79,21 @@ export function Story() {
                 data-step={i}
                 className="lg:flex lg:min-h-[78vh] lg:flex-col lg:justify-center"
               >
-                <PortScene variant={i === 1 ? "stacks" : "crane"} seed={4471 + i} className="mb-6 rounded-xl lg:hidden">
-                  <div className="p-4 sm:p-6">
-                    <Visual step={i} active={i === active} />
-                  </div>
-                </PortScene>
-                <span className="mono grid size-8 place-items-center rounded-full border border-line-strong text-xs text-ink-2">
+                <div className="mb-6 rounded-xl border border-white/15 bg-white/[0.06] p-4 sm:p-6 lg:hidden">
+                  <Visual step={i} active={i === active} />
+                </div>
+                <span
+                  className={`mono grid size-8 place-items-center rounded-full border text-xs transition-colors duration-500 ${
+                    i === active ? "border-white/60 bg-white text-ink" : "border-white/30 text-white/80"
+                  }`}
+                >
                   0{i + 1}
                 </span>
-                {/* Inactive steps fade to muted ink (not opacity, which would fail contrast). */}
-                <h3 className={`display mt-5 text-3xl transition-colors duration-500 sm:text-[2.5rem] ${i === active ? "text-ink" : "text-ink lg:text-muted"}`}>
+                {/* Inactive steps dim to 65% white, which still clears 4.5:1 on the darkened image. */}
+                <h3 className={`display mt-5 text-3xl transition-colors duration-500 sm:text-[2.5rem] ${i === active ? "text-white" : "text-white lg:text-white/65"}`}>
                   {s.title}
                 </h3>
-                <p className={`mt-4 max-w-md leading-relaxed transition-colors duration-500 ${i === active ? "text-ink-2" : "text-ink-2 lg:text-muted"}`}>
+                <p className={`mt-4 max-w-md leading-relaxed transition-colors duration-500 ${i === active ? "text-white/85" : "text-white/85 lg:text-white/65"}`}>
                   {s.body}
                 </p>
               </div>
