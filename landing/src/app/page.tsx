@@ -22,7 +22,7 @@ export default function Home() {
         Skip to content
       </a>
       <Nav />
-      <main id="main">
+      <main id="main" tabIndex={-1} className="outline-none">
         <Hero />
         <Marquee />
         <Problem />
