@@ -282,24 +282,19 @@ export const demo = {
 };
 
 export const footer = {
-  blurb: "Document extraction and cross-checks for customs documentation teams.",
-  columns: [
-    { title: "Product", links: [
-      { label: "How it works", href: "#how-it-works" },
-      { label: "Product tour", href: "#product" },
-      { label: "Security", href: "#security" },
-      { label: "FAQ", href: "#faq" },
-    ] },
-    { title: "Docs", links: [
-      { label: "Product requirements", href: links.prd },
-      { label: "Technical design", href: links.tdd },
-      { label: "Deployment", href: links.deployment },
-      { label: "Observability", href: links.observability },
-    ] },
-    { title: "Project", links: [
-      { label: "GitHub", href: links.repo },
-      { label: "Live demo", href: links.demo },
-    ] },
+  marquee: ["Invoice read", "Fields scored", "Rules checked", "Flags confirmed", "CSV exported"],
+  giantText: "VERIDOC",
+  heading: "Ready to see it?",
+  primary: [
+    { label: "Try the live demo", href: links.demo },
+    { label: "Read the technical design", href: links.tdd },
   ],
-  fiction: "All people and companies in the demo are fictional.",
+  secondary: [
+    { label: "Product requirements", href: links.prd },
+    { label: "Deployment", href: links.deployment },
+    { label: "Observability", href: links.observability },
+    { label: "GitHub", href: links.repo },
+  ],
+  note: "All data is synthetic. All people and companies in the demo are fictional.",
+  author: "Priyanshu Kumar",
 };
