@@ -2,7 +2,7 @@
 
 import { LayoutDashboard, ListOrdered, MessageCircleQuestion, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
-import { links, nav } from "@/content";
+import { links, nav, sameOrigin } from "@/content";
 import { NotchNav, type NotchItemData } from "./ui/adaptive-notch-navigation-bar";
 import { Logo } from "./primitives";
 
@@ -34,6 +34,9 @@ function useActiveSection() {
   return active;
 }
 
+// The demo is on this site in production; only open a new tab when it lives elsewhere.
+const newTab = sameOrigin ? {} : { target: "_blank", rel: "noopener noreferrer" };
+
 export function Nav() {
   const active = useActiveSection();
 
@@ -63,21 +66,19 @@ export function Nav() {
           <div className="flex h-8.5 items-center gap-3">
             <a
               href={links.demo}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...newTab}
               className="hidden text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-100 sm:block"
             >
-              Sign in<span className="sr-only"> to the demo (opens in a new tab)</span>
+              Sign in<span className="sr-only"> to the demo{sameOrigin ? "" : " (opens in a new tab)"}</span>
             </a>
             <a
               href={links.demo}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...newTab}
               className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-ink transition-colors hover:bg-accent-hover"
             >
               <span className="hidden sm:inline">Try the live demo</span>
               <span className="sm:hidden">Demo</span>
-              <span className="sr-only"> (opens in a new tab)</span>
+              {!sameOrigin && <span className="sr-only"> (opens in a new tab)</span>}
             </a>
           </div>
         }

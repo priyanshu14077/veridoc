@@ -3,9 +3,16 @@
 // app's own labels in web/src. Mock values come from the synthetic shipments in api/app/seed.py and
 // sample-docs/ (all people and companies are fictional).
 
+// Where the app lives. In production Caddy serves the landing page and the app on one address, so
+// the Docker build sets NEXT_PUBLIC_APP_URL="" and links are same-site (/login, /api/health).
+// In local development (`npm run dev`) they point at the live server.
+const APP = process.env.NEXT_PUBLIC_APP_URL ?? "https://16-179-13-144.sslip.io";
+/** True when the landing page is served by the app's own Caddy (same origin). */
+export const sameOrigin = APP === "";
+
 export const links = {
-  demo: "https://16-179-13-144.sslip.io",
-  health: "https://16-179-13-144.sslip.io/api/health",
+  demo: `${APP}/login`,
+  health: `${APP}/api/health`,
   repo: "https://github.com/priyanshu14077/veridoc",
   tdd: "https://github.com/priyanshu14077/veridoc/blob/master/docs/TDD.md",
   prd: "https://github.com/priyanshu14077/veridoc/blob/master/docs/PRD.md",

@@ -42,7 +42,7 @@ export function Hero() {
           {hero.sub}
         </p>
         <div className="rise mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row" style={stagger(0, 240)}>
-          <ButtonLink href={links.demo} external className="w-full sm:w-auto">
+          <ButtonLink href={links.demo} className="w-full sm:w-auto">
             Try the live demo
           </ButtonLink>
           <ButtonLink href="#how-it-works" variant="secondary" className="w-full bg-surface/80 backdrop-blur sm:w-auto">

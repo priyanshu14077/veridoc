@@ -132,7 +132,8 @@ export function ButtonLink({
   href,
   children,
   variant = "primary",
-  external = false,
+  // Off-site links open in a new tab; same-site ones (e.g. /login in production) don't.
+  external = /^https?:/.test(href),
   className = "",
 }: {
   href: string;

@@ -7,7 +7,6 @@ import {
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { failing, links, live, queue, rules, tour } from "@/content";
-import { Backdrop } from "./backdrop";
 import { AppWindow, ButtonLink, Kbd, Section, SectionHeader, StatusChip } from "./primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -47,17 +46,17 @@ export function Tour() {
   };
 
   return (
-    <Section id="product" labelledBy="tour-title">
-      <SectionHeader id="tour-title" eyebrow={tour.eyebrow} title={tour.title} />
+    <Section id="product" labelledBy="tour-title" backdrop={{ image: "reverie", position: "50% 40%", wash: "dark" }}>
+      <SectionHeader id="tour-title" eyebrow={tour.eyebrow} title={tour.title} tone="dark" />
       <div
         ref={wrap}
-        className="reveal mt-14 rounded-2xl border border-line bg-surface p-2"
+        className="reveal mt-14 rounded-2xl border border-white/15 bg-black/35 p-2"
         onPointerEnter={() => setPaused(true)}
         onPointerLeave={() => setPaused(false)}
         onFocus={() => setPaused(true)}
         onBlur={() => setPaused(false)}
       >
-        <div role="tablist" aria-label="Product screens" onKeyDown={onKey} className="flex gap-1 overflow-x-auto rounded-xl bg-paper p-1 [scrollbar-width:none]">
+        <div role="tablist" aria-label="Product screens" onKeyDown={onKey} className="flex gap-1 overflow-x-auto rounded-xl bg-black/30 p-1 [scrollbar-width:none]">
           {tour.tabs.map((t, i) => {
             const Icon = ICONS[i];
             const on = i === index;
@@ -74,7 +73,7 @@ export function Tour() {
                 tabIndex={on ? 0 : -1}
                 onClick={() => pick(i)}
                 className={`relative flex min-h-11 flex-1 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-lg px-4 text-sm whitespace-nowrap transition-colors duration-300 ${
-                  on ? "text-ink" : "text-muted hover:text-ink"
+                  on ? "text-ink" : "text-white/80 hover:text-white"
                 }`}
               >
                 {on && (
@@ -102,20 +101,20 @@ export function Tour() {
         </div>
 
         <div role="tabpanel" id={`panel-${tab.id}`} aria-labelledby={`tab-${tab.id}`} className="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
-          <div className="flex flex-col rounded-xl bg-paper p-6 sm:p-8">
+          <div className="flex flex-col rounded-xl border border-white/10 bg-black/40 p-6 sm:p-8">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={tab.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.35, ease: EASE }}>
-                <span className="inline-flex rounded-full border border-line-strong bg-surface px-2.5 py-0.5 text-xs text-ink-2">
+                <span className="inline-flex rounded-full border border-white/30 bg-white/10 px-2.5 py-0.5 text-xs text-white/90">
                   {tab.role === "Both" ? "Executives and managers" : `For the ${tab.role.toLowerCase()}`}
                 </span>
-                <h3 className="display mt-5 text-3xl text-ink">{tab.title}</h3>
+                <h3 className="display mt-5 text-3xl text-white">{tab.title}</h3>
                 <ul className="mt-6 space-y-4">
                   {tab.points.map((p) => (
                     <li key={p.title} className="flex gap-3">
-                      <CheckCircle2 aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
+                      <CheckCircle2 aria-hidden className="mt-0.5 size-4 shrink-0 text-[#9db4ff]" />
                       <span className="text-sm leading-relaxed">
-                        <span className="font-medium text-ink">{p.title}</span>
-                        <span className="block text-muted">{p.body}</span>
+                        <span className="font-medium text-white">{p.title}</span>
+                        <span className="block text-white/75">{p.body}</span>
                       </span>
                     </li>
                   ))}
@@ -123,13 +122,14 @@ export function Tour() {
               </motion.div>
             </AnimatePresence>
             <div className="mt-auto pt-8">
-              <ButtonLink href={links.demo} external variant="secondary" className="w-full">
+              <ButtonLink href={links.demo} variant="secondary" className="w-full">
                 Open it in the demo
               </ButtonLink>
             </div>
           </div>
 
-          <Backdrop image="velvex" position="50% 35%" className="min-h-[440px] rounded-xl sm:min-h-[500px]">
+          {/* The screens float straight on the section's photo. */}
+          <div className="relative min-h-[440px] overflow-hidden rounded-xl border border-white/10 bg-black/20 sm:min-h-[500px]">
             <div className="absolute inset-x-3 top-6 sm:left-8 sm:right-auto sm:top-10 sm:w-[115%] lg:w-[108%]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -143,10 +143,10 @@ export function Tour() {
                 </motion.div>
               </AnimatePresence>
             </div>
-            <p className="absolute bottom-3 right-4 rounded-full bg-black/40 px-2.5 py-0.5 text-[11px] text-white/80 backdrop-blur">
+            <p className="absolute bottom-3 right-4 rounded-full bg-black/60 px-2.5 py-0.5 text-[11px] text-white/85">
               Recreated from the app · synthetic, illustrative data
             </p>
-          </Backdrop>
+          </div>
         </div>
       </div>
     </Section>

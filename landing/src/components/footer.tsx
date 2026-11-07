@@ -2,14 +2,17 @@
 
 import { ArrowUpRight, FileText } from "lucide-react";
 import { useEffect, useState } from "react";
-import { footer, links } from "@/content";
+import { footer, links, sameOrigin } from "@/content";
+import { SectionBackdrop } from "./backdrop";
 import { CinematicFooter } from "./ui/motion-footer";
 
 type Health = "checking" | "up" | "down";
 
 /**
- * Whether the live demo answers. The API sends no CORS headers, so from another origin the body
- * can't be read; an opaque request only proves the server responded. Hence "reachable", not "healthy".
+ * Whether the live demo is up. Served from the app's own address (production), the health
+ * response is read: "healthy" means /api/health said {"status":"ok"}. From another origin (local
+ * development) the API sends no CORS headers, so an opaque request only proves the server
+ * answered: "reachable".
  */
 function useDemoHealth(): Health {
   const [h, setH] = useState<Health>("checking");
@@ -18,10 +21,14 @@ function useDemoHealth(): Health {
     const timer = setTimeout(() => ctl.abort(), 6000);
     (async () => {
       try {
-        // Same origin: a readable response. Cross-origin: an opaque one, which still proves the
-        // server answered. Either way no CORS error is logged.
-        const r = await fetch(links.health, { mode: "no-cors", signal: ctl.signal, cache: "no-store" });
-        setH(r.type === "opaque" || r.ok ? "up" : "down");
+        if (sameOrigin) {
+          const r = await fetch(links.health, { signal: ctl.signal, cache: "no-store" });
+          const body = r.ok ? ((await r.json()) as { status?: string }) : null;
+          setH(body?.status === "ok" ? "up" : "down");
+        } else {
+          const r = await fetch(links.health, { mode: "no-cors", signal: ctl.signal, cache: "no-store" });
+          setH(r.type === "opaque" || r.ok ? "up" : "down");
+        }
       } catch {
         setH("down");
       } finally {
@@ -39,11 +46,13 @@ function useDemoHealth(): Health {
 export function Footer() {
   const health = useDemoHealth();
   const dot = { checking: "bg-line-strong", up: "bg-clear", down: "bg-conflict" }[health];
-  const text = { checking: "Checking the live demo…", up: "Live demo reachable", down: "Live demo not reachable right now" }[health];
+  const text = { checking: "Checking the live demo…", up: sameOrigin ? "Live demo healthy" : "Live demo reachable", down: "Live demo not reachable right now" }[health];
   const icons = [<ArrowUpRight key="d" aria-hidden className="size-5 text-primary" />, <FileText key="t" aria-hidden className="size-5 text-muted-foreground transition-colors group-hover:text-foreground" />];
 
   return (
     <CinematicFooter
+      className="theme-night"
+      background={<SectionBackdrop image="nocturne" position="50% 60%" wash="dark" />}
       marquee={footer.marquee}
       giantText={footer.giantText}
       heading={footer.heading}
