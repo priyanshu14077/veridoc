@@ -13,7 +13,7 @@ A documentation executive drops in a shipment's **invoice, packing list and bill
 | Client | Customs broker at Nhava Sheva, 1,100 shipments/month, documentation team of 14 |
 | Problem | 45 min of retyping per shipment, plus a 3% error rate that forces amended Bills of Entry: **₹70.29 lakh/year** |
 | Target | Entry under 15 min per shipment, 95% field accuracy, amended Bills of Entry halved |
-| Docs | [Product requirements](docs/PRD.md) · [Technical design](docs/TDD.md) |
+| Docs | [Product requirements](docs/PRD.md) · [Technical design](docs/TDD.md) · [Deployment](docs/deployment.md) · [Observability](docs/observability.md) |
 
 ---
 
@@ -34,6 +34,8 @@ A documentation executive drops in a shipment's **invoice, packing list and bill
 | Manager overrides log (accepted mismatches, corrections, reopens) | ✅ Done |
 | Manager accuracy report by field and supplier (exported shipments; corrections the flags missed) | ✅ Done |
 | Not-found page, app error boundary, phone layout for every screen | ✅ Done |
+| Deploy from CI: every green push to `master` goes to EC2 over SSH, then a live smoke test | ✅ Done |
+| Observability: OpenTelemetry traces, metrics and logs → VictoriaMetrics, VictoriaLogs and VictoriaTraces; Grafana dashboard and 8 email alerts ([docs/observability.md](docs/observability.md)) | ✅ Done |
 
 ---
 

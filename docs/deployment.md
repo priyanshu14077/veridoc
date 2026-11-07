@@ -2,7 +2,7 @@
 
 **Live app:** https://16-179-13-144.sslip.io · **Repository:** https://github.com/priyanshu14077/veridoc
 
-Veridoc runs as five containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
+Veridoc runs as five app containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. Five more containers handle monitoring: the OpenTelemetry Collector, VictoriaMetrics, VictoriaLogs, VictoriaTraces and Grafana. [observability.md](observability.md) covers them. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
 
 ```
 Internet ──443──► Caddy ──/api/*──► api (FastAPI) ──► db (Postgres)
@@ -139,6 +139,8 @@ One-time setup:
 3. **Repository variable** `SITE_ADDRESS`, for example `16-179-13-144.sslip.io`. The deploy job stays off until this is set.
 
 The deploy job only fast-forwards. If someone has edited tracked files on the server, it stops rather than overwrite them.
+
+On the first deploy with monitoring, `deploy.sh` adds a random `GRAFANA_ADMIN_PASSWORD` to `deploy/.env` on the server. It never leaves the server. To turn on alert email, add the `SMTP_*` and `ALERT_EMAIL` lines described in [observability.md §4](observability.md#4-alerts).
 
 ## 4. Environment variables
 
