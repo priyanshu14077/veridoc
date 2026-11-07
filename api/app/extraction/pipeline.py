@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
+from app import telemetry
 from app.extraction import gemini
 from app.extraction.catalog import HEADER, LINES, FieldDef
 from app.extraction.confidence import score
@@ -95,6 +96,10 @@ def store_result(db: Session, doc: Document, result: gemini.ExtractionResult, at
                 for fd in line_defs
             )
     db.add_all(rows)
+    if not manual:
+        for r in rows:
+            if r.confidence is not None:
+                telemetry.field_confidence.record(r.confidence, {"doc_type": doc.doc_type})
     detected = parsed.detected_doc_type  # type: ignore[attr-defined]
     doc.detected_type = detected if detected != "other" else None
     doc.extraction_status = "manual" if manual else "done"

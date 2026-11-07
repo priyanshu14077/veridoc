@@ -3,6 +3,16 @@
 {$SITE_ADDRESS} {
 	encode zstd gzip
 
+	# One JSON line per request (status, duration). Cookies and auth headers are redacted by
+	# Caddy itself.
+	log {
+		output stdout
+		format json
+	}
+	# Extra directives, only when the local monitoring overlay mounts them (request tracing).
+	# In production nothing matches, and Caddy skips the import.
+	import /etc/caddy/local.d/*.caddy
+
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options "nosniff"

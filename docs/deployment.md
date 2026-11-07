@@ -2,7 +2,7 @@
 
 **Live app:** https://16-179-13-144.sslip.io · **Repository:** https://github.com/priyanshu14077/veridoc
 
-Veridoc runs as five containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
+Veridoc runs as five app containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. Monitoring (OpenTelemetry, VictoriaMetrics/Logs/Traces and Grafana) is not deployed: it runs on a developer's machine on top of the same compose file. [observability.md](observability.md) explains why and how. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
 
 ```
 Internet ──443──► Caddy ──/api/*──► api (FastAPI) ──► db (Postgres)

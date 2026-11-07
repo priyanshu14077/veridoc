@@ -1,0 +1,5 @@
+# Mounted only by deploy/compose.observability.yml: start a trace for every request and pass it
+# on (traceparent), so the API's and web's spans join it.
+tracing {
+	span http.request
+}

@@ -1,8 +1,20 @@
 # Production: Postgres, API, extraction worker, web and Caddy (HTTPS) on one server.
 # Run from the repo root:  docker compose -f deploy/compose.yml --env-file deploy/.env up -d --build
+# Monitoring is not part of production. It runs on a laptop as an overlay on this file:
+# deploy/compose.observability.yml (see docs/observability.md).
 # The project, database and user keep the old "crosscheck" name: renaming the project would
 # start new, empty volumes, and Postgres only reads POSTGRES_USER/DB when it first creates them.
 name: crosscheck
+
+# Every container logs JSON lines to a capped file (Docker's default never rotates and can fill
+# the disk). The compose service name rides along on each line, so `docker compose logs` and the
+# local log collector can tell apart api, worker, web, caddy and db.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+    labels: com.docker.compose.service
 
 x-api: &api
   build:
@@ -10,6 +22,7 @@ x-api: &api
     dockerfile: api/Dockerfile
   image: veridoc-api
   restart: unless-stopped
+  logging: *logging
   env_file: .env
   environment:
     DATABASE_URL: postgresql+psycopg://crosscheck:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/crosscheck
@@ -23,6 +36,7 @@ services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_USER: crosscheck
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
@@ -62,6 +76,7 @@ services:
         API_ORIGIN: http://api:8000
     image: veridoc-web
     restart: unless-stopped
+    logging: *logging
     depends_on:
       api:
         condition: service_healthy
@@ -69,6 +84,7 @@ services:
   caddy:
     image: caddy:2.10-alpine
     restart: unless-stopped
+    logging: *logging
     ports:
       - "80:80"
       - "443:443"

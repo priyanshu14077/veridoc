@@ -1,0 +1,3 @@
+# No plugin apps to provision. The file exists so Grafana does not log an error at start.
+apiVersion: 1
+apps: []

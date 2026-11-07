@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
+from app import telemetry
 from app.auth.router import router as auth_router
 from app.checks.router import router as checks_router
 from app.config import get_settings
@@ -14,6 +15,7 @@ from app.reports.router import router as reports_router
 from app.shipments.router import router as shipments_router
 from app.users import router as users_router
 
+telemetry.setup("veridoc-api")
 app = FastAPI(title="Veridoc API", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
 UNSAFE = {"POST", "PUT", "PATCH", "DELETE"}
@@ -47,3 +49,5 @@ for r in (
     users_router,
 ):
     app.include_router(r, prefix="/api")
+
+telemetry.instrument_app(app)

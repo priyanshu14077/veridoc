@@ -1,0 +1,127 @@
+# Local monitoring: an overlay on the production compose file, for a laptop only. Never deployed.
+# It points the app's OpenTelemetry at a collector and adds five stores/UIs, all on 127.0.0.1.
+#   deploy/observability/run.sh up       start the app and the monitoring stack
+#   deploy/observability/run.sh report   write a Markdown report from the collected metrics
+# The app code ships the OpenTelemetry SDK everywhere, but it stays off unless
+# OTEL_EXPORTER_OTLP_ENDPOINT is set, which only this file does.
+
+x-otel: &otel
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+  # Stable HTTP names: http_route holds the route template, so IDs don't each make a new series.
+  OTEL_SEMCONV_STABILITY_OPT_IN: http
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+    labels: com.docker.compose.service
+
+services:
+  api:
+    environment: *otel
+  worker:
+    environment: *otel
+  web:
+    environment: *otel
+
+  caddy:
+    environment:
+      OTEL_SERVICE_NAME: caddy
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_INSECURE: "true"
+    volumes:
+      - ./observability/caddy:/etc/caddy/local.d:ro  # the `tracing` directive
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.164.0
+    logging: *logging
+    command: ["--config=/etc/otelcol/config.yaml"]
+    # Root with read-only mounts: reading other containers' log files, the Docker socket
+    # (container stats) and the host's /proc needs it. On a Mac, "host" is Docker Desktop's VM.
+    user: "0"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      GOMEMLIMIT: 110MiB
+      # Set by run.sh: changes when deploy/observability changes, which recreates the container,
+      # because editing a mounted file alone doesn't restart anything.
+      CONFIG_HASH: ${OBS_CONFIG_HASH:-}
+    volumes:
+      - ./observability/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - otel_state:/var/lib/otelcol
+    mem_limit: 160m
+    depends_on: [victoriametrics, victorialogs, victoriatraces]
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.154.1
+    logging: *logging
+    command:
+      - -storageDataPath=/storage
+      - -retentionPeriod=15d
+      - -memory.allowedPercent=25  # caches are sized from the container limit; keep them small
+    ports: ["127.0.0.1:8428:8428"]  # PromQL for run.sh report
+    volumes: [vmdata:/storage]
+    mem_limit: 256m
+
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.53.0
+    logging: *logging
+    command:
+      - -storageDataPath=/vlogs
+      - -retentionPeriod=7d
+      - -retention.maxDiskSpaceUsageBytes=2GiB
+      - -memory.allowedPercent=50
+    volumes: [vldata:/vlogs]
+    mem_limit: 192m
+
+  victoriatraces:
+    image: victoriametrics/victoria-traces:v0.12.1
+    logging: *logging
+    command:
+      - -storageDataPath=/vtraces
+      - -retentionPeriod=3d
+      - -retention.maxDiskSpaceUsageBytes=1GiB
+      - -memory.allowedPercent=50
+    volumes: [vtdata:/vtraces]
+    mem_limit: 192m
+
+  grafana:
+    image: grafana/grafana:13.2.5
+    logging: *logging
+    ports: ["127.0.0.1:3001:3000"]  # http://localhost:3001, this machine only
+    environment:
+      CONFIG_HASH: ${OBS_CONFIG_HASH:-}  # see otel-collector
+      GOMEMLIMIT: 300MiB
+      GF_SERVER_ROOT_URL: http://localhost:3001/
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      # Pinned: downloaded once into the grafana volume.
+      GF_PLUGINS_PREINSTALL: victoriametrics-logs-datasource@0.33.1
+      # Alert rules evaluate and show under Alerting. No SMTP locally, so nothing is emailed.
+      ALERT_EMAIL: alerts@veridoc.invalid
+    volumes:
+      - ./observability/grafana:/etc/grafana/provisioning:ro
+      - grafana:/var/lib/grafana
+    mem_limit: 384m
+    healthcheck:
+      # Healthy only once the logs plugin is installed, so `up --wait` waits for it.
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health && test -f /var/lib/grafana/plugins/victoriametrics-logs-datasource/plugin.json"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
+    depends_on: [victoriametrics, victorialogs, victoriatraces]
+
+volumes:
+  otel_state:
+  vmdata:
+  vldata:
+  vtdata:
+  grafana:

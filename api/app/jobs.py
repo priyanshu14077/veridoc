@@ -8,6 +8,8 @@ from typing import Any
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.telemetry import inject_context
+
 BACKOFF_S = (5, 20, 60)  # TDD §5.5
 MAX_ATTEMPTS = len(BACKOFF_S)
 STALE_AFTER_S = 300  # a job "running" this long is assumed orphaned by a dead worker
@@ -22,6 +24,9 @@ class Job:
 
 
 def enqueue(db: Session, kind: str, payload: dict[str, Any]) -> None:
+    # The worker continues the uploader's trace, so one trace shows upload → extraction.
+    if trace_ctx := inject_context():
+        payload = {**payload, "trace": trace_ctx}
     db.execute(
         text("INSERT INTO jobs (kind, payload) VALUES (:k, CAST(:p AS jsonb))"),
         {"k": kind, "p": json.dumps(payload)},
