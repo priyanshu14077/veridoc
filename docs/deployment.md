@@ -1,8 +1,8 @@
-# Deployment: Crosscheck
+# Deployment: Veridoc
 
 **Live app:** https://16-179-13-144.sslip.io · **Repository:** https://github.com/priyanshu14077/veridoc
 
-Crosscheck runs as five containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
+Veridoc runs as five containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
 
 ```
 Internet ──443──► Caddy ──/api/*──► api (FastAPI) ──► db (Postgres)
@@ -14,13 +14,13 @@ Only Caddy publishes ports (80 and 443). The database, API and web app are reach
 
 ## Demo accounts
 
-All people and companies are fictional. The password for every account is `crosscheck-demo`.
+All people and companies are fictional. The password for every account is `veridoc-demo`.
 
 | Role | Email | Sees |
 |---|---|---|
-| Executive | `meera.exec@crosscheck.demo` | Their own shipments and the unassigned pool |
-| Executive | `rohan.exec@crosscheck.demo` | Their own shipments and the unassigned pool |
-| Manager | `anil.manager@crosscheck.demo` | Every shipment, the overrides log and the accuracy report |
+| Executive | `meera.exec@veridoc.demo` | Their own shipments and the unassigned pool |
+| Executive | `rohan.exec@veridoc.demo` | Their own shipments and the unassigned pool |
+| Manager | `anil.manager@veridoc.demo` | Every shipment, the overrides log and the accuracy report |
 
 ## 1. Run locally (development)
 
@@ -124,6 +124,21 @@ docker compose -f deploy/compose.yml --env-file deploy/.env exec db \
 ```
 
 Data lives in Docker volumes (`pgdata`, `storage`) and survives restarts and rebuilds. `docker compose down -v` deletes it.
+
+### 3.6 Automatic deploys from CI
+
+After the `api`, `web` and `stack` jobs pass on a push to `master`, the `deploy` job in `.github/workflows/ci.yml` connects to the server over SSH and runs `deploy/deploy.sh`. The script fast-forwards the checkout to the tested commit, rebuilds and restarts the containers, and waits for them to become healthy. The job then smoke-tests the live site. Pull requests never deploy.
+
+One-time setup:
+
+1. **Security group:** GitHub's runners use many different IP addresses, so the SSH rule has to allow port 22 from `0.0.0.0/0`. Login is by key only (Ubuntu turns off password login by default).
+2. **Repository secrets** (*Settings → Secrets and variables → Actions*):
+   - `EC2_HOST`: the Elastic IP.
+   - `EC2_SSH_KEY`: the whole `.pem` file.
+   - `EC2_KNOWN_HOSTS`: the output of `ssh-keyscan -t ed25519 <elastic-ip>`, so the job refuses an unknown server.
+3. **Repository variable** `SITE_ADDRESS`, for example `16-179-13-144.sslip.io`. The deploy job stays off until this is set.
+
+The deploy job only fast-forwards. If someone has edited tracked files on the server, it stops rather than overwrite them.
 
 ## 4. Environment variables
 
