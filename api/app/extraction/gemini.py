@@ -9,9 +9,11 @@ from typing import Any, Literal
 
 from google import genai
 from google.genai import errors, types
+from opentelemetry import trace
 from PIL import Image
 from pydantic import BaseModel, Field, ValidationError, create_model
 
+from app import telemetry
 from app.config import get_settings
 from app.extraction.catalog import HEADER, LINES
 
@@ -119,6 +121,59 @@ def _client() -> genai.Client:
     )
 
 
+def _call(
+    model: str,
+    contents: list[Any],
+    config: types.GenerateContentConfig,
+    schema: type[BaseModel],
+    quota_waits: list[int],
+) -> tuple[str, ExtractionResult | None, ExtractionError | None]:
+    """One request to one model: (outcome, result, error). Records the call metrics."""
+    t0 = time.monotonic()
+    outcome, result, err = "ok", None, None
+    try:
+        resp = _client().models.generate_content(model=model, contents=contents, config=config)
+    except errors.APIError as e:
+        code = getattr(e, "code", None) or 0
+        if code == 429:
+            # Out of quota on this model (the free tier caps requests per model per day).
+            # Each model has its own quota, so the next one may still work.
+            quota_waits.append(_retry_delay_s(e) or 60)
+            outcome, err = "quota", ExtractionError(f"{model}: quota exhausted", retryable=True)
+        else:
+            err = ExtractionError(
+                f"{model}: HTTP {code}: {str(e)[:200]}", retryable=code in (408, 500, 502, 503, 504)
+            )
+            # Overloaded or retired: try the next model. Anything else stops here.
+            outcome = "overloaded" if code in (503, 504, 404) else "bad_status"
+    except Exception as e:  # network errors, timeouts
+        outcome = "network"
+        err = ExtractionError(f"{model}: {type(e).__name__}: {str(e)[:200]}", retryable=True)
+    else:
+        latency = int((time.monotonic() - t0) * 1000)
+        try:
+            parsed = schema.model_validate_json(resp.text or "")
+        except ValidationError as e:
+            outcome = "bad_schema"
+            err = ExtractionError(
+                f"{model}: response did not match schema: {e.errors()[:2]}", retryable=True
+            )
+        else:
+            usage = resp.usage_metadata
+            result = ExtractionResult(
+                parsed=parsed,
+                raw=parsed.model_dump(),
+                model=model,
+                latency_ms=latency,
+                tokens_in=usage.prompt_token_count if usage else None,
+                tokens_out=usage.candidates_token_count if usage else None,
+            )
+    attrs = {"model": model, "outcome": outcome}
+    telemetry.gemini_calls.add(1, attrs)
+    telemetry.gemini_duration.record(time.monotonic() - t0, attrs)
+    return outcome, result, err
+
+
 def extract(data: bytes, mime: str, doc_type: str) -> ExtractionResult:
     s = get_settings()
     schema = response_model(doc_type)
@@ -130,43 +185,21 @@ def extract(data: bytes, mime: str, doc_type: str) -> ExtractionResult:
     last: ExtractionError | None = None
     quota_waits: list[int] = []
     for model in [s.gemini_model, *s.gemini_fallback_models]:
-        t0 = time.monotonic()
-        try:
-            resp = _client().models.generate_content(model=model, contents=contents, config=config)
-        except errors.APIError as e:
-            code = getattr(e, "code", None) or 0
-            if code == 429:
-                # Out of quota on this model (the free tier caps requests per model per day).
-                # Each model has its own quota, so the next one may still work.
-                quota_waits.append(_retry_delay_s(e) or 60)
-                last = ExtractionError(f"{model}: quota exhausted", retryable=True)
-                continue
-            last = ExtractionError(
-                f"{model}: HTTP {code}: {str(e)[:200]}", retryable=code in (408, 500, 502, 503, 504)
-            )
-            if code in (503, 504, 404):
-                continue  # overloaded or retired: try the next model
-            raise last from e
-        except Exception as e:  # network errors, timeouts
-            last = ExtractionError(f"{model}: {type(e).__name__}: {str(e)[:200]}", retryable=True)
-            continue
-        latency = int((time.monotonic() - t0) * 1000)
-        text = resp.text or ""
-        try:
-            parsed = schema.model_validate_json(text)
-        except ValidationError as e:
-            raise ExtractionError(
-                f"{model}: response did not match schema: {e.errors()[:2]}", retryable=True
-            ) from e
-        usage = resp.usage_metadata
-        return ExtractionResult(
-            parsed=parsed,
-            raw=parsed.model_dump(),
-            model=model,
-            latency_ms=latency,
-            tokens_in=usage.prompt_token_count if usage else None,
-            tokens_out=usage.candidates_token_count if usage else None,
-        )
+        with telemetry.tracer.start_as_current_span(
+            "gemini generate_content",
+            attributes={"gen_ai.system": "gemini", "gen_ai.request.model": model},
+        ) as span:
+            outcome, result, err = _call(model, contents, config, schema, quota_waits)
+            span.set_attribute("veridoc.outcome", outcome)
+            if result is not None:
+                span.set_attribute("gen_ai.usage.input_tokens", result.tokens_in or 0)
+                span.set_attribute("gen_ai.usage.output_tokens", result.tokens_out or 0)
+                return result
+            assert err is not None
+            span.set_status(trace.StatusCode.ERROR, str(err))
+            last = err
+            if outcome in ("bad_status", "bad_schema"):
+                raise err
     if quota_waits and len(quota_waits) == 1 + len(s.gemini_fallback_models):
         raise ExtractionError(
             "AI quota exhausted on every configured model",
