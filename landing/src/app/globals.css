@@ -1,46 +1,67 @@
 @import "tailwindcss";
 
-/* Dark only. One accent (blue); green and amber/red carry state, as in the app. */
+/* Light, matching the Veridoc app (web/src/app/globals.css): ink on paper; colour carries state. */
 @theme {
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-serif: var(--font-plex-serif), ui-serif, Georgia, serif;
 
-  --color-bg: #09090b;
-  --color-surface: #111113;
-  --color-surface-2: #18181b;
-  --color-line: #27272a;
-  --color-line-strong: #3f3f46;
-  --color-ink: #fafaf9;
-  --color-ink-2: #d4d4d8;
-  --color-muted: #a1a1aa;
+  --color-paper: #fbfbfa;
+  --color-surface: #ffffff;
+  --color-sunk: #f4f3f0;
+  --color-line: #e6e5e1;
+  --color-line-strong: #d3d1cb;
+  --color-ink: #1c1d1f;
+  --color-ink-2: #4a4c50;
+  --color-muted: #6f7176;
 
-  --color-accent: #5b8cff;
-  --color-accent-ink: #09090b;
-  --color-clear: #3ecf8e;
-  --color-unsure: #f5a524;
-  --color-conflict: #f87171;
+  --color-accent: #1f4fd1;
+  --color-accent-hover: #1a43b3;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #eef2fd;
+
+  --color-unsure: #a35f00;
+  --color-unsure-soft: #fdf4e3;
+  --color-conflict: #b42318;
+  --color-conflict-soft: #fdeceb;
+  --color-clear: #1d7a46;
+  --color-clear-soft: #e8f5ee;
+  --color-info: #4a4c50;
+  --color-info-soft: #f1f1ef;
+
+  --color-night: #0d1129;
 }
 
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
-  color-scheme: dark;
+  color-scheme: light;
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
 
 body {
-  background: var(--color-bg);
+  background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
+/* Numbers, refs and codes line up, as in the app. */
 .mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Display headings: Plex Serif, two tones (the second line in muted ink). */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
 }
 
 :focus-visible {
@@ -49,11 +70,105 @@ body {
   border-radius: 4px;
 }
 
-/* Faint grid behind the hero, fading out towards the edges. */
-.grid-bg {
-  background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+/* App-style loading shimmer, as in the product. */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #efeeeb 0, #f6f5f3 60px, #efeeeb 120px);
+  background-size: 400px 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius: 4px;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee { animation: marquee 40s linear infinite; }
+.marquee-wrap:hover .marquee { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .skeleton, .marquee { animation: none; }
+}
+
+
+/* ── Motion ──────────────────────────────────────────────────────────────────
+   One easing curve everywhere. Everything below is decoration on top of a page
+   that is complete without it: no rule hides content unless the browser can
+   also animate it back in, and reduced-motion visitors get the static page. */
+@theme {
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mock-in {
+  from { opacity: 0; transform: perspective(1400px) rotateX(10deg) translateY(48px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes flow {
+  to { stroke-dashoffset: -16; }
+}
+@keyframes travel {
+  0% { offset-distance: 0%; opacity: 0; }
+  15%, 85% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero entrance: the one orchestrated moment on load. --d is the delay. */
+  .rise { animation: rise 0.8s var(--ease-smooth) both; animation-delay: var(--d, 0ms); }
+  .mock-in { animation: mock-in 1.1s var(--ease-smooth) both; animation-delay: var(--d, 0ms); transform-origin: 50% 0; }
+
+  /* Scroll reveals, scrubbed by scroll position. --i staggers siblings. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timing-function: var(--ease-smooth);
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 6%) entry calc(70% + var(--i, 0) * 6%);
+    }
+  }
+
+  .flow-line { animation: flow 0.9s linear infinite; }
+  .packet { animation: travel 2.4s var(--ease-smooth) infinite; animation-delay: var(--d, 0ms); }
+}
+
+/* Reading progress under the nav. Informational, so it stays on with reduced motion. */
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    transform-origin: 0 50%;
+    animation: progress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@supports not (animation-timeline: scroll()) {
+  .scroll-progress { display: none; }
+}
+
+/* Cursor spotlight on cards (pointer devices only). --x/--y are set from JS. */
+.spotlight { position: relative; isolation: isolate; }
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(360px circle at var(--x, 50%) var(--y, 50%), rgb(31 79 209 / 0.07), transparent 45%);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-smooth);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .spotlight:hover::before { opacity: 1; }
 }

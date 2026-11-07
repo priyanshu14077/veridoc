@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 
-const sans = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
-const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
+// The app's own type (IBM Plex Sans and Mono), plus Plex Serif for display headings.
+const sans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-sans", display: "swap" });
+// Mono only appears inside the mockups, so it isn't preloaded and doesn't compete with the headline's fonts.
+const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono", display: "swap", preload: false });
+const serif = IBM_Plex_Serif({ subsets: ["latin"], weight: ["400"], variable: "--font-plex-serif", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Veridoc: AI document extraction and cross-checks for customs brokers",
@@ -11,11 +14,11 @@ export const metadata: Metadata = {
     "Invoice, packing list and bill of lading in; one clean Bill of Entry file out. AI does the typing, rules do the checking, a person signs off.",
 };
 
-export const viewport: Viewport = { themeColor: "#09090b" };
+export const viewport: Viewport = { themeColor: "#fbfbfa" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
       <body>{children}</body>
     </html>
   );
