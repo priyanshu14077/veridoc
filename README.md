@@ -35,7 +35,7 @@ A documentation executive drops in a shipment's **invoice, packing list and bill
 | Manager accuracy report by field and supplier (exported shipments; corrections the flags missed) | ✅ Done |
 | Not-found page, app error boundary, phone layout for every screen | ✅ Done |
 | Deploy from CI: every green push to `master` goes to EC2 over SSH, then a live smoke test | ✅ Done |
-| Observability: OpenTelemetry traces, metrics and logs → VictoriaMetrics, VictoriaLogs and VictoriaTraces; Grafana dashboard and 8 email alerts ([docs/observability.md](docs/observability.md)) | ✅ Done |
+| Observability (local, not deployed): OpenTelemetry traces, metrics and logs → VictoriaMetrics, VictoriaLogs and VictoriaTraces; Grafana dashboard, 8 alert rules and a generated report ([docs/observability.md](docs/observability.md), [report](docs/observability-report.md)) | ✅ Done |
 
 ---
 
