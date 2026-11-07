@@ -1,4 +1,7 @@
 # One address for everything, so the session cookie is first-party and there's no CORS.
+#   /            the landing page (static files baked into this image at /srv/landing)
+#   /api/*       the API
+#   everything else (/login, /shipments, /_next/*, ...) the web app
 # Caddy gets and renews the HTTPS certificate for SITE_ADDRESS on its own.
 {$SITE_ADDRESS} {
 	encode zstd gzip
@@ -29,6 +32,30 @@
 	handle /api/* {
 		reverse_proxy api:8000
 	}
+
+	# ── Landing page ──
+	# Its JS, CSS and fonts are built under /_landing (the app owns /_next). File names carry a
+	# content hash, so they can be cached for a year and never revalidated.
+	handle_path /_landing/* {
+		root * /srv/landing
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+	# Background photos and video: not hashed, so a week, then revalidate (ETag).
+	handle /media/* {
+		root * /srv/landing
+		header Cache-Control "public, max-age=604800"
+		file_server
+	}
+	# The page itself: always revalidate, so a deploy shows up at once.
+	@landing path / /index.html /icon.svg
+	handle @landing {
+		root * /srv/landing
+		header Cache-Control "no-cache"
+		file_server
+	}
+
+	# ── The app ──
 	handle {
 		reverse_proxy web:3000
 	}

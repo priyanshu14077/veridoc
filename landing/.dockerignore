@@ -1,0 +1,10 @@
+# Only source and the compressed media go into the image build.
+node_modules
+.next
+out
+design-assets
+*.tsbuildinfo
+.env*
+Dockerfile
+.dockerignore
+README.md

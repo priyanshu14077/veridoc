@@ -82,7 +82,10 @@ services:
         condition: service_healthy
 
   caddy:
-    image: caddy:2.10-alpine
+    # Stock Caddy plus the static landing page (landing/Dockerfile), served at /.
+    build:
+      context: ../landing
+    image: veridoc-caddy
     restart: unless-stopped
     logging: *logging
     ports:
