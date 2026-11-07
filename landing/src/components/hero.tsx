@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 import { memo, useEffect, useRef, useState } from "react";
 import { hero, links, live, queue, type Status } from "@/content";
 import { HeroVideo } from "./backdrop";
-import { AppWindow, ButtonLink, Container, StatusChip, stagger } from "./ui";
+import { AppWindow, ButtonLink, Container, StatusChip, stagger } from "./primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -20,7 +20,7 @@ export function Hero() {
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper to-transparent" />
       </div>
 
-      <Container className="flex flex-col items-center pb-10 pt-14 text-center sm:pt-20">
+      <Container className="flex flex-col items-center pb-10 pt-24 text-center sm:pt-28">
         <a
           href="#product"
           className="rise group inline-flex items-center gap-2 rounded-full border border-line bg-surface/90 py-1 pl-1 pr-3 text-sm text-ink-2 shadow-sm backdrop-blur transition-colors duration-300 hover:border-line-strong"

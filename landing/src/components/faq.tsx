@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useId, useState } from "react";
 import { faq } from "@/content";
-import { Section, SectionHeader, stagger } from "./ui";
+import { Section, SectionHeader, stagger } from "./primitives";
 
 export function Faq() {
   const half = Math.ceil(faq.items.length / 2);

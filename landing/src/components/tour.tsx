@@ -8,7 +8,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 import { useEffect, useRef, useState } from "react";
 import { failing, links, live, queue, rules, tour } from "@/content";
 import { Backdrop } from "./backdrop";
-import { AppWindow, ButtonLink, Kbd, Section, SectionHeader, StatusChip } from "./ui";
+import { AppWindow, ButtonLink, Kbd, Section, SectionHeader, StatusChip } from "./primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const ICONS = [LayoutList, FileSearch, ListChecks, ShieldCheck, Target];

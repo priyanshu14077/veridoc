@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { failing, live, story } from "@/content";
 import { Backdrop } from "./backdrop";
-import { AppWindow, Kbd, Section, SectionHeader } from "./ui";
+import { AppWindow, Kbd, Section, SectionHeader } from "./primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 

@@ -1,5 +1,5 @@
 import { reads } from "@/content";
-import { Container } from "./ui";
+import { Container } from "./primitives";
 
 /** An endless strip of what Veridoc reads, where other pages put customer logos. Pauses on hover. */
 export function Marquee() {

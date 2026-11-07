@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 import { useEffect, useRef, useState } from "react";
 import { how } from "@/content";
 import { Backdrop } from "./backdrop";
-import { Section, SectionHeader, stagger } from "./ui";
+import { Section, SectionHeader, stagger } from "./primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 // Four crops of one landscape, left to right, so the row reads as one continuous view.

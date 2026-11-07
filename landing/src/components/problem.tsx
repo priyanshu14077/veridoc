@@ -1,6 +1,6 @@
 import { problem } from "@/content";
 import { CountUp } from "./motion";
-import { Section, SectionHeader, stagger } from "./ui";
+import { Section, SectionHeader, stagger } from "./primitives";
 
 export function Problem() {
   return (

@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { demo, links, live } from "@/content";
 import { Backdrop } from "./backdrop";
-import { AppWindow, ButtonLink, Section, StatusChip, TwoTone } from "./ui";
+import { AppWindow, ButtonLink, Section, StatusChip, TwoTone } from "./primitives";
 
 export function FinalCta() {
   return (

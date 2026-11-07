@@ -1,7 +1,7 @@
 import { targets } from "@/content";
 import { CountUp } from "./motion";
 import { Backdrop } from "./backdrop";
-import { Eyebrow, Section, TwoTone, stagger } from "./ui";
+import { Eyebrow, Section, TwoTone, stagger } from "./primitives";
 
 /** The client's targets, in the place other pages put a customer story. Labelled as targets. */
 export function Targets() {

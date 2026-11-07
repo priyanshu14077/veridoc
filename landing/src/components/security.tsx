@@ -2,7 +2,7 @@ import { Database, EyeOff, FileLock2, KeyRound, ScrollText, ShieldCheck } from "
 import { security } from "@/content";
 import { Backdrop } from "./backdrop";
 import { Spotlight } from "./motion";
-import { Section, SectionHeader, stagger } from "./ui";
+import { Section, SectionHeader, stagger } from "./primitives";
 
 const icons = [KeyRound, ShieldCheck, EyeOff, FileLock2, ScrollText, Database];
 
