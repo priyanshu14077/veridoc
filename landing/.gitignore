@@ -42,3 +42,6 @@ next-env.d.ts
 
 # keep the template
 !.env.example
+
+# full-size source images and video (optimised copies live in public/media)
+/design-assets/
