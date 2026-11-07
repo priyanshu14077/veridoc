@@ -53,6 +53,16 @@
   --border: #e6e5e1;
   --ring: #1f4fd1;
 }
+/* The footer's night: same tokens, dark values. */
+.theme-night {
+  --background: #07080c;
+  --foreground: #f4f4f2;
+  --muted-foreground: #b9bcc4;
+  --border: rgb(255 255 255 / 0.14);
+  --primary: #8aa6ff;
+  --secondary: #c9b3ff;
+  --destructive: #ff6b5e;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -77,8 +87,10 @@ html {
   html { scroll-behavior: auto; }
 }
 
+/* Every section brings its own photo; underneath is night, so no white ever shows between them. */
+html { background: #07080c; }
 body {
-  background: var(--color-paper);
+  background: #07080c;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

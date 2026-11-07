@@ -225,6 +225,10 @@ export interface CinematicFooterProps {
   author: string;
   /** Extra content for the bottom bar (e.g. a status indicator). */
   status?: React.ReactNode;
+  /** Optional layer behind everything (e.g. a photo). */
+  background?: React.ReactNode;
+  /** Classes for the outer wrapper, e.g. a scope that sets the colour tokens. */
+  className?: string;
 }
 
 const isExternal = (href: string) => /^https?:/.test(href);
@@ -251,6 +255,8 @@ export function CinematicFooter({
   note,
   author,
   status,
+  background,
+  className,
 }: CinematicFooterProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const giantTextRef = useRef<HTMLDivElement>(null);
@@ -339,10 +345,12 @@ export function CinematicFooter({
       */}
       <div
         ref={wrapperRef}
-        className="cinematic-footer-curtain relative h-screen w-full"
+        className={cn("cinematic-footer-curtain relative h-screen w-full", className)}
         style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
       >
         <footer className="cinematic-footer-wrapper fixed bottom-0 left-0 flex h-screen w-full flex-col justify-between overflow-hidden bg-background text-foreground">
+          {background && <div className="pointer-events-none absolute inset-0 z-0">{background}</div>}
+
           {/* Ambient Light & Grid Background */}
           <div className="footer-aurora animate-footer-breathe pointer-events-none absolute left-1/2 top-1/2 z-0 h-[60vh] w-[80vw] -translate-x-1/2 -translate-y-1/2 rounded-[50%] blur-[80px]" />
           <div className="footer-bg-grid pointer-events-none absolute inset-0 z-0" />

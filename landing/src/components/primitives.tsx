@@ -1,3 +1,4 @@
+import { SectionBackdrop, type BackdropImage, type Wash } from "./backdrop";
 import { ArrowRight, ArrowUpRight, CheckCircle2, CircleDashed, FileUp, Loader2, TriangleAlert } from "lucide-react";
 import type { Status, Title } from "@/content";
 
@@ -5,19 +6,27 @@ export function Container({ children, className = "" }: { children: React.ReactN
   return <div className={`mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 ${className}`}>{children}</div>;
 }
 
+/** A page section. With `backdrop`, a full-bleed photo and its wash sit behind the content. */
 export function Section({
   id,
   labelledBy,
   children,
   className = "",
+  backdrop,
 }: {
   id?: string;
   labelledBy: string;
   children: React.ReactNode;
   className?: string;
+  backdrop?: { image: BackdropImage; position?: string; wash: Wash };
 }) {
   return (
-    <section id={id} aria-labelledby={labelledBy} className={`py-20 sm:py-28 ${className}`}>
+    <section
+      id={id}
+      aria-labelledby={labelledBy}
+      className={`py-20 sm:py-28 ${backdrop ? "relative isolate overflow-hidden" : ""} ${className}`}
+    >
+      {backdrop && <SectionBackdrop {...backdrop} />}
       <Container>{children}</Container>
     </section>
   );

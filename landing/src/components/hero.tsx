@@ -11,13 +11,14 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
+    <section aria-labelledby="hero-title" className="relative isolate overflow-hidden bg-[#c3d0e3]">
       {/* The video: a sunlit valley under a white sky. Text sits on the sky, the product on the meadow. */}
       <div aria-hidden className="absolute inset-x-0 bottom-0 top-[30%] -z-10 sm:top-0">
         <HeroVideo />
-        {/* Paper fades into the sky at the top, so the nav and text sit on a clean, even ground. */}
-        <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-paper via-paper/70 to-transparent sm:h-2/5" />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper to-transparent" />
+        {/* The video's white sky is tinted a soft steel blue (no white ground), easing into the
+            footage; at the bottom it darkens into the night-blue strip below. */}
+        <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#c3d0e3] via-[#c3d0e3]/75 to-transparent sm:h-3/5" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0b1324] to-transparent" />
       </div>
 
       <Container className="flex flex-col items-center pb-10 pt-24 text-center sm:pt-28">

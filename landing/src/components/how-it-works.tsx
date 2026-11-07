@@ -14,24 +14,28 @@ const crops = ["4% 40%", "36% 70%", "62% 85%", "96% 45%"];
 export function HowItWorks() {
   const snippets = [<UploadSnippet key="u" />, <ExtractSnippet key="e" />, <CheckSnippet key="c" />, <ExportSnippet key="x" />];
   return (
-    <Section id="how-it-works" labelledBy="how-title">
+    <Section id="how-it-works" labelledBy="how-title" backdrop={{ image: "meadow", position: "50% 60%", wash: "light" }}>
       <SectionHeader id="how-title" eyebrow={how.eyebrow} title={how.title} />
       <ol className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {how.steps.map((s, i) => (
-          <li key={s.title} style={stagger(i)} className="reveal flex min-w-0 flex-col">
-            <Backdrop image="velvex" position={crops[i]} className="h-60 rounded-xl">
+          <li
+            key={s.title}
+            style={stagger(i)}
+            className="reveal flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white/60 bg-white/85 shadow-[0_20px_50px_-24px_rgb(20_30_20/0.55)]"
+          >
+            <Backdrop image="velvex" position={crops[i]} className="h-60">
               <div aria-hidden className="flex h-full items-center justify-center p-4">
                 <div className="w-full max-w-[250px] rounded-lg border border-line bg-surface p-3 text-[12px] shadow-[0_18px_40px_-16px_rgb(5_8_30/0.7)]">
                   {snippets[i]}
                 </div>
               </div>
             </Backdrop>
-            <div className="pt-5">
+            <div className="p-5">
               <h3 className="flex items-baseline gap-2 font-semibold text-ink">
-                <span className="mono text-xs font-normal text-muted">{i + 1}</span>
+                <span className="mono text-xs font-normal text-ink-2">{i + 1}</span>
                 {s.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-2">{s.body}</p>
             </div>
           </li>
         ))}
@@ -149,7 +153,7 @@ function CheckSnippet() {
             i === stage ? "bg-accent-soft" : i < stage && !pass ? "bg-conflict-soft" : ""
           }`}
         >
-          <span className="mono w-6 text-[10px] text-muted">{id}</span>
+          <span className="mono w-6 text-[10px] text-ink-2">{id}</span>
           <span className="flex-1 truncate text-[11px] text-ink-2">{title}</span>
           {i < stage ? (
             <motion.span initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>

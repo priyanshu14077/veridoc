@@ -1,6 +1,5 @@
 import { Database, EyeOff, FileLock2, KeyRound, ScrollText, ShieldCheck } from "lucide-react";
 import { security } from "@/content";
-import { Backdrop } from "./backdrop";
 import { Spotlight } from "./motion";
 import { Section, SectionHeader, stagger } from "./primitives";
 
@@ -8,13 +7,8 @@ const icons = [KeyRound, ShieldCheck, EyeOff, FileLock2, ScrollText, Database];
 
 export function Security() {
   return (
-    <Section id="security" labelledBy="security-title" className="relative isolate overflow-hidden">
-      <div aria-hidden className="absolute inset-0 -z-10">
-        <Backdrop image="aurorix" position="50% 60%" className="size-full" />
-        {/* Soften the steel so ink text and white cards keep their contrast. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-paper/80 via-paper/35 to-paper/80" />
-      </div>
-      <SectionHeader id="security-title" eyebrow={security.eyebrow} title={security.title} center />
+    <Section id="security" labelledBy="security-title" backdrop={{ image: "aurorix", position: "50% 70%", wash: "dark" }}>
+      <SectionHeader id="security-title" eyebrow={security.eyebrow} title={security.title} center tone="dark" />
       <ul className="mt-14 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {security.items.map((c, i) => {
           const Icon = icons[i];
