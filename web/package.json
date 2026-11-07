@@ -9,7 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/api-logs": "^0.223.0",
+    "@opentelemetry/instrumentation": "^0.223.0",
+    "@opentelemetry/sdk-logs": "^0.223.0",
     "@tanstack/react-query": "^5.105.1",
+    "@vercel/otel": "^2.3.0",
     "clsx": "^2.1.1",
     "lucide-react": "^1.66.0",
     "next": "16.4.3",
