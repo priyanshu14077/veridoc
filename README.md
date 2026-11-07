@@ -408,7 +408,7 @@ npm install
 npm run dev                         # → http://localhost:3000
 ```
 
-Landing page (static, no backend): `cd landing && npm install && npm run dev` → http://localhost:3002. `npm run build` writes plain HTML/CSS/JS to `landing/out/` for any static host.
+Landing page (static, no backend): `cd landing && npm install && npm run dev` → http://localhost:3002. `npm run build` writes plain HTML/CSS/JS to `landing/out/` for any static host. Full-size background art stays in `landing/design-assets/` (git-ignored); the page uses the compressed copies in `landing/public/media/`.
 
 API docs: http://localhost:8000/api/docs · Health check: http://localhost:8000/api/health
 
