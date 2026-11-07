@@ -373,6 +373,7 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │     ├─ components/       app shell, documents, checks and export panels, pdf.js viewer, UI primitives
 │     ├─ lib/              API client, types, formatting
 │     └─ proxy.ts          route guard (Next 16's replacement for middleware)
+├─ landing/                Landing page: one static Next.js 16 page in the app's look (Tailwind v4, motion, canvas); copy in src/content.ts
 ├─ sample-docs/            synthetic invoices, packing lists, B/Ls + ground truth + recorded extractions
 ├─ docs/                   PRD.md, TDD.md
 ├─ docker-compose.yml      Postgres 16 (dev + test databases)
@@ -406,6 +407,8 @@ cp .env.example .env.local
 npm install
 npm run dev                         # → http://localhost:3000
 ```
+
+Landing page (static, no backend): `cd landing && npm install && npm run dev` → http://localhost:3002. `npm run build` writes plain HTML/CSS/JS to `landing/out/` for any static host. Full-size background art stays in `landing/design-assets/` (git-ignored); the page uses the compressed copies in `landing/public/media/`.
 
 API docs: http://localhost:8000/api/docs · Health check: http://localhost:8000/api/health
 
