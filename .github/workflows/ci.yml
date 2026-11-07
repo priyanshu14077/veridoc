@@ -42,6 +42,34 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm run build
 
+  landing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: landing
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: landing/package-lock.json
+      - run: npm ci
+      - run: npx eslint src
+      - run: npx tsc --noEmit
+      # Built exactly as the Caddy image builds it (files under /_landing, same-site links).
+      - run: npm run build
+        env:
+          LANDING_ASSET_PREFIX: /_landing
+          NEXT_PUBLIC_APP_URL: ""
+      - name: Built page references only prefixed files and same-site links
+        run: |
+          grep -q '/_landing/_next/static/' out/index.html
+          ! grep -qE '"/_next/' out/index.html
+          grep -q 'href="/login"' out/index.html
+          test -f out/media/hero-poster.webp
+          test ! -e out/media/*.png  # full-size art belongs in design-assets/, not the deploy
+
   stack:
     # The production stack (deploy/compose.yml) builds, starts and serves over HTTPS. The same run
     # adds the local monitoring overlay and proves telemetry reaches every backend.
@@ -70,6 +98,8 @@ jobs:
           curl -fsk -b jar.txt https://localhost/api/reports/accuracy | grep -q '"shipments":4'
           test "$(curl -sk -o /dev/null -w '%{http_code}' -b jar.txt -X POST \
             -H 'Origin: https://evil.example' https://localhost/api/shipments)" = 403
+      - name: Landing page at /, app everywhere else, caching right
+        run: CURL_OPTS=-k deploy/check-landing.sh https://localhost
       - name: Telemetry reaches metrics, logs and traces
         run: |
           pw=$(grep '^GRAFANA_ADMIN_PASSWORD=' deploy/.env | cut -d= -f2)
@@ -115,7 +145,7 @@ jobs:
     # Every push to master that passes the three jobs above goes to the EC2 server.
     # Stays off until the repo variable SITE_ADDRESS is set (see docs/deployment.md §3.6).
     if: github.event_name == 'push' && github.ref == 'refs/heads/master' && vars.SITE_ADDRESS != ''
-    needs: [api, web, stack]
+    needs: [api, web, landing, stack]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
@@ -146,6 +176,7 @@ jobs:
         run: |
           for i in $(seq 1 30); do curl -fs "$SITE/api/health" && break; sleep 5; done
           curl -fs "$SITE/login" | grep -q Veridoc
+          deploy/check-landing.sh "$SITE"
           test "$(curl -s -o /dev/null -w '%{http_code}' -H "Origin: $SITE" \
             -H 'Content-Type: application/json' \
             -d '{"email":"anil.manager@veridoc.demo","password":"veridoc-demo"}' \
