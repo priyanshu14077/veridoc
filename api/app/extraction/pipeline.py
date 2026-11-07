@@ -16,7 +16,7 @@ from app.models import Document, ExtractionRun, FieldRow, Shipment
 from app.shipments.status import recompute_status
 from app.storage import get_storage
 
-log = logging.getLogger("crosscheck.extraction")
+log = logging.getLogger("veridoc.extraction")
 UNREADABLE_NULL_SHARE = 0.7  # TDD A16
 
 

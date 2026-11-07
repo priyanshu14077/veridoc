@@ -1,12 +1,14 @@
 # Production: Postgres, API, extraction worker, web and Caddy (HTTPS) on one server.
 # Run from the repo root:  docker compose -f deploy/compose.yml --env-file deploy/.env up -d --build
+# The project, database and user keep the old "crosscheck" name: renaming the project would
+# start new, empty volumes, and Postgres only reads POSTGRES_USER/DB when it first creates them.
 name: crosscheck
 
 x-api: &api
   build:
     context: ..
     dockerfile: api/Dockerfile
-  image: crosscheck-api
+  image: veridoc-api
   restart: unless-stopped
   env_file: .env
   environment:
@@ -58,7 +60,7 @@ services:
       context: ../web
       args:
         API_ORIGIN: http://api:8000
-    image: crosscheck-web
+    image: veridoc-web
     restart: unless-stopped
     depends_on:
       api:

@@ -15,7 +15,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Crosscheck", template: "%s · Crosscheck" },
+  title: { default: "Veridoc", template: "%s · Veridoc" },
   description: "Shipment document extraction and cross-checks for customs documentation.",
 };
 

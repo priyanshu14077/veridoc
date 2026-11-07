@@ -16,7 +16,7 @@ from app.extraction.gemini import ExtractionError
 from app.extraction.pipeline import process, record_failure
 from app.models import Document
 
-log = logging.getLogger("crosscheck.worker")
+log = logging.getLogger("veridoc.worker")
 
 
 def quota_message(retry_after_s: int | None) -> str:

@@ -1,7 +1,7 @@
 [project]
-name = "crosscheck-api"
+name = "veridoc-api"
 version = "0.1.0"
-description = "Crosscheck API: shipment document extraction and cross-checks"
+description = "Veridoc API: shipment document extraction and cross-checks"
 requires-python = ">=3.12"
 dependencies = [
     "argon2-cffi>=25.1.0",
