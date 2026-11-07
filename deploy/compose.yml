@@ -191,7 +191,8 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "false"
       GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
-      GF_PLUGINS_PREINSTALL: victoriametrics-logs-datasource
+      # Pinned: downloaded once into the grafana volume, so a new release can't change a deploy.
+      GF_PLUGINS_PREINSTALL: victoriametrics-logs-datasource@0.33.1
       # Alert email through Gmail SMTP with an app password. Off until SMTP_USER is set.
       GF_SMTP_ENABLED: ${SMTP_ENABLED:-false}
       GF_SMTP_HOST: smtp.gmail.com:587
@@ -204,6 +205,13 @@ services:
       - ./observability/grafana:/etc/grafana/provisioning:ro
       - grafana:/var/lib/grafana
     mem_limit: 384m  # measured ~280 MB in use: Grafana is the heaviest piece here
+    healthcheck:
+      # Healthy only once the logs plugin is installed, so `up --wait` (deploy and CI) waits for it.
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/grafana/api/health && test -f /var/lib/grafana/plugins/victoriametrics-logs-datasource/plugin.json"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
     depends_on:
       - victoriametrics
       - victorialogs
