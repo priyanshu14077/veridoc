@@ -4,7 +4,7 @@ import tempfile
 os.environ.setdefault(
     "DATABASE_URL", "postgresql+psycopg://crosscheck:crosscheck@localhost:5433/crosscheck_test"
 )
-os.environ["STORAGE_DIR"] = tempfile.mkdtemp(prefix="crosscheck-test-")
+os.environ["STORAGE_DIR"] = tempfile.mkdtemp(prefix="veridoc-test-")
 os.environ["GEMINI_API_KEY"] = ""  # tests must never reach the real model
 
 from collections.abc import Iterator  # noqa: E402
@@ -71,9 +71,9 @@ def login(client: TestClient, email: str) -> TestClient:
     return client
 
 
-EXEC = "meera.exec@crosscheck.demo"
-EXEC2 = "rohan.exec@crosscheck.demo"
-MANAGER = "anil.manager@crosscheck.demo"
+EXEC = "meera.exec@veridoc.demo"
+EXEC2 = "rohan.exec@veridoc.demo"
+MANAGER = "anil.manager@veridoc.demo"
 
 
 @pytest.fixture

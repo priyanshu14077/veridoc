@@ -16,7 +16,7 @@ def test_password_hash_roundtrip() -> None:
 
 
 def test_login_sets_httponly_cookie_and_me_works(client) -> None:
-    r = client.post("/api/auth/login", json={"email": EXEC, "password": "crosscheck-demo"})
+    r = client.post("/api/auth/login", json={"email": EXEC, "password": "veridoc-demo"})
     assert r.status_code == 200
     assert r.json()["role"] == "executive"
     cookie = r.headers["set-cookie"]
@@ -25,7 +25,7 @@ def test_login_sets_httponly_cookie_and_me_works(client) -> None:
 
 
 def test_email_is_case_insensitive(client) -> None:
-    r = client.post("/api/auth/login", json={"email": EXEC.upper(), "password": "crosscheck-demo"})
+    r = client.post("/api/auth/login", json={"email": EXEC.upper(), "password": "veridoc-demo"})
     assert r.status_code == 200
 
 
@@ -41,7 +41,7 @@ def test_login_is_throttled_after_five_failures(client) -> None:
         assert (
             client.post("/api/auth/login", json={"email": EXEC, "password": "x"}).status_code == 401
         )
-    r = client.post("/api/auth/login", json={"email": EXEC, "password": "crosscheck-demo"})
+    r = client.post("/api/auth/login", json={"email": EXEC, "password": "veridoc-demo"})
     assert r.status_code == 429
 
 
@@ -86,7 +86,7 @@ def test_login_is_audited(client, db) -> None:
 def test_cross_origin_post_is_blocked(client) -> None:
     r = client.post(
         "/api/auth/login",
-        json={"email": EXEC, "password": "crosscheck-demo"},
+        json={"email": EXEC, "password": "veridoc-demo"},
         headers={"Origin": "https://evil.example"},
     )
     assert r.status_code == 403
