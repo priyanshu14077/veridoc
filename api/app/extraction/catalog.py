@@ -1,4 +1,4 @@
-"""Every field Crosscheck extracts, per document type (PRD §8.1).
+"""Every field Veridoc extracts, per document type (PRD §8.1).
 
 The catalog drives the Gemini response schema, normalisation, validation, the review UI's
 grouping, and the export mapping, so a field is declared exactly once.

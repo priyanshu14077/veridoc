@@ -1,4 +1,4 @@
-# Technical Design Document: Crosscheck
+# Technical Design Document: Veridoc
 
 **GitHub:** https://github.com/priyanshu14077/veridoc · **Live app:** https://16-179-13-144.sslip.io (demo logins in [deployment.md](./deployment.md))
 Version 0.1 · 2026-11-02 · Author: Priyanshu Kumar · Companion to [PRD.md](./PRD.md)

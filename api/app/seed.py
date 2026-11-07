@@ -12,7 +12,7 @@ from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.auth.passwords import hash_password
+from app.auth.passwords import hash_password, verify_password
 from app.extraction.gemini import ExtractionResult, response_model
 from app.extraction.pipeline import store_result
 from app.models import Document, Importer, Shipment, Supplier, User
@@ -22,12 +22,12 @@ SAMPLES = Path(__file__).resolve().parents[2] / "sample-docs"
 DOC_TYPES = ("invoice", "packing_list", "bill_of_lading")
 
 # Demo password is public by design (it's printed in deployment.md); override per environment.
-DEMO_PASSWORD = os.environ.get("SEED_DEMO_PASSWORD", "crosscheck-demo")
+DEMO_PASSWORD = os.environ.get("SEED_DEMO_PASSWORD", "veridoc-demo")
 
 USERS = [
-    ("meera.exec@crosscheck.demo", "Meera Iyer", "executive"),
-    ("rohan.exec@crosscheck.demo", "Rohan Desai", "executive"),
-    ("anil.manager@crosscheck.demo", "Anil Kulkarni", "manager"),
+    ("meera.exec@veridoc.demo", "Meera Iyer", "executive"),
+    ("rohan.exec@veridoc.demo", "Rohan Desai", "executive"),
+    ("anil.manager@veridoc.demo", "Anil Kulkarni", "manager"),
 ]
 
 IMPORTERS = [
@@ -63,18 +63,18 @@ SUPPLIERS = [
 
 # (ref, importer idx, supplier idx, assignee email | None). SHP-24811/24812 are the brief's rows.
 SHIPMENTS = [
-    ("SHP-24811", 0, 0, "meera.exec@crosscheck.demo"),
-    ("SHP-24812", 1, 1, "meera.exec@crosscheck.demo"),
-    ("SHP-24813", 2, 3, "rohan.exec@crosscheck.demo"),
+    ("SHP-24811", 0, 0, "meera.exec@veridoc.demo"),
+    ("SHP-24812", 1, 1, "meera.exec@veridoc.demo"),
+    ("SHP-24813", 2, 3, "rohan.exec@veridoc.demo"),
     ("SHP-24814", 0, 0, None),
-    ("SHP-24815", 1, 2, "meera.exec@crosscheck.demo"),
+    ("SHP-24815", 1, 2, "meera.exec@veridoc.demo"),
     ("SHP-24816", 2, 3, None),
-    ("SHP-24817", 0, 0, "rohan.exec@crosscheck.demo"),
-    ("SHP-24818", 1, 1, "meera.exec@crosscheck.demo"),
-    ("SHP-24819", 2, 2, "rohan.exec@crosscheck.demo"),
+    ("SHP-24817", 0, 0, "rohan.exec@veridoc.demo"),
+    ("SHP-24818", 1, 1, "meera.exec@veridoc.demo"),
+    ("SHP-24819", 2, 2, "rohan.exec@veridoc.demo"),
     ("SHP-24820", 0, 3, None),
-    ("SHP-24821", 1, 1, "meera.exec@crosscheck.demo"),
-    ("SHP-24822", 2, 0, "rohan.exec@crosscheck.demo"),
+    ("SHP-24821", 1, 1, "meera.exec@veridoc.demo"),
+    ("SHP-24822", 2, 0, "rohan.exec@veridoc.demo"),
 ]
 
 # Cleared shipments the seed files as an executive would, so the manager's accuracy report and
@@ -89,6 +89,9 @@ def seed(db: Session) -> None:
         if u is None:
             u = User(email=email, name=name, role=role, password_hash=hash_password(DEMO_PASSWORD))
             db.add(u)
+        elif not verify_password(u.password_hash, DEMO_PASSWORD):
+            # Demo accounts follow SEED_DEMO_PASSWORD, so changing it (as the rename did) applies.
+            u.password_hash = hash_password(DEMO_PASSWORD)
         users[email] = u
 
     importers: list[Importer] = []
@@ -110,7 +113,7 @@ def seed(db: Session) -> None:
         suppliers.append(sup)
     db.flush()
 
-    creator = users["anil.manager@crosscheck.demo"]
+    creator = users["anil.manager@veridoc.demo"]
     for ref, imp_i, sup_i, assignee in SHIPMENTS:
         if db.scalar(select(Shipment).where(Shipment.ref == ref)):
             continue

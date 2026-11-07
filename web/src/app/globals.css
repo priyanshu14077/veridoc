@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Crosscheck tokens. Colour carries state only; everything else is ink on paper. */
+/* Veridoc tokens. Colour carries state only; everything else is ink on paper. */
 @theme {
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;

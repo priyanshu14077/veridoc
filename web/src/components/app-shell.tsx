@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/shipments" className="flex items-center gap-2 font-semibold tracking-tight">
             <Logo />
             <span className={clsx(me.data?.role === "manager" && "hidden sm:inline")}>
-              Crosscheck
+              Veridoc
             </span>
           </Link>
           <Suspense fallback={<NavLinks pathname="" />}>

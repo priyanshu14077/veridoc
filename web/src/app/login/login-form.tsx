@@ -10,10 +10,10 @@ import type { Me } from "@/lib/types";
 
 // Public demo accounts (also listed in deployment.md). Not secrets: seed data for reviewers.
 const DEMO = [
-  { email: "meera.exec@crosscheck.demo", label: "Meera Iyer", role: "Executive" },
-  { email: "anil.manager@crosscheck.demo", label: "Anil Kulkarni", role: "Manager" },
+  { email: "meera.exec@veridoc.demo", label: "Meera Iyer", role: "Executive" },
+  { email: "anil.manager@veridoc.demo", label: "Anil Kulkarni", role: "Manager" },
 ];
-const DEMO_PASSWORD = "crosscheck-demo";
+const DEMO_PASSWORD = "veridoc-demo";
 
 function safeNext(raw: string | null): string {
   // Only same-site paths, never "//evil.com" or absolute URLs.
@@ -41,7 +41,7 @@ export function LoginForm() {
   return (
     <div className="w-full max-w-[380px]">
       <div className="mb-8 flex items-center gap-2.5 text-lg font-semibold tracking-tight">
-        <Logo className="size-7" /> Crosscheck
+        <Logo className="size-7" /> Veridoc
       </div>
       <h1 className="text-xl font-semibold tracking-tight">Sign in</h1>
       <p className="mt-1 text-muted">Documentation team access only.</p>

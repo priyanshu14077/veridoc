@@ -55,10 +55,10 @@ jobs:
         run: |
           for i in $(seq 1 30); do curl -fsk https://localhost/api/health && break; sleep 2; done
           test "$(curl -sk -o /dev/null -w '%{http_code}' https://localhost/api/reports/accuracy)" = 401
-          curl -fsk https://localhost/login | grep -q Crosscheck
+          curl -fsk https://localhost/login | grep -q Veridoc
           curl -sk -D headers.txt -c jar.txt -H 'Origin: https://localhost' \
             -H 'Content-Type: application/json' \
-            -d '{"email":"anil.manager@crosscheck.demo","password":"crosscheck-demo"}' \
+            -d '{"email":"anil.manager@veridoc.demo","password":"veridoc-demo"}' \
             https://localhost/api/auth/login
           grep -i '^set-cookie:.*secure' headers.txt
           grep -i '^strict-transport-security' headers.txt
@@ -67,3 +67,43 @@ jobs:
             -H 'Origin: https://evil.example' https://localhost/api/shipments)" = 403
       - if: failure()
         run: docker compose -f deploy/compose.yml --env-file deploy/.env logs --tail 200
+
+  deploy:
+    # Every push to master that passes the three jobs above goes to the EC2 server.
+    # Stays off until the repo variable SITE_ADDRESS is set (see docs/deployment.md §3.6).
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && vars.SITE_ADDRESS != ''
+    needs: [api, web, stack]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false  # never stop a deploy halfway through a build
+    environment:
+      name: production
+      url: https://${{ vars.SITE_ADDRESS }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Deploy ${{ github.sha }}
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
+            "ubuntu@$HOST" "bash -s -- ${{ github.sha }}" < deploy/deploy.sh
+      - name: Smoke test the live site
+        env:
+          SITE: https://${{ vars.SITE_ADDRESS }}
+        run: |
+          for i in $(seq 1 30); do curl -fs "$SITE/api/health" && break; sleep 5; done
+          curl -fs "$SITE/login" | grep -q Veridoc
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H "Origin: $SITE" \
+            -H 'Content-Type: application/json' \
+            -d '{"email":"anil.manager@veridoc.demo","password":"veridoc-demo"}' \
+            "$SITE/api/auth/login")" = 200

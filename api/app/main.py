@@ -14,7 +14,7 @@ from app.reports.router import router as reports_router
 from app.shipments.router import router as shipments_router
 from app.users import router as users_router
 
-app = FastAPI(title="Crosscheck API", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI(title="Veridoc API", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
 UNSAFE = {"POST", "PUT", "PATCH", "DELETE"}
 

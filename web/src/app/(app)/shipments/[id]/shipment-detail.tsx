@@ -31,7 +31,7 @@ export function ShipmentDetailView() {
   });
 
   useEffect(() => {
-    if (q.data) document.title = `${q.data.ref} · Crosscheck`;
+    if (q.data) document.title = `${q.data.ref} · Veridoc`;
   }, [q.data]);
 
   return (
