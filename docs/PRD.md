@@ -1,4 +1,4 @@
-# PRD: Crosscheck: AI document extraction and cross-check for import shipments
+# PRD: Veridoc: AI document extraction and cross-check for import shipments
 
 Status: Draft v0.1 (2026-11-02) · Owner: Priyanshu Kumar · Brief: isokode take-home, problem statement #2
 
@@ -8,7 +8,7 @@ Status: Draft v0.1 (2026-11-02) · Owner: Priyanshu Kumar · Brief: isokode take
 
 ## 1. Summary
 
-Company A is a customs broker at Nhava Sheva. Its documentation team retypes importer PDFs (invoice, packing list, bill of lading) into an Excel checklist and then into its customs filing software. Crosscheck replaces the retyping. An executive drops a shipment's three documents in, a vision AI model extracts the fields with a confidence score on each, and the system checks the three documents against each other. The executive confirms every uncertain or conflicting field beside the source page, then exports a file in the filing software's import layout. The filing software stays as it is.
+Company A is a customs broker at Nhava Sheva. Its documentation team retypes importer PDFs (invoice, packing list, bill of lading) into an Excel checklist and then into its customs filing software. Veridoc replaces the retyping. An executive drops a shipment's three documents in, a vision AI model extracts the fields with a confidence score on each, and the system checks the three documents against each other. The executive confirms every uncertain or conflicting field beside the source page, then exports a file in the filing software's import layout. The filing software stays as it is.
 
 ## 2. Problem and goals
 

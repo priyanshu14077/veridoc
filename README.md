@@ -1,10 +1,10 @@
-# Crosscheck
+# Veridoc
 
 [![ci](https://github.com/priyanshu14077/veridoc/actions/workflows/ci.yml/badge.svg)](https://github.com/priyanshu14077/veridoc/actions/workflows/ci.yml)
 
 **AI document extraction and cross-checks for a customs broker's import shipments.**
 
-**Live demo:** https://16-179-13-144.sslip.io · sign in as `anil.manager@crosscheck.demo` / `crosscheck-demo` (more accounts in [docs/deployment.md](docs/deployment.md))
+**Live demo:** https://16-179-13-144.sslip.io · sign in as `anil.manager@veridoc.demo` / `veridoc-demo` (more accounts in [docs/deployment.md](docs/deployment.md))
 
 A documentation executive drops in a shipment's **invoice, packing list and bill of lading**. A vision model extracts the fields with a confidence score on each. Deterministic rules check the three documents against each other (totals, packages, weights, containers). **Nothing exports until a person has cleared every uncertain or conflicting value.** The export is a file the existing customs filing software can import, so that software doesn't change.
 
@@ -409,13 +409,13 @@ API docs: http://localhost:8000/api/docs · Health check: http://localhost:8000/
 
 ### Demo accounts
 
-All people and companies are fictional. Password for every account: `crosscheck-demo`
+All people and companies are fictional. Password for every account: `veridoc-demo`
 
 | Role | Email | Sees |
 |---|---|---|
-| Executive | `meera.exec@crosscheck.demo` | Their own shipments + the unassigned pool (8) |
-| Executive | `rohan.exec@crosscheck.demo` | Their own shipments + the unassigned pool (7) |
-| Manager | `anil.manager@crosscheck.demo` | All 12, plus override review and reports |
+| Executive | `meera.exec@veridoc.demo` | Their own shipments + the unassigned pool (8) |
+| Executive | `rohan.exec@veridoc.demo` | Their own shipments + the unassigned pool (7) |
+| Manager | `anil.manager@veridoc.demo` | All 12, plus override review and reports |
 
 ### Environment variables
 
