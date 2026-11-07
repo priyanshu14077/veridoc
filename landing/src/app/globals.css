@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* Dark only. One accent (blue); green and amber/red carry state, as in the app. */
+@theme {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-bg: #09090b;
+  --color-surface: #111113;
+  --color-surface-2: #18181b;
+  --color-line: #27272a;
+  --color-line-strong: #3f3f46;
+  --color-ink: #fafaf9;
+  --color-ink-2: #d4d4d8;
+  --color-muted: #a1a1aa;
+
+  --color-accent: #5b8cff;
+  --color-accent-ink: #09090b;
+  --color-clear: #3ecf8e;
+  --color-unsure: #f5a524;
+  --color-conflict: #f87171;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Faint grid behind the hero, fading out towards the edges. */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+}
