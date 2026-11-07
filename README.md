@@ -373,7 +373,7 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │     ├─ components/       app shell, documents, checks and export panels, pdf.js viewer, UI primitives
 │     ├─ lib/              API client, types, formatting
 │     └─ proxy.ts          route guard (Next 16's replacement for middleware)
-├─ landing/                Landing page: one static Next.js 16 page (Tailwind v4, motion); copy in src/content.ts
+├─ landing/                Landing page: one static Next.js 16 page in the app's look (Tailwind v4, motion, canvas); copy in src/content.ts
 ├─ sample-docs/            synthetic invoices, packing lists, B/Ls + ground truth + recorded extractions
 ├─ docs/                   PRD.md, TDD.md
 ├─ docker-compose.yml      Postgres 16 (dev + test databases)
