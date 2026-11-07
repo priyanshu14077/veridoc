@@ -1,212 +1,375 @@
 "use client";
 
-import { Check, FileText, Pencil } from "lucide-react";
-import { motion, useInView, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import { hero, links, review } from "@/content";
-import { ButtonLink, ConfidenceBadge, Container } from "./ui";
+import { Check, CheckCircle2, Download, FileText, Loader2, Pencil, TriangleAlert } from "lucide-react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import { memo, useEffect, useRef, useState } from "react";
+import { hero, links, live, queue, type Status } from "@/content";
+import { PortScene } from "./port-scene";
+import { AppWindow, ButtonLink, Container, StatusChip, stagger } from "./ui";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden">
-      <div aria-hidden className="grid-bg pointer-events-none absolute inset-0" />
-      <Container className="relative pb-20 pt-16 sm:pb-28 sm:pt-24">
-        <div className="max-w-3xl">
-          <p className="mono text-xs uppercase tracking-[0.18em] text-accent">{hero.eyebrow}</p>
-          <h1
-            id="hero-title"
-            className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-6xl"
+      <Container className="grid grid-cols-1 items-center gap-12 pb-16 pt-14 sm:pb-24 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-12">
+        <div className="min-w-0">
+          <a
+            href="#product"
+            className="rise group inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1 pl-1 pr-3 text-sm text-ink-2 transition-colors duration-300 hover:border-line-strong"
           >
-            {hero.title}
+            <span className="rounded-full bg-ink px-2 py-0.5 text-xs font-medium text-surface">{hero.chipLabel}</span>
+            {hero.chip}
+            <span aria-hidden className="transition-transform duration-300 ease-smooth group-hover:translate-x-0.5">→</span>
+          </a>
+          {/* Static on purpose: the headline is the first thing read (and the LCP element). */}
+          <h1 id="hero-title" className="display mt-6 text-[2.6rem] text-balance sm:text-6xl lg:text-[3.5rem] xl:text-[3.9rem]">
+            {hero.title.map((line, i) => (
+              <span key={line} className={`block ${i === 1 ? "text-muted" : "text-ink"}`}>
+                {line}
+              </span>
+            ))}
           </h1>
-          <p className="mt-5 text-lg font-medium text-ink-2 sm:text-xl">{hero.tagline}</p>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">{hero.sub}</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <p className="rise mt-6 max-w-xl text-base leading-relaxed text-ink-2 sm:text-lg" style={stagger(0, 380)}>
+            {hero.sub}
+          </p>
+          <div className="rise mt-8 flex flex-col gap-3 sm:flex-row sm:items-center" style={stagger(0, 470)}>
             <ButtonLink href={links.demo} external>
               Try the live demo
             </ButtonLink>
-            <ButtonLink href={links.tdd} variant="secondary" external>
-              Read the technical design
+            <ButtonLink href="#how-it-works" variant="ghost">
+              See how it works
             </ButtonLink>
           </div>
+          <p className="rise mt-6 text-sm text-muted" style={stagger(0, 540)}>
+            {hero.note}
+          </p>
         </div>
-        <ReviewMockup />
+
+        <div className="mock-in min-w-0" style={stagger(0, 300)}>
+          <PortScene variant="wide" seed={24817} className="aspect-[2/3] rounded-2xl sm:aspect-[4/3] lg:aspect-[1/1.04]">
+            <div className="absolute inset-x-4 top-8 [transform:translateZ(0)] sm:inset-x-auto sm:left-[8%] sm:top-[12%] sm:w-[118%]">
+              <Autopilot />
+            </div>
+          </PortScene>
+        </div>
       </Container>
     </section>
   );
 }
 
-/** A coded picture of the review screen: fields fill in, one is flagged, a person confirms it. */
-function ReviewMockup() {
+// ── The autopilot queue ──────────────────────────────────────────────────────
+
+// Step numbers. The fields arrive at FIELDS..FIELDS+5; FLAG is the "needs a person" moment.
+const ARRIVE = 1;
+const DOCS = 2; // 2, 3, 4: documents finish reading one by one
+const FIELDS = 5;
+const FLAG = FIELDS + live.fields.length; // 11
+const PRESS = FLAG + 1;
+const CONFIRMED = PRESS + 1;
+const EXPORTED = CONFIRMED + 1;
+const HOLD = EXPORTED + 1;
+
+// Delay before moving to each step, in ms (index = step being entered).
+const DELAYS: Record<number, number> = {
+  [ARRIVE]: 700, 2: 900, 3: 450, 4: 450, [FLAG]: 400, [PRESS]: 1900, [CONFIRMED]: 260, [EXPORTED]: 1500, [HOLD]: 2600,
+};
+const delayFor = (s: number) => DELAYS[s] ?? 260;
+
+function liveStatus(s: number): Status {
+  if (s >= EXPORTED) return "exported";
+  if (s >= CONFIRMED) return "cleared";
+  if (s >= FLAG) return "needs_review";
+  return "extracting";
+}
+
+function Autopilot() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.3 });
+  const inView = useInView(ref, { amount: 0.3 });
   const reduce = useReducedMotion();
-  const count = review.fields.length;
-  // stage = how many fields are shown; count + 1 = the flagged field has been confirmed.
-  const [stage, setStage] = useState(0);
-  const shown = reduce ? count : stage;
-  const confirmed = !reduce && stage > count;
+  // Server render and reduced motion: the informative still, a shipment waiting on one flag.
+  const [step, setStep] = useState(FLAG);
+  const [cycle, setCycle] = useState(0);
 
   useEffect(() => {
-    if (!inView || reduce) return;
-    const timers = review.fields.map((_, i) => setTimeout(() => setStage(i + 1), 350 + i * 320));
-    timers.push(setTimeout(() => setStage(count + 1), 350 + count * 320 + 1600));
-    return () => timers.forEach(clearTimeout);
-  }, [inView, reduce, count]);
+    if (reduce) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- restart the loop from the top once JS runs
+    setStep(0);
+  }, [reduce]);
 
-  const flagged = review.fields[review.flaggedIndex];
-  const flagVisible = shown > review.flaggedIndex;
+  useEffect(() => {
+    if (reduce || !inView) return;
+    const t = setTimeout(
+      () => {
+        if (step >= HOLD) {
+          setStep(0);
+          setCycle((c) => c + 1);
+        } else setStep(step + 1);
+      },
+      step >= HOLD ? 500 : delayFor(step + 1),
+    );
+    return () => clearTimeout(t);
+  }, [step, inView, reduce]);
+
+  const s = reduce ? FLAG : step;
+  const status = liveStatus(s);
+  const flagged = live.fields[live.flaggedIndex];
 
   return (
     <div
       ref={ref}
       role="img"
-      aria-label={`Veridoc review screen for shipment ${review.shipment}. The invoice is on the left; extracted fields with confidence scores are on the right. ${flagged.label} is at ${Math.round(flagged.confidence * 100)}%, below the 85% threshold, so it is flagged for a person to confirm or edit.`}
-      className="mt-14 overflow-hidden rounded-xl border border-line bg-surface shadow-2xl shadow-black/40 sm:mt-20"
+      aria-label={`Veridoc's shipment queue. A new shipment, ${live.ref}, arrives and its three documents are read. Each field gets a confidence score; the invoice total reads at ${Math.round(flagged.confidence * 100)}%, below the 85% threshold, so it is flagged. A person confirms it, the shipment is cleared and exported as a CSV.`}
     >
-      <div aria-hidden>
-        {/* Window bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="mono text-ink">{review.shipment}</span>
-            <span className="text-line-strong">/</span>
-            <span className="flex items-center gap-1.5 text-muted">
-              <FileText className="size-3.5" />
-              {review.document}
-            </span>
-          </div>
-          <StatusPill clear={confirmed} />
+      <AppWindow
+        title={
+          <>
+            Veridoc <span className="font-normal text-muted">/ Shipments</span>
+          </>
+        }
+      >
+        <div aria-hidden className="grid grid-cols-1 text-[12px] sm:grid-cols-[230px_minmax(0,1fr)]">
+          <QueueList arrived={s >= ARRIVE} status={status} cycle={cycle} />
+          <Detail step={s} status={status} />
         </div>
+      </AppWindow>
+    </div>
+  );
+}
 
-        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-          <DocumentPreview highlight={flagVisible} confirmed={confirmed} />
-          <div className="min-w-0 border-t border-line p-4 sm:p-5 md:border-l md:border-t-0">
-            <p className="mono mb-3 text-[11px] uppercase tracking-wider text-muted">Extracted fields</p>
-            <ul className="space-y-1.5">
-              {review.fields.map((f, i) => {
-                const isFlag = i === review.flaggedIndex;
-                // Every row is always in the layout (no shift); it fades in when its turn comes.
-                return (
-                  <motion.li
-                    key={f.label}
-                    initial={false}
-                    animate={{ opacity: i < shown ? 1 : 0, y: i < shown ? 0 : 6 }}
-                    transition={{ duration: 0.35, ease: "easeOut" }}
-                    className={`rounded-lg border px-3 py-2.5 transition-colors duration-500 ${
-                      isFlag && !confirmed
-                        ? "border-unsure/50 bg-unsure/[0.07]"
-                        : isFlag
-                          ? "border-clear/40 bg-clear/[0.06]"
-                          : "border-transparent"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted">{f.label}</p>
-                        <p className="mono mt-0.5 truncate text-sm text-ink">{f.value}</p>
-                      </div>
-                      {isFlag && confirmed ? (
-                        <span className="mono inline-flex items-center gap-1 rounded bg-clear/10 px-1.5 py-0.5 text-[11px] text-clear">
-                          <Check className="size-3" /> Confirmed
-                        </span>
-                      ) : (
-                        <ConfidenceBadge value={f.confidence} threshold={review.threshold} />
-                      )}
-                    </div>
-                    {isFlag && (
-                      <div className="mt-2.5 flex min-h-6 items-center gap-2">
-                        {confirmed ? (
-                          <span className="text-xs text-clear">Confirmed by Meera · recorded in the edit history</span>
-                        ) : (
-                          <>
-                            <span className="text-xs text-unsure">Below 85%: check against the page</span>
-                            <span className="ml-auto inline-flex items-center gap-1 rounded-md bg-ink px-2 py-1 text-xs font-medium text-bg">
-                              <Check className="size-3" /> Confirm
-                            </span>
-                            <span className="inline-flex items-center gap-1 rounded-md border border-line-strong px-2 py-1 text-xs text-ink-2">
-                              <Pencil className="size-3" /> Edit
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </motion.li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
+const QueueList = memo(function QueueList({ arrived, status, cycle }: { arrived: boolean; status: Status; cycle: number }) {
+  const counts = { open: 3 + (status === "needs_review" ? 1 : 0) };
+  return (
+    <div className="hidden border-r border-line sm:block">
+      <div className="flex items-center justify-between px-3 pb-1.5 pt-3">
+        <span className="font-semibold">All open</span>
+        <span className="flex items-center gap-1 text-[11px] text-clear">
+          <span className="relative flex size-1.5">
+            <span className="absolute inline-flex size-full rounded-full bg-clear opacity-60 motion-safe:animate-ping" />
+            <span className="relative size-1.5 rounded-full bg-clear" />
+          </span>
+          Live
+        </span>
+      </div>
+      <p className="px-3 pb-2 text-[11px] text-muted">
+        <span className="mono">{counts.open}</span> need review
+      </p>
+      <ul className="space-y-0.5 px-1.5 pb-2">
+        <AnimatePresence initial={false}>
+          {arrived && (
+            <motion.li
+              key={`live-${cycle}`}
+              layout
+              initial={{ opacity: 0, height: 0, y: -8 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="overflow-hidden"
+            >
+              <Row active refName={live.ref} importer={live.importer} ago="now" status={status} flags={status === "needs_review" ? 1 : 0} />
+            </motion.li>
+          )}
+          {queue.map((q) => (
+            <motion.li key={q.ref} layout transition={{ duration: 0.5, ease: EASE }}>
+              <Row refName={q.ref} importer={q.importer} ago={q.ago} status={q.status} flags={q.flags} />
+            </motion.li>
+          ))}
+        </AnimatePresence>
+      </ul>
+    </div>
+  );
+});
+
+function Row({
+  refName, importer, ago, status, flags, active = false,
+}: { refName: string; importer: string; ago: string; status: Status; flags: number; active?: boolean }) {
+  return (
+    <div className={`rounded-md px-2 py-1.5 transition-colors duration-500 ${active ? "bg-accent-soft/70 shadow-[inset_2px_0_0_var(--color-accent)]" : ""}`}>
+      <div className="flex items-center justify-between gap-2">
+        <span className="mono font-medium">{refName}</span>
+        <span className="text-[10px] text-muted">{ago}</span>
+      </div>
+      <div className="mt-0.5 flex items-center justify-between gap-2">
+        <span className="truncate text-[11px] text-ink-2">{importer}</span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={status}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.25 }}
+            className="flex items-center gap-1"
+          >
+            {flags > 0 && <span className="mono min-w-4 rounded-full bg-unsure-soft px-1 text-center text-[10px] text-unsure">{flags}</span>}
+            <StatusChip status={status} small />
+          </motion.span>
+        </AnimatePresence>
       </div>
     </div>
   );
 }
 
-function StatusPill({ clear }: { clear: boolean }) {
-  return clear ? (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-clear/40 px-2.5 py-1 text-xs text-clear">
-      <Check className="size-3" /> Cleared · ready to export
-    </span>
-  ) : (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-unsure/40 px-2.5 py-1 text-xs text-unsure">
-      <span className="size-1.5 rounded-full bg-unsure" /> Needs review · 1 flag
-    </span>
-  );
-}
+function Detail({ step, status }: { step: number; status: Status }) {
+  const docsDone = Math.max(0, Math.min(3, step - DOCS + 1));
+  const shown = Math.max(0, Math.min(live.fields.length, step - FIELDS + 1));
+  const confirmed = step >= CONFIRMED;
+  const exported = step >= EXPORTED;
+  const open = step >= FLAG && !confirmed ? 1 : 0;
 
-/** The source document, drawn in HTML: an off-white invoice page with the flagged cell boxed. */
-function DocumentPreview({ highlight, confirmed }: { highlight: boolean; confirmed: boolean }) {
-  const l = review.line;
   return (
-    <div className="min-w-0 bg-surface-2 p-4 sm:p-6">
-      <div className="mx-auto max-w-md rounded-sm bg-[#f4f3ef] p-5 text-[#2a2b2e] shadow-lg sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[13px] font-semibold leading-tight">{review.supplier}</p>
-            <p className="mt-1 text-[11px] text-[#6b6d72]">Shenzhen, China</p>
-          </div>
-          <p className="hidden text-right text-[11px] font-semibold uppercase tracking-wider sm:block">Commercial invoice</p>
-        </div>
-        <dl className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-[11px]">
-          <dt className="text-[#6b6d72]">Invoice no.</dt>
-          <dd className="font-mono">{review.invoiceNo}</dd>
-          <dt className="text-[#6b6d72]">Buyer</dt>
-          <dd className="truncate">{review.buyer}</dd>
-          <dt className="text-[#6b6d72]">Terms</dt>
-          <dd>CFR Nhava Sheva</dd>
-        </dl>
-        <table className="mt-4 w-full border-t border-[#d8d6cf] text-[11px]">
-          <thead>
-            <tr className="text-left text-[#6b6d72]">
-              <th className="py-1.5 font-normal">Description</th>
-              <th className="py-1.5 font-normal">HSN</th>
-              <th className="hidden py-1.5 text-right font-normal sm:table-cell">Qty</th>
-              <th className="py-1.5 text-right font-normal">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-t border-[#e4e2dc]">
-              <td className="py-2 pr-2">{l.description}</td>
-              <td className="relative py-2 pr-3 font-mono">
-                <span
-                  className={`absolute -inset-x-1 inset-y-1 rounded-sm border-2 transition-all duration-500 ${
-                    highlight ? (confirmed ? "border-[#1d7a46] opacity-100" : "border-[#d98c00] opacity-100") : "opacity-0"
-                  }`}
-                />
-                {l.hsn}
-              </td>
-              <td className="hidden py-2 text-right font-mono sm:table-cell">{l.qty}</td>
-              <td className="py-2 text-right font-mono">{l.amount}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div className="mt-3 flex justify-end gap-6 border-t border-[#d8d6cf] pt-2 text-[11px]">
-          <span className="text-[#6b6d72]">Total USD</span>
-          <span className="font-mono font-semibold">14,940.00</span>
-        </div>
-        <div className="mt-5 space-y-1.5" >
-          <div className="h-1.5 w-3/4 rounded bg-[#e2e0d9]" />
-          <div className="h-1.5 w-1/2 rounded bg-[#e2e0d9]" />
-        </div>
+    <div className="min-w-0 p-3 sm:p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="mono text-[15px] font-medium">{live.ref}</span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span key={status} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }} transition={{ duration: 0.25 }}>
+            <StatusChip status={status} />
+          </motion.span>
+        </AnimatePresence>
+      </div>
+      <p className="mt-0.5 text-[11px] text-muted">
+        {live.supplier.replace(" · ", ", ")} → {live.importer}
+      </p>
+
+      {/* Documents */}
+      <ul className="mt-3 divide-y divide-line rounded-md border border-line">
+        {live.docs.map((d, i) => {
+          const done = i < docsDone;
+          const hasFlag = i === 0 && step >= FLAG && !confirmed;
+          return (
+            <li key={d} className="flex items-center gap-2 px-2.5 py-1.5">
+              {!done ? (
+                step >= ARRIVE ? (
+                  <Loader2 className="size-3.5 shrink-0 text-accent motion-safe:animate-spin" />
+                ) : (
+                  <FileText className="size-3.5 shrink-0 text-muted" />
+                )
+              ) : hasFlag ? (
+                <TriangleAlert className="size-3.5 shrink-0 text-unsure" />
+              ) : (
+                <CheckCircle2 className="size-3.5 shrink-0 text-clear" />
+              )}
+              <span className="font-medium">{d}</span>
+              <span className={`ml-auto truncate text-[11px] ${!done ? "text-accent" : hasFlag ? "text-unsure" : "text-clear"}`}>
+                {!done ? (step >= ARRIVE ? "Reading…" : "Waiting") : hasFlag ? "1 field to check" : "All fields confident"}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Fields of the invoice */}
+      <div className="mt-3 rounded-md border border-line">
+        <p className="border-b border-line px-2.5 py-1.5 text-[10px] font-medium tracking-wide text-muted uppercase">Commercial invoice</p>
+        <ul>
+          {live.fields.map((f, i) => {
+            const isFlag = i === live.flaggedIndex;
+            const visible = i < shown;
+            const flagOpen = isFlag && step >= FLAG && !confirmed;
+            return (
+              <li
+                key={f.label}
+                className={`border-b border-line px-2.5 py-1.5 transition-colors duration-500 last:border-0 ${
+                  flagOpen ? "bg-unsure-soft/70 shadow-[inset_2px_0_0_var(--color-accent)]" : ""
+                }`}
+              >
+                <div className="grid grid-cols-[88px_minmax(0,1fr)_auto] items-center gap-2">
+                  <span className="truncate text-muted">{f.label}</span>
+                  {visible ? (
+                    <motion.span
+                      initial={{ opacity: 0, x: -4 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, ease: EASE }}
+                      className="mono truncate"
+                    >
+                      {f.value}
+                    </motion.span>
+                  ) : (
+                    <span className="skeleton h-3 w-3/4" />
+                  )}
+                  <span className="flex items-center gap-1">
+                    {visible &&
+                      (isFlag && confirmed ? (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0.7 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 26 }}
+                          className="flex items-center gap-0.5 text-[11px] font-medium text-clear"
+                        >
+                          <Check className="size-3" /> Confirmed
+                        </motion.span>
+                      ) : (
+                        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`mono text-[11px] ${isFlag ? "text-unsure" : "text-muted"}`}>
+                          {Math.round(f.confidence * 100)}%
+                        </motion.span>
+                      ))}
+                    {flagOpen && <TriangleAlert className="size-3 text-unsure" />}
+                  </span>
+                </div>
+                <AnimatePresence initial={false}>
+                  {flagOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.35, ease: EASE }}
+                      className="overflow-hidden"
+                    >
+                      <p className="pt-1.5 text-[11px] text-unsure">{live.flagReason}</p>
+                      <div className="flex gap-1.5 pt-1.5 pb-0.5">
+                        <motion.span
+                          animate={step === PRESS ? { scale: 0.92 } : { scale: 1 }}
+                          transition={{ duration: 0.15 }}
+                          className={`inline-flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-medium text-accent-ink transition-shadow ${
+                            step === PRESS ? "bg-accent-hover shadow-[0_0_0_3px_rgb(31_79_209/0.25)]" : "bg-accent"
+                          }`}
+                        >
+                          <Check className="size-3" /> Confirm
+                        </motion.span>
+                        <span className="inline-flex h-6 items-center gap-1 rounded-md border border-line-strong px-2 text-[11px] font-medium">
+                          <Pencil className="size-3" /> Edit
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* Export */}
+      <div className="mt-3 flex items-center gap-2">
+        <span
+          className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-medium transition-colors duration-500 ${
+            confirmed && !exported ? "bg-accent text-accent-ink" : exported ? "bg-info-soft text-ink-2" : "bg-info-soft text-ink-2"
+          }`}
+        >
+          <Download className="size-3.5" />
+          {exported ? "Exported" : "Export CSV"}
+        </span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={exported ? "x" : confirmed ? "c" : `o${open}`}
+            initial={{ opacity: 0, x: -4 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="truncate text-[11px] text-muted"
+          >
+            {exported ? (
+              <>
+                Version 1 · {live.confirmedBy} · <span className="mono">{live.ref}-v1.csv</span>
+              </>
+            ) : confirmed ? (
+              <>Confirmed by {live.confirmedBy}. Ready to export.</>
+            ) : step >= FLAG ? (
+              "Clear the 1 open item first."
+            ) : (
+              "Waiting for the documents."
+            )}
+          </motion.span>
+        </AnimatePresence>
       </div>
     </div>
   );

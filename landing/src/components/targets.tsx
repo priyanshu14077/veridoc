@@ -1,22 +1,38 @@
 import { targets } from "@/content";
-import { Section, SectionHeader } from "./ui";
+import { CountUp } from "./motion";
+import { PortScene } from "./port-scene";
+import { Eyebrow, Section, TwoTone, stagger } from "./ui";
 
+/** The client's targets, in the place other pages put a customer story. Labelled as targets. */
 export function Targets() {
   return (
     <Section labelledBy="targets-title">
-      <SectionHeader id="targets-title" eyebrow="Targets" title={targets.title} intro={targets.note} />
-      <ul className="mt-12 grid gap-4 md:grid-cols-3">
-        {targets.items.map((t) => (
-          <li key={t.label}>
-            <div className="h-full rounded-xl border border-dashed border-line-strong p-6">
-              <p className="mono text-xs uppercase tracking-wider text-muted">Target</p>
-              <p className="mono mt-3 text-4xl font-medium tracking-tight">{t.value}</p>
-              <p className="mt-2 text-sm font-medium text-ink-2">{t.label}</p>
-              <p className="mt-1 text-sm text-muted">{t.from}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="reveal grid grid-cols-1 overflow-hidden rounded-2xl border border-line bg-surface p-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <PortScene variant="water" seed={45} className="min-h-64 rounded-xl lg:min-h-full">
+          <div className="flex h-full items-end p-5">
+            <span className="rounded-full bg-surface/90 px-3 py-1 text-xs font-medium text-ink backdrop-blur">
+              Target, not a result
+            </span>
+          </div>
+        </PortScene>
+        <div className="p-6 sm:p-10">
+          <Eyebrow>{targets.eyebrow}</Eyebrow>
+          <TwoTone id="targets-title" title={targets.title} className="mt-4 text-3xl sm:text-4xl" />
+          <p className="mt-5 max-w-xl leading-relaxed text-ink-2">{targets.statement}</p>
+          <ul className="mt-10 grid grid-cols-1 gap-6 border-t border-line pt-8 sm:grid-cols-3">
+            {targets.items.map((t, i) => (
+              <li key={t.label} className="reveal" style={stagger(i)}>
+                <p className="display text-4xl text-ink">
+                  <CountUp value={t.value} from={t.countFrom} />
+                </p>
+                <p className="mt-2 text-sm font-medium text-ink">{t.label}</p>
+                <p className="mt-0.5 text-sm text-muted">{t.from}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 text-xs text-muted">{targets.note}</p>
+        </div>
+      </div>
     </Section>
   );
 }

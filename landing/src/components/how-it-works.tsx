@@ -1,29 +1,35 @@
 "use client";
 
-import { Check, Download, FileUp, Lock } from "lucide-react";
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { Check, CheckCircle2, Download, FileText, Lock, XCircle } from "lucide-react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { steps } from "@/content";
-import { Section, SectionHeader } from "./ui";
+import { how } from "@/content";
+import { PortScene, type SceneVariant } from "./port-scene";
+import { Section, SectionHeader, stagger } from "./ui";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+const scenes: [SceneVariant, number][] = [["stacks", 11], ["crane", 23], ["wide", 37], ["water", 51]];
 
 export function HowItWorks() {
   const snippets = [<UploadSnippet key="u" />, <ExtractSnippet key="e" />, <CheckSnippet key="c" />, <ExportSnippet key="x" />];
   return (
     <Section id="how-it-works" labelledBy="how-title">
-      <SectionHeader
-        id="how-title"
-        eyebrow="How it works"
-        title="From three PDFs to a filed-ready CSV, with a person in the loop"
-      />
-      <ol className="relative mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {steps.map((s, i) => (
-          <li key={s.n} className="relative flex min-w-0 flex-col rounded-xl border border-line bg-surface">
-            <div aria-hidden className="h-44 border-b border-line bg-surface-2/60 p-4">
-              {snippets[i]}
-            </div>
-            <div className="p-5">
-              <p className="mono text-xs text-accent">{s.n}</p>
-              <h3 className="mt-1 text-lg font-semibold">{s.title}</h3>
+      <SectionHeader id="how-title" eyebrow={how.eyebrow} title={how.title} />
+      <ol className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {how.steps.map((s, i) => (
+          <li key={s.title} style={stagger(i)} className="reveal flex min-w-0 flex-col">
+            <PortScene variant={scenes[i][0]} seed={scenes[i][1]} className="h-60 rounded-xl">
+              <div aria-hidden className="flex h-full items-center justify-center p-4">
+                <div className="w-full max-w-[250px] rounded-lg border border-line bg-surface p-3 text-[12px] shadow-[0_18px_40px_-16px_rgb(5_8_30/0.7)]">
+                  {snippets[i]}
+                </div>
+              </div>
+            </PortScene>
+            <div className="pt-5">
+              <h3 className="flex items-baseline gap-2 font-semibold text-ink">
+                <span className="mono text-xs font-normal text-muted">{i + 1}</span>
+                {s.title}
+              </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
             </div>
           </li>
@@ -33,47 +39,66 @@ export function HowItWorks() {
   );
 }
 
-/** Steps through 0..max once the snippet is on screen; jumps to max with reduced motion. */
-function useStage(max: number, every = 600) {
+/** Steps 0..max while the snippet is on screen, then holds and replays. Max with reduced motion. */
+function useLoop(max: number, every = 600, hold = 2600) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
+  const inView = useInView(ref, { amount: 0.6 });
   const reduce = useReducedMotion();
-  const [stage, setStage] = useState(0);
+  const [stage, setStage] = useState(max);
+  useEffect(() => {
+    if (reduce) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- start from the top once JS runs
+    setStage(0);
+  }, [reduce]);
   useEffect(() => {
     if (!inView || reduce) return;
-    const timers = Array.from({ length: max }, (_, i) => setTimeout(() => setStage(i + 1), 300 + i * every));
-    return () => timers.forEach(clearTimeout);
-  }, [inView, reduce, max, every]);
+    const t = setTimeout(() => setStage((s) => (s >= max ? 0 : s + 1)), stage >= max ? hold : stage === 0 ? 400 : every);
+    return () => clearTimeout(t);
+  }, [inView, reduce, stage, max, every, hold]);
   return [ref, reduce ? max : stage] as const;
 }
 
-const fade = { initial: { opacity: 0, y: 4 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.3 } };
+const fade = {
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.45, ease: EASE },
+};
 
 function UploadSnippet() {
   const files = [
-    ["invoice.pdf", "1.2 MB"],
-    ["packing_list.pdf", "0.8 MB"],
-    ["bill_of_lading.pdf", "0.6 MB"],
+    ["invoice.pdf", "84 KB"],
+    ["packing_list.pdf", "61 KB"],
+    ["bill_of_lading.pdf", "73 KB"],
   ];
-  const [ref, stage] = useStage(files.length);
+  const [ref, stage] = useLoop(files.length, 650);
   return (
-    <div ref={ref} className="flex h-full flex-col rounded-lg border border-dashed border-line-strong p-3">
-      <p className="flex items-center gap-1.5 text-xs text-muted">
-        <FileUp className="size-3.5" /> PDF, PNG or JPEG · ≤ 15 MB · ≤ 10 pages
-      </p>
-      <ul className="mt-3 space-y-1.5">
-        {files.map(([name, size], i) =>
-          i < stage ? (
-            <motion.li key={name} {...fade} className="flex items-center justify-between rounded bg-surface px-2 py-1.5">
-              <span className="mono truncate text-xs text-ink-2">{name}</span>
-              <span className="flex items-center gap-1 text-[11px] text-clear">
-                <Check className="size-3" /> {size}
-              </span>
-            </motion.li>
-          ) : (
-            <li key={name} className="h-[28px] rounded bg-surface/40" />
-          ),
-        )}
+    <div ref={ref}>
+      <p className="mb-2 text-[11px] text-muted">PDF, PNG or JPG · up to 15 MB · 10 pages</p>
+      <ul className="space-y-1.5">
+        {files.map(([name, size], i) => (
+          <li key={name} className="relative flex h-7 items-center gap-2 overflow-hidden rounded-md border border-line px-2">
+            {i < stage ? (
+              <motion.span {...fade} className="flex w-full items-center gap-2">
+                <CheckCircle2 className="size-3.5 shrink-0 text-clear" />
+                <span className="mono truncate text-ink-2">{name}</span>
+                <span className="ml-auto text-[10px] text-muted">{size}</span>
+              </motion.span>
+            ) : i === stage ? (
+              <>
+                <FileText className="size-3.5 shrink-0 text-accent" />
+                <span className="mono truncate text-ink-2">{name}</span>
+                <motion.span
+                  className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                />
+              </>
+            ) : (
+              <span className="skeleton h-2.5 w-24" />
+            )}
+          </li>
+        ))}
       </ul>
     </div>
   );
@@ -81,26 +106,24 @@ function UploadSnippet() {
 
 function ExtractSnippet() {
   const rows: [string, string, number][] = [
-    ["Invoice no.", "ZS-2026-1219", 99],
-    ["Total packages", "150", 97],
-    ["Gross weight", "3,060.00 kg", 93],
-    ["HSN code", "94054290", 71],
+    ["Invoice no.", "ZS-2026-1187", 99],
+    ["Packages", "240 CARTONS", 97],
+    ["Gross weight", "3,120.00 kg", 93],
+    ["Invoice total", "16,320.00", 62],
   ];
-  const [ref, stage] = useStage(rows.length, 450);
+  const [ref, stage] = useLoop(rows.length, 450);
   return (
-    <div ref={ref} className="space-y-2">
+    <div ref={ref} className="divide-y divide-line">
       {rows.map(([label, value, c], i) => (
-        <div key={label} className="flex items-center justify-between gap-2 rounded bg-surface px-2 py-1.5">
+        <div key={label} className={`flex h-7 items-center justify-between gap-2 px-1 ${i < stage && c < 85 ? "bg-unsure-soft/70" : ""}`}>
           <span className="truncate text-[11px] text-muted">{label}</span>
           {i < stage ? (
             <motion.span {...fade} className="flex items-center gap-2">
-              <span className="mono text-xs text-ink-2">{value}</span>
-              <span className={`mono rounded px-1 text-[10px] ${c < 85 ? "bg-unsure/15 text-unsure" : "bg-clear/10 text-clear"}`}>
-                {c}%
-              </span>
+              <span className="mono text-ink">{value}</span>
+              <span className={`mono text-[10px] ${c < 85 ? "text-unsure" : "text-muted"}`}>{c}%</span>
             </motion.span>
           ) : (
-            <span className="h-3 w-20 animate-pulse rounded bg-line motion-reduce:animate-none" />
+            <span className="skeleton h-2.5 w-20" />
           )}
         </div>
       ))}
@@ -111,23 +134,28 @@ function ExtractSnippet() {
 function CheckSnippet() {
   const rows: [string, string, boolean][] = [
     ["X1", "Invoice total = sum of lines", true],
+    ["X3", "Quantities match", true],
     ["X4", "Package count, PL ↔ B/L", false],
-    ["X5", "Gross weight across documents", true],
-    ["X7", "Container numbers, PL ↔ B/L", true],
+    ["X7", "Container numbers", true],
   ];
-  const [ref, stage] = useStage(rows.length, 450);
+  const [ref, stage] = useLoop(rows.length, 450);
   return (
-    <ul ref={ref as React.Ref<HTMLUListElement>} className="space-y-2">
+    <ul ref={ref as React.Ref<HTMLUListElement>} className="space-y-1">
       {rows.map(([id, title, pass], i) => (
-        <li key={id} className="flex items-center gap-2 rounded bg-surface px-2 py-1.5">
-          <span className="mono w-7 text-[11px] text-muted">{id}</span>
+        <li
+          key={id}
+          className={`flex h-7 items-center gap-2 rounded-md px-1.5 transition-colors duration-300 ${
+            i === stage ? "bg-accent-soft" : i < stage && !pass ? "bg-conflict-soft" : ""
+          }`}
+        >
+          <span className="mono w-6 text-[10px] text-muted">{id}</span>
           <span className="flex-1 truncate text-[11px] text-ink-2">{title}</span>
           {i < stage ? (
-            <motion.span {...fade} className={`mono text-[10px] ${pass ? "text-clear" : "text-conflict"}`}>
-              {pass ? "pass" : "fail"}
+            <motion.span initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+              {pass ? <Check className="size-3.5 text-clear" /> : <XCircle className="size-3.5 text-conflict" />}
             </motion.span>
           ) : (
-            <span className="mono text-[10px] text-muted">···</span>
+            <span className="size-3.5 rounded-full border border-dashed border-line-strong" />
           )}
         </li>
       ))}
@@ -136,23 +164,44 @@ function CheckSnippet() {
 }
 
 function ExportSnippet() {
-  const [ref, stage] = useStage(2, 1100);
+  const [ref, stage] = useLoop(3, 1000, 3000);
   const open = stage < 2;
   return (
-    <div ref={ref} className="flex h-full flex-col justify-between rounded-lg bg-surface p-3">
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-muted">Open flags</span>
-        <span className={`mono ${open ? "text-unsure" : "text-clear"}`}>{open ? (stage === 0 ? 2 : 1) : 0}</span>
+    <div ref={ref} className="space-y-2.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] text-muted">Open items</span>
+        <span className={`mono rounded-full px-1.5 text-[11px] transition-colors duration-300 ${open ? "bg-unsure-soft text-unsure" : "bg-clear-soft text-clear"}`}>
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.span key={stage} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="inline-block">
+              {open ? 2 - stage : 0}
+            </motion.span>
+          </AnimatePresence>
+        </span>
       </div>
-      <div
-        className={`flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-colors duration-500 ${
-          open ? "border border-line-strong text-muted" : "bg-clear text-bg"
+      <motion.div
+        animate={open ? { scale: 1 } : { scale: [1, 1.04, 1] }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className={`flex h-8 items-center justify-center gap-1.5 overflow-hidden rounded-md text-[11px] font-medium transition-colors duration-500 ${
+          open ? "bg-info-soft text-ink-2" : "bg-accent text-accent-ink"
         }`}
       >
-        {open ? <Lock className="size-3.5" /> : <Download className="size-3.5" />}
-        {open ? "Export blocked: clear the flags" : "Export CSV"}
-      </div>
-      <p className="mono text-[11px] text-muted">{open ? "409 · blockers listed" : "SHP-24817-v1.csv · sha256 stored"}</p>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={open ? "lock" : "go"}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            className="flex items-center gap-1.5"
+          >
+            {open ? <Lock className="size-3.5" /> : <Download className="size-3.5" />}
+            {open ? "Export blocked" : "Export CSV"}
+          </motion.span>
+        </AnimatePresence>
+      </motion.div>
+      <p className="mono h-4 truncate text-[10px] text-muted">
+        {stage >= 3 ? "SHP-24811-v1.csv · sha256 3fa9c1…" : open ? "Clear the open items first." : "Ready to export."}
+      </p>
     </div>
   );
 }
