@@ -107,7 +107,10 @@ jobs:
           vm() { g "datasources/proxy/uid/vm/api/v1/query" -G --data-urlencode "query=$1"; }
           # Grafana requires its login; nothing about it is public.
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/api/dashboards/uid/veridoc-overview)" = 401
-          for ds in vm vlogs traces; do g "datasources/uid/$ds/health" | grep -q '"OK"'; done
+          for ds in vm vlogs traces; do  # retried: a data source can take a few seconds after start
+            for i in $(seq 1 12); do g "datasources/uid/$ds/health" | grep -q '"OK"' && break; sleep 5; done
+            g "datasources/uid/$ds/health" | grep -q '"OK"' || { echo "data source $ds not healthy"; exit 1; }
+          done
           g dashboards/uid/veridoc-overview | grep -q 'Veridoc overview'
           test "$(g v1/provisioning/alert-rules | jq length)" -ge 8
           for i in $(seq 1 24); do  # metrics are exported every 15–30 s
