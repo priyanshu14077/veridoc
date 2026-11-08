@@ -102,8 +102,9 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "false"
       GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
-      # Pinned: downloaded once into the grafana volume.
-      GF_PLUGINS_PREINSTALL: victoriametrics-logs-datasource@0.33.1
+      # Pinned: downloaded once into the grafana volume. Sync: installed before Grafana starts
+      # serving, so the VictoriaLogs data source works as soon as /api/health answers.
+      GF_PLUGINS_PREINSTALL_SYNC: victoriametrics-logs-datasource@0.33.1
       # Alert rules evaluate and show under Alerting. No SMTP locally, so nothing is emailed.
       ALERT_EMAIL: alerts@veridoc.invalid
     volumes:

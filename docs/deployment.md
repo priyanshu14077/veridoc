@@ -1,16 +1,33 @@
 # Deployment: Veridoc
 
-**Live app:** https://16-179-13-144.sslip.io · **Repository:** https://github.com/priyanshu14077/veridoc
+**Live site:** https://16-179-13-144.sslip.io (landing page) · **Live app:** https://16-179-13-144.sslip.io/login · **Repository:** https://github.com/priyanshu14077/veridoc
 
-Veridoc runs as five app containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS. Monitoring (OpenTelemetry, VictoriaMetrics/Logs/Traces and Grafana) is not deployed: it runs on a developer's machine on top of the same compose file. [observability.md](observability.md) explains why and how. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
+Veridoc runs as five app containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS, which also serves the static landing page. Monitoring (OpenTelemetry, VictoriaMetrics/Logs/Traces and Grafana) is not deployed: it runs on a developer's machine on top of the same compose file. [observability.md](observability.md) explains why and how. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
 
 ```
-Internet ──443──► Caddy ──/api/*──► api (FastAPI) ──► db (Postgres)
-                    └────other────► web (Next.js)          ▲
-                                     worker (same image as api) ──► Gemini API
+Internet ──443──► Caddy ──/api/*──────────────► api (FastAPI) ──► db (Postgres)
+                    ├──/, /_landing/*, /media/*─► landing page (static files inside the Caddy image)
+                    └──everything else─────────► web (Next.js)          ▲
+                                                 worker (same image as api) ──► Gemini API
 ```
 
 Only Caddy publishes ports (80 and 443). The database, API and web app are reachable only from the other containers.
+
+### One address, landing page and app
+
+The landing page (`landing/`) and the app share the address, so the session cookie stays first-party and nothing needs CORS.
+
+| Path | Served by | Cache-Control |
+|---|---|---|
+| `/` (and `/icon.svg`) | landing page | `no-cache`: revalidated on every visit, so a deploy shows at once |
+| `/_landing/*` | landing page's JS, CSS and fonts (content-hashed names) | `public, max-age=31536000, immutable` |
+| `/media/*` | landing page's background photos and video | `public, max-age=604800` (a week, then ETag) |
+| `/api/*` | API | set by the API |
+| everything else: `/login`, `/shipments`, `/_next/*` … | web app | set by Next.js |
+
+Both are Next.js builds and both would put their files under `/_next/`. The landing page is built with `LANDING_ASSET_PREFIX=/_landing`, and Caddy strips the prefix again (`handle_path`). Its links to the demo are same-site (`/login`) because the build sets `NEXT_PUBLIC_APP_URL=""`.
+
+The Caddy image is built by `landing/Dockerfile`: Node builds the static site, then only `out/` is copied onto `caddy:2.10-alpine`. `landing/.dockerignore` keeps `node_modules`, earlier builds and the full-size art in `landing/design-assets/` out of the build context. `deploy/check-landing.sh` checks all of the above; CI runs it on the local stack and against the live site after every deploy.
 
 ## Demo accounts
 
@@ -109,6 +126,7 @@ The first build takes several minutes. On every start, the API applies the SQL m
 ```bash
 curl -s https://<site-address>/api/health                         # {"status":"ok"}
 curl -s -o /dev/null -w "%{http_code}\n" https://<site-address>/api/reports/accuracy   # 401
+deploy/check-landing.sh https://<site-address>   # landing page at /, app at /login, caching
 ```
 
 Then run the demo script from PRD §14 in a browser.
@@ -117,7 +135,9 @@ Then run the demo script from PRD §14 in a browser.
 
 ```bash
 cd ~/veridoc && git pull
-docker compose -f deploy/compose.yml --env-file deploy/.env up -d --build
+# One image at a time (two Next.js builds at once can exhaust 2 GB), then start.
+for s in api web caddy; do docker compose -f deploy/compose.yml --env-file deploy/.env build "$s"; done
+docker compose -f deploy/compose.yml --env-file deploy/.env up -d --wait
 docker compose -f deploy/compose.yml --env-file deploy/.env logs -f api worker
 docker compose -f deploy/compose.yml --env-file deploy/.env exec db \
   pg_dump -U crosscheck crosscheck > backup-$(date +%F).sql

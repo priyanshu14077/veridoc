@@ -4,7 +4,7 @@
 
 **AI document extraction and cross-checks for a customs broker's import shipments.**
 
-**Live demo:** https://16-179-13-144.sslip.io · sign in as `anil.manager@veridoc.demo` / `veridoc-demo` (more accounts in [docs/deployment.md](docs/deployment.md))
+**Live site:** https://16-179-13-144.sslip.io · **Live demo:** https://16-179-13-144.sslip.io/login · sign in as `anil.manager@veridoc.demo` / `veridoc-demo` (more accounts in [docs/deployment.md](docs/deployment.md))
 
 A documentation executive drops in a shipment's **invoice, packing list and bill of lading**. A vision model extracts the fields with a confidence score on each. Deterministic rules check the three documents against each other (totals, packages, weights, containers). **Nothing exports until a person has cleared every uncertain or conflicting value.** The export is a file the existing customs filing software can import, so that software doesn't change.
 
@@ -373,7 +373,7 @@ An **acceptance** of a mismatch only counts while `accepted_hash == inputs_hash`
 │     ├─ components/       app shell, documents, checks and export panels, pdf.js viewer, UI primitives
 │     ├─ lib/              API client, types, formatting
 │     └─ proxy.ts          route guard (Next 16's replacement for middleware)
-├─ landing/                Landing page: one static Next.js 16 page in the app's look (Tailwind v4, motion, canvas); copy in src/content.ts
+├─ landing/                Landing page at / : one static Next.js 16 page (Tailwind v4, motion, GSAP); copy in src/content.ts
 ├─ sample-docs/            synthetic invoices, packing lists, B/Ls + ground truth + recorded extractions
 ├─ docs/                   PRD.md, TDD.md
 ├─ docker-compose.yml      Postgres 16 (dev + test databases)
@@ -408,7 +408,7 @@ npm install
 npm run dev                         # → http://localhost:3000
 ```
 
-Landing page (static, no backend): `cd landing && npm install && npm run dev` → http://localhost:3002. `npm run build` writes plain HTML/CSS/JS to `landing/out/` for any static host. Full-size background art stays in `landing/design-assets/` (git-ignored); the page uses the compressed copies in `landing/public/media/`.
+Landing page (static, no backend): `cd landing && npm install && npm run dev` → http://localhost:3002. `npm run build` writes plain HTML/CSS/JS to `landing/out/`. In production it is baked into the Caddy image (`landing/Dockerfile`) and served at `/` of the app's own address; see [docs/deployment.md](docs/deployment.md). Full-size background art stays in `landing/design-assets/` (git-ignored); the page uses the compressed copies in `landing/public/media/`.
 
 API docs: http://localhost:8000/api/docs · Health check: http://localhost:8000/api/health
 
