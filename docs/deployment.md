@@ -2,7 +2,7 @@
 
 **Live site:** https://16-179-13-144.sslip.io (landing page) · **Live app:** https://16-179-13-144.sslip.io/login · **Repository:** https://github.com/priyanshu14077/veridoc
 
-Veridoc runs as five app containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS, which also serves the static landing page. Monitoring (OpenTelemetry, VictoriaMetrics/Logs/Traces and Grafana) is not deployed: it runs on a developer's machine on top of the same compose file. [observability.md](observability.md) explains why and how. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
+Veridoc runs as five app containers on one Linux server: Postgres, the API, the extraction worker, the Next.js web app, and Caddy for HTTPS, which also serves the static landing page. Monitoring (OpenTelemetry, VictoriaMetrics/Logs/Traces and Grafana) is not deployed: it runs on a developer's machine on top of the same compose file. [observability.md](https://github.com/priyanshu14077/veridoc/blob/master/docs/observability.md) explains why and how. The live demo runs on one AWS EC2 server in Sydney (ap-southeast-2), because the AWS account used for it can't open other regions. It holds only fictional data. A real deployment uses the same steps in Mumbai (ap-south-1), so the database and the uploaded files stay in India (TDD assumption A32).
 
 ```
 Internet ──443──► Caddy ──/api/*──────────────► api (FastAPI) ──► db (Postgres)
@@ -129,7 +129,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://<site-address>/api/reports/accu
 deploy/check-landing.sh https://<site-address>   # landing page at /, app at /login, caching
 ```
 
-Then run the demo script from PRD §14 in a browser.
+Then run the demo script (acceptance checklist, PRD §14: https://github.com/priyanshu14077/veridoc/blob/master/docs/PRD.md) in a browser.
 
 ### 3.5 Update, logs, backup
 
@@ -187,3 +187,4 @@ Names only. Real values live in `api/.env` (development) or `deploy/.env` (serve
 - One server, no replica. A backup is a manual `pg_dump` (above).
 - Files are on the server's disk (a Docker volume), not S3. The storage interface takes an S3 driver without other changes.
 - The Gemini free tier allows about 20 extractions per model per day. The seeded shipments don't use it. Production would move to Vertex AI in an Indian region (TDD §5.7).
+- When Google's free tier is overloaded (HTTP 503/504), the worker falls back to other Flash models. Extraction still finishes, but one document can then take a few minutes instead of 10–20 seconds.

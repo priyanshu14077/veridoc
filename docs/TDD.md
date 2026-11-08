@@ -1,9 +1,9 @@
 # Technical Design Document: Veridoc
 
-**GitHub:** https://github.com/priyanshu14077/veridoc · **Live app:** https://16-179-13-144.sslip.io (demo logins in [deployment.md](./deployment.md))
-Version 0.1 · 2026-11-02 · Author: Priyanshu Kumar · Companion to [PRD.md](./PRD.md)
+**GitHub:** https://github.com/priyanshu14077/veridoc · **Live app:** https://16-179-13-144.sslip.io/login (landing page at https://16-179-13-144.sslip.io) · Demo login: `anil.manager@veridoc.demo` / `veridoc-demo` (all accounts in deployment.md)
+Version 1.0 · 2026-11-08 · Author: Priyanshu Kumar · Companion to the PRD ([docs/PRD.md](https://github.com/priyanshu14077/veridoc/blob/master/docs/PRD.md))
 
-> Assumptions carry the PRD's tags **[A#]**. New ones introduced here start at **[A14]**. Sections marked *(fill after build)* will be finished with measured numbers before submission.
+> Assumptions carry the PRD's tags **[A#]**. New ones introduced here start at **[A14]**.
 
 ---
 
@@ -177,8 +177,8 @@ Validators: date range [A7], 8-digit HSN, ISO 6346 container check digit, ISO 42
 
 ### 5.7 Provider, privacy and cost
 - **Demo:** free-tier Gemini API key, **synthetic data only** [A11]. The free tier's terms allow Google to use submitted content to improve its products, so the free tier must never see real client documents.
-- **Production design:** the same SDK pointed at **Vertex AI** (`GOOGLE_GENAI_USE_VERTEXAI=true`) in an Indian region. Vertex AI's terms say customer data is not used for training. *Check available models in `asia-south1` before final submission.*
-- **Measured tokens:** about 1,060–1,140 input tokens per one-page document, output 350–1,990; latency 4–24 s (median about 13 s) across 35 calls. Cost at the client's volume = 3,300 documents/month × these tokens × the paid price for the chosen model *(fill in from the current price list)*.
+- **Production design:** the same SDK pointed at **Vertex AI** (`GOOGLE_GENAI_USE_VERTEXAI=true`) in an Indian region. Vertex AI's terms say customer data is not used for training. Google's Vertex AI data-residency page lists Gemini 2.5 Flash (and 2.5 Flash-Lite and 2.5 Pro) in Mumbai (`asia-south1`); the newer 3.x Flash models the demo uses were not listed there when checked (2026-11-08). So production starts on Gemini 2.5 Flash in Mumbai, and the eval (§5.6) is rerun on it before go-live **[A33]**.
+- **Measured tokens:** about 1,060–1,140 input tokens per one-page document, output 350–1,990; latency 4–24 s (median about 13 s) across 35 calls. Cost at the client's volume = 3,300 documents/month × these tokens × the paid price. At the published Gemini 3.5 Flash rate (USD 1.50 per million input tokens, USD 9.00 per million output) that is about 3.6 M input tokens (≈ USD 5) and 1.2–6.6 M output tokens (≈ USD 11–59) a month: **about USD 16–65, roughly ₹1,400–5,700 a month** at ₹88/USD **[A34]**. Gemini 2.5 Flash on Vertex is cheaper per token. Either way the AI cost (at most about ₹0.7 lakh a year) is under 1% of the ₹70 lakh a year the brief puts on manual entry and amendments, so model choice is decided by accuracy, not price.
 - **Free tier is capped at 20 requests per model per day** (Google's `GenerateRequestsPerDayPerProjectPerModel-FreeTier`; the `gemini-3.5-flash` alias counts against `gemini-3.6-flash`). That's about 6 shipments a day per model. The worker falls back across models (each has its own quota) and then waits for the reset (§5.5). The worker also paces calls with `GEMINI_RPM`. Seed shipments replay recorded real extractions, so the demo doesn't spend quota. Production needs a paid tier, which also removes the training-on-data concern.
 
 ## 6. API surface
@@ -256,7 +256,23 @@ The layout is one module (`api/app/export/layout.py`), so the real filing-softwa
 - **Overrides (manager):** one list of accepted mismatches, corrected values and reopens, with who, when and why, filterable by kind and period. An acceptance whose values have since changed is marked "no longer applies".
 - **States:** skeleton loaders that match the final layout. Empty states with one next action ("No shipments yet. Create one"). Errors that say what happened and offer Retry.
 
-*(Add screenshots after build.)*
+**Screenshots** (live app, manager account; the seed data is fictional)
+
+![Shipment list: status chips with icon and label, open-flag counts, filters in one row](screenshots/1-shipments.jpg)
+*Shipment list. SHP-24811 is the brief's row: it needs review because of one open flag.*
+
+![Shipment SHP-24811: the X5 gross-weight conflict, export disabled with the reason](screenshots/2-shipment-checks.jpg)
+*SHP-24811. X5 shows each document's gross weight side by side (3,165 / 3,165 / 3,120 kg) and the tolerance. Export stays disabled, with the reason in words, until the conflict is corrected or accepted with a reason. The importer's contact is masked (DPDP).*
+
+![Review screen: the invoice beside its fields, the flagged gross weight first, highlighted on the page](screenshots/3-review.jpg)
+*Review screen: the document beside the fields. The flagged field sits in "Needs you" at the top and its box is highlighted on the page. Note the bilingual seller name and the stamp: the model read both.*
+
+![Accuracy report by field, with the 95% target marked](screenshots/4-accuracy.jpg)
+*Accuracy (manager). One packing-list field was corrected without having been flagged, so it is shown both as below target and as "missed by the flags".*
+
+<img src="screenshots/5-phone-review.jpg" alt="Review screen at phone width: Fields and Document tabs" width="300">
+
+*At phone width the review screen switches to Fields / Document tabs.*
 
 ## 10. Testing
 
@@ -342,3 +358,5 @@ veridoc/
 | A30 | Documents that went to manual entry have no AI values and are left out of accuracy (shown as a count) |
 | A31 | Accuracy counts shipments whose current status is Exported. A reopened shipment drops out until it's exported again, so the numbers always describe values that were filed |
 | A32 | The live demo is hosted in Sydney (ap-southeast-2), not India: the AWS account available for this exercise is limited to that region. It holds only fictional data, so no personal data leaves India. A real deployment runs the same stack in Mumbai (ap-south-1) |
+| A33 | Production uses Gemini 2.5 Flash on Vertex AI in Mumbai (`asia-south1`), the newest Flash model Google lists for that region, until a newer one is listed there. Its accuracy is assumed close enough to the demo model's to be confirmed by rerunning the eval, not redesigned for |
+| A34 | Paid cost uses Google's published Gemini 3.5 Flash token prices (USD 1.50 / 9.00 per million input / output tokens, 2026-11-08), the measured tokens per document from §5.6, the brief's 1,100 shipments × 3 documents a month, and ₹88 per USD |
