@@ -471,7 +471,10 @@ CI runs all of this on every push.
 - **AI and client data:** the demo runs Gemini's free tier on **synthetic documents only**. Production targets Vertex AI in an Indian region, whose terms exclude training on customer data. See [TDD §5.7](docs/TDD.md#57-provider-privacy-and-cost).
 
 ---
+ live at the documentation 
 
+
+ 
 ## Documentation
 
 - [docs/PRD.md](docs/PRD.md): users, scope, flows, cross-check rules, assumptions A1–A13
